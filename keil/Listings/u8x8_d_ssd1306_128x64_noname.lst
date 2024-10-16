@@ -1,0 +1,592 @@
+C51 COMPILER V9.60.7.0   U8X8_D_SSD1306_128X64_NONAME                                      10/16/2024 16:37:11 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE U8X8_D_SSD1306_128X64_NONAME
+OBJECT MODULE PLACED IN .\Objects\u8x8_d_ssd1306_128x64_noname.obj
+COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE ..\u8g2\u8x8_d_ssd1306_128x64_noname.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR
+                    -(..\Libary\Device\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\u8x8_d_ssd130
+                    -6_128x64_noname.lst) TABS(2) OBJECT(.\Objects\u8x8_d_ssd1306_128x64_noname.obj)
+
+line level    source
+
+   1          /*
+   2          
+   3            u8x8_d_ssd1306_128x64_noname.c
+   4          
+   5            Universal 8bit Graphics Library (https://github.com/olikraus/u8g2/)
+   6          
+   7            Copyright (c) 2016, olikraus@gmail.com
+   8            All rights reserved.
+   9          
+  10            Redistribution and use in source and binary forms, with or without modification, 
+  11            are permitted provided that the following conditions are met:
+  12          
+  13            * Redistributions of source code must retain the above copyright notice, this list 
+  14              of conditions and the following disclaimer.
+  15              
+  16            * Redistributions in binary form must reproduce the above copyright notice, this 
+  17              list of conditions and the following disclaimer in the documentation and/or other 
+  18              materials provided with the distribution.
+  19          
+  20            THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+  21            CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+  22            INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  23            MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+  24            DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+  25            CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+  26            SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+  27            NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+  28            LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+  29            CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+  30            STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+  31            ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+  32            ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+  33            
+  34          */
+  35          
+  36          
+  37          #include "u8x8.h"
+  38          
+  39          
+  40          
+  41          /* more or less generic setup of all these small OLEDs */
+  42          static const uint8_t u8x8_d_ssd1306_128x64_noname_init_seq[] = {
+  43              
+  44            U8X8_START_TRANSFER(),              /* enable chip, delay is part of the transfer start */
+  45            
+  46            
+  47            U8X8_C(0x0ae),                    /* display off */
+  48            U8X8_CA(0x0d5, 0x080),    /* clock divide ratio (0x00=1) and oscillator frequency (0x8) */
+  49            U8X8_CA(0x0a8, 0x03f),    /* multiplex ratio */
+  50            U8X8_CA(0x0d3, 0x000),    /* display offset */
+  51            U8X8_C(0x040),                    /* set display start line to 0 */
+  52            U8X8_CA(0x08d, 0x014),    /* [2] charge pump setting (p62): 0x014 enable, 0x010 disable, SSD1306 only, sho
+             -uld be removed for SH1106 */
+C51 COMPILER V9.60.7.0   U8X8_D_SSD1306_128X64_NONAME                                      10/16/2024 16:37:11 PAGE 2   
+
+  53            U8X8_CA(0x020, 0x000),    /* horizontal addressing mode */
+  54            
+  55            U8X8_C(0x0a1),        /* segment remap a0/a1*/
+  56            U8X8_C(0x0c8),        /* c0: scan dir normal, c8: reverse */
+  57            // Flipmode
+  58            // U8X8_C(0x0a0),       /* segment remap a0/a1*/
+  59            // U8X8_C(0x0c0),       /* c0: scan dir normal, c8: reverse */
+  60            
+  61            U8X8_CA(0x0da, 0x012),    /* com pin HW config, sequential com pin config (bit 4), disable left/right rema
+             -p (bit 5) */
+  62          
+  63            U8X8_CA(0x081, 0x0cf),    /* [2] set contrast control */
+  64            U8X8_CA(0x0d9, 0x0f1),    /* [2] pre-charge period 0x022/f1*/
+  65            U8X8_CA(0x0db, 0x040),    /* vcomh deselect level */  
+  66            // if vcomh is 0, then this will give the biggest range for contrast control issue #98
+  67            // restored the old values for the noname constructor, because vcomh=0 will not work for all OLEDs, #116
+  68            
+  69            U8X8_C(0x02e),        /* Deactivate scroll */ 
+  70            U8X8_C(0x0a4),        /* output ram to display */
+  71            U8X8_C(0x0a6),        /* none inverted normal display mode */
+  72              
+  73            U8X8_END_TRANSFER(),              /* disable chip */
+  74            U8X8_END()                  /* end of sequence */
+  75          };
+  76          
+  77          /* this setup maximizes the brightness range, that can be set with setContrast() */
+  78          /* Drawback: VCOMH deselect level is set to 0, which das not work so good with all OLEDs, issue #116 */
+  79          static const uint8_t u8x8_d_ssd1306_128x64_vcomh0_init_seq[] = {
+  80              
+  81            U8X8_START_TRANSFER(),              /* enable chip, delay is part of the transfer start */
+  82            
+  83            
+  84            U8X8_C(0x0ae),                    /* display off */
+  85            U8X8_CA(0x0d5, 0x080),    /* clock divide ratio (0x00=1) and oscillator frequency (0x8) */
+  86            U8X8_CA(0x0a8, 0x03f),    /* multiplex ratio */
+  87            U8X8_CA(0x0d3, 0x000),    /* display offset */
+  88            U8X8_C(0x040),                    /* set display start line to 0 */
+  89            U8X8_CA(0x08d, 0x014),    /* [2] charge pump setting (p62): 0x014 enable, 0x010 disable */
+  90            U8X8_CA(0x020, 0x000),    /* horizontal addressing mode */
+  91            
+  92            U8X8_C(0x0a1),        /* segment remap a0/a1*/
+  93            U8X8_C(0x0c8),        /* c0: scan dir normal, c8: reverse */
+  94            // Flipmode
+  95            // U8X8_C(0x0a0),       /* segment remap a0/a1*/
+  96            // U8X8_C(0x0c0),       /* c0: scan dir normal, c8: reverse */
+  97            
+  98            U8X8_CA(0x0da, 0x012),    /* com pin HW config, sequential com pin config (bit 4), disable left/right rema
+             -p (bit 5) */
+  99            U8X8_CA(0x081, 0x0ef),    /* [2] set contrast control,  */
+ 100            U8X8_CA(0x0d9, 0x0a1),    /* [2] pre-charge period 0x022/f1*/
+ 101            U8X8_CA(0x0db, 0x000),    /* vcomh deselect level 0x000 .. 0x070, low nibble always 0 */
+ 102            // if vcomh is 0, then this will give the biggest range for contrast control issue #98
+ 103            
+ 104            U8X8_C(0x02e),        /* Deactivate scroll */ 
+ 105            U8X8_C(0x0a4),        /* output ram to display */
+ 106            U8X8_C(0x0a6),        /* none inverted normal display mode */
+ 107              
+ 108            U8X8_END_TRANSFER(),              /* disable chip */
+ 109            U8X8_END()                  /* end of sequence */
+ 110          };
+ 111          
+ 112          
+C51 COMPILER V9.60.7.0   U8X8_D_SSD1306_128X64_NONAME                                      10/16/2024 16:37:11 PAGE 3   
+
+ 113          /* same as u8x8_d_ssd1306_128x64_noname_init_seq, but 0x0da bit 4 is set to 0 */
+ 114          /* this will disable the alternative COM configuration */
+ 115          static const uint8_t u8x8_d_ssd1306_128x64_alt0_init_seq[] = {
+ 116              
+ 117            U8X8_START_TRANSFER(),              /* enable chip, delay is part of the transfer start */
+ 118            
+ 119            
+ 120            U8X8_C(0x0ae),                    /* display off */
+ 121            U8X8_CA(0x0d5, 0x080),    /* clock divide ratio (0x00=1) and oscillator frequency (0x8) */
+ 122            U8X8_CA(0x0a8, 0x03f),    /* multiplex ratio */
+ 123            U8X8_CA(0x0d3, 0x000),    /* display offset */
+ 124            U8X8_C(0x040),                    /* set display start line to 0 */
+ 125            U8X8_CA(0x08d, 0x014),    /* [2] charge pump setting (p62): 0x014 enable, 0x010 disable, SSD1306 only, sho
+             -uld be removed for SH1106 */
+ 126            U8X8_CA(0x020, 0x000),    /* horizontal addressing mode */
+ 127            
+ 128            U8X8_C(0x0a1),        /* segment remap a0/a1*/
+ 129            U8X8_C(0x0c8),        /* c0: scan dir normal, c8: reverse */
+ 130            // Flipmode
+ 131            // U8X8_C(0x0a0),       /* segment remap a0/a1*/
+ 132            // U8X8_C(0x0c0),       /* c0: scan dir normal, c8: reverse */
+ 133            
+ 134            U8X8_CA(0x0da, 0x002),    /* com pin HW config, sequential com pin config (bit 4), disable left/right rema
+             -p (bit 5) */
+ 135          
+ 136            U8X8_CA(0x081, 0x0cf),    /* [2] set contrast control */
+ 137            U8X8_CA(0x0d9, 0x0f1),    /* [2] pre-charge period 0x022/f1*/
+ 138            U8X8_CA(0x0db, 0x040),    /* vcomh deselect level */  
+ 139            // if vcomh is 0, then this will give the biggest range for contrast control issue #98
+ 140            // restored the old values for the noname constructor, because vcomh=0 will not work for all OLEDs, #116
+ 141            
+ 142            U8X8_C(0x02e),        /* Deactivate scroll */ 
+ 143            U8X8_C(0x0a4),        /* output ram to display */
+ 144            U8X8_C(0x0a6),        /* none inverted normal display mode */
+ 145              
+ 146            U8X8_END_TRANSFER(),              /* disable chip */
+ 147            U8X8_END()                  /* end of sequence */
+ 148          };
+ 149          
+ 150          
+ 151          
+ 152          /* issue 316: a special sh1106 setup, https://www.mikrocontroller.net/topic/431371?goto=5087807#5087807 */
+ 153          static const uint8_t u8x8_d_sh1106_128x64_winstar_init_seq[] = {
+ 154              
+ 155            U8X8_START_TRANSFER(),              /* enable chip, delay is part of the transfer start */
+ 156            
+ 157            U8X8_C(0xae),                 // Display OFF/ON: off (POR = 0xae)
+ 158            U8X8_C(0xa4),                 // Set Entire Display OFF/ON: off (POR = 0xa4)
+ 159            U8X8_CA(0xd5, 0x50),       // Divide Ratio/Oscillator FrequencyData Set: divide ratio = 1 (POR = 1), Osc
+             -illator Frequency = +/- 0% (POR = +/- 0%)
+ 160            U8X8_CA(0xa8, 0x3f),       // Multiplex Ratio Data Set: 64 (POR = 0x3f, 64)
+ 161            U8X8_CA(0xd3, 0x00),       // Display OffsetData Set: 0 (POR = 0x00)
+ 162            U8X8_C(0x40),                 // Set Display Start Line: 0  
+ 163            U8X8_CA(0xad, 0x8b),       // DC-DC ON/OFF Mode Set: Built-in DC-DC is used, Normal Display (POR = 0x8b)
+ 164            U8X8_CA(0xd9, 0x22),       // Dis-charge/Pre-charge PeriodData Set: pre-charge 2 DCLKs, dis-charge 2 DCL
+             -Ks (POR = 0x22, pre-charge 2 DCLKs, dis-charge 2 DCLKs)
+ 165            U8X8_CA(0xdb, 0x35),       // VCOM Deselect LevelData Set: 0,770V (POR = 0x35, 0,770 V)
+ 166            U8X8_C(0x32), // Set Pump voltage value: 8,0 V (POR = 0x32, 8,0 V)
+ 167            U8X8_CA(0x81, 0xff),       // Contrast Data Register Set: 255 (large) (POR = 0x80)
+ 168            U8X8_C(0x0a6),      // Set Normal/Reverse Display: normal (POR = 0xa6)
+ 169            U8X8_CA(0x0da, 0x012),    // com pin HW config, sequential com pin config (bit 4), disable left/right rema
+             -p (bit 5) 
+C51 COMPILER V9.60.7.0   U8X8_D_SSD1306_128X64_NONAME                                      10/16/2024 16:37:11 PAGE 4   
+
+ 170                
+ 171            U8X8_END_TRANSFER(),              /* disable chip */
+ 172            U8X8_END()                  /* end of sequence */
+ 173          };
+ 174          
+ 175          static const uint8_t u8x8_d_ssd1312_128x64_noname_init_seq[] = {
+ 176              
+ 177            U8X8_START_TRANSFER(),              /* enable chip, delay is part of the transfer start */
+ 178            
+ 179            
+ 180            U8X8_C(0x0ae),                    /* display off */
+ 181            U8X8_CA(0x0d5, 0x080),    /* clock divide ratio (0x00=1) and oscillator frequency (0x8) */
+ 182            U8X8_CA(0x0a8, 0x03f),    /* multiplex ratio */
+ 183            U8X8_CA(0x0d3, 0x000),    /* display offset */
+ 184            U8X8_C(0x040),                    /* set display start line to 0 */
+ 185            U8X8_CA(0x08d, 0x014),    /* [2] charge pump setting (p62): 0x014 enable, 0x010 disable, SSD1306 only, sho
+             -uld be removed for SH1106 */
+ 186            U8X8_CA(0x020, 0x000),    /* horizontal addressing mode */
+ 187            
+ 188            U8X8_C(0x0a1),        /* segment remap a0/a1*/
+ 189            U8X8_C(0x0c0),        /* c0: scan dir normal, c8: reverse */
+ 190            
+ 191            U8X8_CA(0x0da, 0x012),    /* com pin HW config, sequential com pin config (bit 4), disable left/right rema
+             -p (bit 5) */
+ 192          
+ 193            U8X8_CA(0x081, 0x0cf),    /* [2] set contrast control */
+ 194            U8X8_CA(0x0d9, 0x0f1),    /* [2] pre-charge period 0x022/f1*/
+ 195            U8X8_CA(0x0db, 0x040),    /* vcomh deselect level */  
+ 196            // if vcomh is 0, then this will give the biggest range for contrast control issue #98
+ 197            // restored the old values for the noname constructor, because vcomh=0 will not work for all OLEDs, #116
+ 198            
+ 199            U8X8_C(0x02e),        /* Deactivate scroll */ 
+ 200            U8X8_C(0x0a4),        /* output ram to display */
+ 201            U8X8_C(0x0a6),        /* none inverted normal display mode */
+ 202              
+ 203            U8X8_END_TRANSFER(),              /* disable chip */
+ 204            U8X8_END()                  /* end of sequence */
+ 205          };
+ 206          
+ 207          
+ 208          static const uint8_t u8x8_d_ssd1306_128x64_noname_powersave0_seq[] = {
+ 209            U8X8_START_TRANSFER(),              /* enable chip, delay is part of the transfer start */
+ 210            U8X8_C(0x0af),                    /* display on */
+ 211            U8X8_END_TRANSFER(),              /* disable chip */
+ 212            U8X8_END()                  /* end of sequence */
+ 213          };
+ 214          
+ 215          static const uint8_t u8x8_d_ssd1306_128x64_noname_powersave1_seq[] = {
+ 216            U8X8_START_TRANSFER(),              /* enable chip, delay is part of the transfer start */
+ 217            U8X8_C(0x0ae),                    /* display off */
+ 218            U8X8_END_TRANSFER(),              /* disable chip */
+ 219            U8X8_END()                  /* end of sequence */
+ 220          };
+ 221          
+ 222          static const uint8_t u8x8_d_ssd1306_128x64_noname_flip0_seq[] = {
+ 223            U8X8_START_TRANSFER(),              /* enable chip, delay is part of the transfer start */
+ 224            U8X8_C(0x0a1),        /* segment remap a0/a1*/
+ 225            U8X8_C(0x0c8),        /* c0: scan dir normal, c8: reverse */
+ 226            U8X8_END_TRANSFER(),              /* disable chip */
+ 227            U8X8_END()                  /* end of sequence */
+ 228          };
+ 229          
+C51 COMPILER V9.60.7.0   U8X8_D_SSD1306_128X64_NONAME                                      10/16/2024 16:37:11 PAGE 5   
+
+ 230          static const uint8_t u8x8_d_ssd1306_128x64_noname_flip1_seq[] = {
+ 231            U8X8_START_TRANSFER(),              /* enable chip, delay is part of the transfer start */
+ 232            U8X8_C(0x0a0),        /* segment remap a0/a1*/
+ 233            U8X8_C(0x0c0),        /* c0: scan dir normal, c8: reverse */
+ 234            U8X8_END_TRANSFER(),              /* disable chip */
+ 235            U8X8_END()                  /* end of sequence */
+ 236          };
+ 237          
+ 238          static const uint8_t u8x8_d_ssd1312_128x64_noname_flip0_seq[] = {
+ 239            U8X8_START_TRANSFER(),              /* enable chip, delay is part of the transfer start */
+ 240            U8X8_C(0x0a1),        /* segment remap a0/a1*/
+ 241            U8X8_C(0x0c0),        /* c0: scan dir normal, c8: reverse */
+ 242            U8X8_END_TRANSFER(),              /* disable chip */
+ 243            U8X8_END()                  /* end of sequence */
+ 244          };
+ 245          
+ 246          static const uint8_t u8x8_d_ssd1312_128x64_noname_flip1_seq[] = {
+ 247            U8X8_START_TRANSFER(),              /* enable chip, delay is part of the transfer start */
+ 248            U8X8_C(0x0a0),        /* segment remap a0/a1*/
+ 249            U8X8_C(0x0c8),        /* c0: scan dir normal, c8: reverse */
+ 250            U8X8_END_TRANSFER(),              /* disable chip */
+ 251            U8X8_END()                  /* end of sequence */
+ 252          };
+ 253          
+ 254          static uint8_t u8x8_d_ssd1306_sh1106_generic(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
+ 255          {
+ 256   1        uint8_t x, c;
+ 257   1        uint8_t *ptr;
+ 258   1        switch(msg)
+ 259   1        {
+ 260   2          /* handled by the calling function
+ 261   2          case U8X8_MSG_DISPLAY_SETUP_MEMORY:
+ 262   2            u8x8_d_helper_display_setup_memory(u8x8, &u8x8_ssd1306_128x64_noname_display_info);
+ 263   2            break;
+ 264   2          */
+ 265   2          /* handled by the calling function
+ 266   2          case U8X8_MSG_DISPLAY_INIT:
+ 267   2            u8x8_d_helper_display_init(u8x8);
+ 268   2            u8x8_cad_SendSequence(u8x8, u8x8_d_ssd1306_128x64_noname_init_seq);    
+ 269   2            break;
+ 270   2          */
+ 271   2          case U8X8_MSG_DISPLAY_SET_POWER_SAVE:
+ 272   2            if ( arg_int == 0 )
+ 273   2        u8x8_cad_SendSequence(u8x8, u8x8_d_ssd1306_128x64_noname_powersave0_seq);
+ 274   2            else
+ 275   2        u8x8_cad_SendSequence(u8x8, u8x8_d_ssd1306_128x64_noname_powersave1_seq);
+ 276   2            break;
+ 277   2          case U8X8_MSG_DISPLAY_SET_FLIP_MODE:
+ 278   2            if ( arg_int == 0 )
+ 279   2            {
+ 280   3        u8x8_cad_SendSequence(u8x8, u8x8_d_ssd1306_128x64_noname_flip0_seq);
+ 281   3        u8x8->x_offset = u8x8->display_info->default_x_offset;
+ 282   3            }
+ 283   2            else
+ 284   2            {
+ 285   3        u8x8_cad_SendSequence(u8x8, u8x8_d_ssd1306_128x64_noname_flip1_seq);
+ 286   3        u8x8->x_offset = u8x8->display_info->flipmode_x_offset;
+ 287   3            }
+ 288   2            break;
+ 289   2      #ifdef U8X8_WITH_SET_CONTRAST
+ 290   2          case U8X8_MSG_DISPLAY_SET_CONTRAST:
+ 291   2            u8x8_cad_StartTransfer(u8x8);
+C51 COMPILER V9.60.7.0   U8X8_D_SSD1306_128X64_NONAME                                      10/16/2024 16:37:11 PAGE 6   
+
+ 292   2            u8x8_cad_SendCmd(u8x8, 0x081 );
+ 293   2            u8x8_cad_SendArg(u8x8, arg_int ); /* ssd1306 has range from 0 to 255 */
+ 294   2            u8x8_cad_EndTransfer(u8x8);
+ 295   2            break;
+ 296   2      #endif
+ 297   2          case U8X8_MSG_DISPLAY_DRAW_TILE:
+ 298   2            u8x8_cad_StartTransfer(u8x8);
+ 299   2            x = ((u8x8_tile_t *)arg_ptr)->x_pos;    
+ 300   2            x *= 8;
+ 301   2            x += u8x8->x_offset;
+ 302   2          
+ 303   2            u8x8_cad_SendCmd(u8x8, 0x040 ); /* set line offset to 0 */
+ 304   2          
+ 305   2            u8x8_cad_SendCmd(u8x8, 0x010 | (x>>4) );
+ 306   2            u8x8_cad_SendArg(u8x8, 0x000 | ((x&15)));         /* probably wrong, should be SendCmd */
+ 307   2            u8x8_cad_SendArg(u8x8, 0x0b0 | (((u8x8_tile_t *)arg_ptr)->y_pos));  /* probably wrong, should be Send
+             -Cmd */
+ 308   2      
+ 309   2          
+ 310   2            do
+ 311   2            {
+ 312   3        c = ((u8x8_tile_t *)arg_ptr)->cnt;
+ 313   3        ptr = ((u8x8_tile_t *)arg_ptr)->tile_ptr;
+ 314   3        u8x8_cad_SendData(u8x8, c*8, ptr);  /* note: SendData can not handle more than 255 bytes */
+ 315   3        /*
+ 316   3        do
+ 317   3        {
+ 318   3          u8x8_cad_SendData(u8x8, 8, ptr);
+ 319   3          ptr += 8;
+ 320   3          c--;
+ 321   3        } while( c > 0 );
+ 322   3        */
+ 323   3        arg_int--;
+ 324   3            } while( arg_int > 0 );
+ 325   2            
+ 326   2            u8x8_cad_EndTransfer(u8x8);
+ 327   2            break;
+ 328   2          default:
+ 329   2            return 0;
+ 330   2        }
+ 331   1        return 1;
+ 332   1      }
+ 333          
+ 334          
+ 335          static const u8x8_display_info_t u8x8_ssd1306_128x64_noname_display_info =
+ 336          {
+ 337            /* chip_enable_level = */ 0,
+ 338            /* chip_disable_level = */ 1,
+ 339            
+ 340            /* post_chip_enable_wait_ns = */ 20,
+ 341            /* pre_chip_disable_wait_ns = */ 10,
+ 342            /* reset_pulse_width_ms = */ 100,   /* SSD1306: 3 us */
+ 343            /* post_reset_wait_ms = */ 100, /* far east OLEDs need much longer setup time */
+ 344            /* sda_setup_time_ns = */ 50,   /* SSD1306: 15ns, but cycle time is 100ns, so use 100/2 */
+ 345            /* sck_pulse_width_ns = */ 50,  /* SSD1306: 20ns, but cycle time is 100ns, so use 100/2, AVR: below 70: 8
+             - MHz, >= 70 --> 4MHz clock */
+ 346            /* sck_clock_hz = */ 8000000UL, /* since Arduino 1.6.0, the SPI bus speed in Hz. Should be  1000000000/s
+             -ck_pulse_width_ns */
+ 347            /* spi_mode = */ 0,   /* active high, rising edge */
+ 348            /* i2c_bus_clock_100kHz = */ 4,
+ 349            /* data_setup_time_ns = */ 40,
+ 350            /* write_pulse_width_ns = */ 150, /* SSD1306: cycle time is 300ns, so use 300/2 = 150 */
+C51 COMPILER V9.60.7.0   U8X8_D_SSD1306_128X64_NONAME                                      10/16/2024 16:37:11 PAGE 7   
+
+ 351            /* tile_width = */ 16,
+ 352            /* tile_hight = */ 8,
+ 353            /* default_x_offset = */ 0,
+ 354            /* flipmode_x_offset = */ 0,
+ 355            /* pixel_width = */ 128,
+ 356            /* pixel_height = */ 64
+ 357          };
+ 358          
+ 359          uint8_t u8x8_d_ssd1306_128x64_noname(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
+ 360          {
+ 361   1          
+ 362   1        if ( u8x8_d_ssd1306_sh1106_generic(u8x8, msg, arg_int, arg_ptr) != 0 )
+ 363   1          return 1;
+ 364   1        
+ 365   1        switch(msg)
+ 366   1        {
+ 367   2          case U8X8_MSG_DISPLAY_INIT:
+ 368   2            u8x8_d_helper_display_init(u8x8);
+ 369   2            u8x8_cad_SendSequence(u8x8, u8x8_d_ssd1306_128x64_noname_init_seq);    
+ 370   2            break;
+ 371   2          case U8X8_MSG_DISPLAY_SETUP_MEMORY:
+ 372   2            u8x8_d_helper_display_setup_memory(u8x8, &u8x8_ssd1306_128x64_noname_display_info);
+ 373   2            break;
+ 374   2          default:
+ 375   2            return 0;
+ 376   2        }
+ 377   1        return 1;
+ 378   1      }
+ 379          
+ 380          uint8_t u8x8_d_ssd1312_128x64_noname(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
+ 381          {
+ 382   1        switch(msg)
+ 383   1        {
+ 384   2          case U8X8_MSG_DISPLAY_SET_FLIP_MODE:
+ 385   2            if ( arg_int == 0 )
+ 386   2            {
+ 387   3        u8x8_cad_SendSequence(u8x8, u8x8_d_ssd1312_128x64_noname_flip0_seq);
+ 388   3        u8x8->x_offset = u8x8->display_info->default_x_offset;
+ 389   3            }
+ 390   2            else
+ 391   2            {
+ 392   3        u8x8_cad_SendSequence(u8x8, u8x8_d_ssd1312_128x64_noname_flip1_seq);
+ 393   3        u8x8->x_offset = u8x8->display_info->flipmode_x_offset;
+ 394   3            }
+ 395   2            break;
+ 396   2          case U8X8_MSG_DISPLAY_INIT:
+ 397   2            u8x8_d_helper_display_init(u8x8);
+ 398   2            u8x8_cad_SendSequence(u8x8, u8x8_d_ssd1312_128x64_noname_init_seq);    /* update 27 mar 2022 */
+ 399   2            break;
+ 400   2          case U8X8_MSG_DISPLAY_SETUP_MEMORY:
+ 401   2            u8x8_d_helper_display_setup_memory(u8x8, &u8x8_ssd1306_128x64_noname_display_info);
+ 402   2            break;
+ 403   2          default:
+ 404   2            if ( u8x8_d_ssd1306_sh1106_generic(u8x8, msg, arg_int, arg_ptr) != 0 )
+ 405   2              return 1;
+ 406   2        }
+ 407   1        return 1;
+ 408   1      }
+ 409          
+ 410          
+ 411          
+ 412          uint8_t u8x8_d_ssd1306_128x64_vcomh0(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
+C51 COMPILER V9.60.7.0   U8X8_D_SSD1306_128X64_NONAME                                      10/16/2024 16:37:11 PAGE 8   
+
+ 413          {
+ 414   1          
+ 415   1        if ( u8x8_d_ssd1306_sh1106_generic(u8x8, msg, arg_int, arg_ptr) != 0 )
+ 416   1          return 1;
+ 417   1        
+ 418   1        switch(msg)
+ 419   1        {
+ 420   2          case U8X8_MSG_DISPLAY_INIT:
+ 421   2            u8x8_d_helper_display_init(u8x8);
+ 422   2            u8x8_cad_SendSequence(u8x8, u8x8_d_ssd1306_128x64_vcomh0_init_seq);    
+ 423   2            break;
+ 424   2          case U8X8_MSG_DISPLAY_SETUP_MEMORY:
+ 425   2            u8x8_d_helper_display_setup_memory(u8x8, &u8x8_ssd1306_128x64_noname_display_info);
+ 426   2            break;
+ 427   2          default:
+ 428   2            return 0;
+ 429   2        }
+ 430   1        return 1;
+ 431   1      }
+ 432          
+ 433          uint8_t u8x8_d_ssd1306_128x64_alt0(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
+ 434          {
+ 435   1        
+ 436   1        if ( u8x8_d_ssd1306_sh1106_generic(u8x8, msg, arg_int, arg_ptr) != 0 )
+ 437   1          return 1;
+ 438   1        
+ 439   1        switch(msg)
+ 440   1        {
+ 441   2          case U8X8_MSG_DISPLAY_INIT:
+ 442   2            u8x8_d_helper_display_init(u8x8);
+ 443   2            u8x8_cad_SendSequence(u8x8, u8x8_d_ssd1306_128x64_alt0_init_seq);    
+ 444   2            break;
+ 445   2          case U8X8_MSG_DISPLAY_SETUP_MEMORY:
+ 446   2            u8x8_d_helper_display_setup_memory(u8x8, &u8x8_ssd1306_128x64_noname_display_info);
+ 447   2            break;
+ 448   2          default:
+ 449   2            return 0;
+ 450   2        }
+ 451   1        return 1;
+ 452   1      }
+ 453          
+ 454          
+ 455          static const u8x8_display_info_t u8x8_sh1106_128x64_noname_display_info =
+ 456          {
+ 457            /* chip_enable_level = */ 0,
+ 458            /* chip_disable_level = */ 1,
+ 459            
+ 460            /* post_chip_enable_wait_ns = */ 20,
+ 461            /* pre_chip_disable_wait_ns = */ 10,
+ 462            /* reset_pulse_width_ms = */ 100,   /* SSD1306: 3 us */
+ 463            /* post_reset_wait_ms = */ 100, /* far east OLEDs need much longer setup time */
+ 464            /* sda_setup_time_ns = */ 50,   /* SSD1306: 15ns, but cycle time is 100ns, so use 100/2 */
+ 465            /* sck_pulse_width_ns = */ 50,  /* SSD1306: 20ns, but cycle time is 100ns, so use 100/2, AVR: below 70: 8
+             - MHz, >= 70 --> 4MHz clock */
+ 466            /* sck_clock_hz = */ 4000000UL, /* since Arduino 1.6.0, the SPI bus speed in Hz. Should be  1000000000/s
+             -ck_pulse_width_ns, increased to 8MHz (issue 215) */
+ 467            /* spi_mode = */ 3,   /* active low (clock is high by default), rising edge, this seems to be a differenc
+             -e to the ssd1306 */
+ 468            /* i2c_bus_clock_100kHz = */ 4,
+ 469            /* data_setup_time_ns = */ 40,
+ 470            /* write_pulse_width_ns = */ 150, /* SSD1306: cycle time is 300ns, so use 300/2 = 150 */
+ 471            /* tile_width = */ 16,
+C51 COMPILER V9.60.7.0   U8X8_D_SSD1306_128X64_NONAME                                      10/16/2024 16:37:11 PAGE 9   
+
+ 472            /* tile_hight = */ 8,
+ 473            /* default_x_offset = */ 2,
+ 474            /* flipmode_x_offset = */ 2,
+ 475            /* pixel_width = */ 128,
+ 476            /* pixel_height = */ 64
+ 477          };
+ 478          
+ 479          uint8_t u8x8_d_sh1106_128x64_noname(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
+ 480          {
+ 481   1        if ( u8x8_d_ssd1306_sh1106_generic(u8x8, msg, arg_int, arg_ptr) != 0 )
+ 482   1          return 1;
+ 483   1        
+ 484   1        switch(msg)
+ 485   1        {
+ 486   2          case U8X8_MSG_DISPLAY_INIT:
+ 487   2            u8x8_d_helper_display_init(u8x8);
+ 488   2            /* maybe use a better init sequence */
+ 489   2            /* https://www.mikrocontroller.net/topic/431371 */
+ 490   2            /* the new sequence is added in the winstar constructor (see below), this is kept untouched */
+ 491   2            u8x8_cad_SendSequence(u8x8, u8x8_d_ssd1306_128x64_noname_init_seq);    
+ 492   2            break;
+ 493   2          case U8X8_MSG_DISPLAY_SETUP_MEMORY:
+ 494   2            u8x8_d_helper_display_setup_memory(u8x8, &u8x8_sh1106_128x64_noname_display_info);
+ 495   2            break;
+ 496   2          default:
+ 497   2            return 0;
+ 498   2        }
+ 499   1        return 1;
+ 500   1          
+ 501   1      }
+ 502          
+ 503          uint8_t u8x8_d_sh1106_128x64_vcomh0(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
+ 504          {
+ 505   1        if ( u8x8_d_ssd1306_sh1106_generic(u8x8, msg, arg_int, arg_ptr) != 0 )
+ 506   1          return 1;
+ 507   1        
+ 508   1        switch(msg)
+ 509   1        {
+ 510   2          case U8X8_MSG_DISPLAY_INIT:
+ 511   2            u8x8_d_helper_display_init(u8x8);
+ 512   2            u8x8_cad_SendSequence(u8x8, u8x8_d_ssd1306_128x64_vcomh0_init_seq);    
+ 513   2            break;
+ 514   2          case U8X8_MSG_DISPLAY_SETUP_MEMORY:
+ 515   2            u8x8_d_helper_display_setup_memory(u8x8, &u8x8_sh1106_128x64_noname_display_info);
+ 516   2            break;
+ 517   2          default:
+ 518   2            return 0;
+ 519   2        }
+ 520   1        return 1;
+ 521   1          
+ 522   1      }
+ 523          
+ 524          uint8_t u8x8_d_sh1106_128x64_winstar(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
+ 525          {
+ 526   1        if ( u8x8_d_ssd1306_sh1106_generic(u8x8, msg, arg_int, arg_ptr) != 0 )
+ 527   1          return 1;
+ 528   1        
+ 529   1        switch(msg)
+ 530   1        {
+ 531   2          case U8X8_MSG_DISPLAY_INIT:
+ 532   2            u8x8_d_helper_display_init(u8x8);
+ 533   2            u8x8_cad_SendSequence(u8x8, u8x8_d_sh1106_128x64_winstar_init_seq);    
+C51 COMPILER V9.60.7.0   U8X8_D_SSD1306_128X64_NONAME                                      10/16/2024 16:37:11 PAGE 10  
+
+ 534   2            break;
+ 535   2          case U8X8_MSG_DISPLAY_SETUP_MEMORY:
+ 536   2            u8x8_d_helper_display_setup_memory(u8x8, &u8x8_sh1106_128x64_noname_display_info);
+ 537   2            break;
+ 538   2          default:
+ 539   2            return 0;
+ 540   2        }
+ 541   1        return 1;
+ 542   1          
+ 543   1      }
+ 544          
+*** ERROR C249 IN LINE 544 OF ..\u8g2\u8x8_d_ssd1306_128x64_noname.c: 'DATA': SEGMENT TOO LARGE
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  1 ERROR(S)

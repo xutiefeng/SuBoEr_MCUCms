@@ -1,0 +1,2336 @@
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MUI_U8G2
+OBJECT MODULE PLACED IN .\Objects\mui_u8g2.obj
+COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE ..\u8g2\mui_u8g2.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\Device\CM
+                    -S8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\mui_u8g2.lst) TABS(2) OBJECT(.\Ob
+                    -jects\mui_u8g2.obj)
+
+line level    source
+
+   1          /*
+   2          
+   3            mui_u8g2.c
+   4          
+   5            Monochrome minimal user interface: Glue code between mui and u8g2.
+   6          
+   7            Universal 8bit Graphics Library (https://github.com/olikraus/u8g2/)
+   8          
+   9            Copyright (c) 2021, olikraus@gmail.com
+  10            All rights reserved.
+  11          
+  12            Redistribution and use in source and binary forms, with or without modification, 
+  13            are permitted provided that the following conditions are met:
+  14          
+  15            * Redistributions of source code must retain the above copyright notice, this list 
+  16              of conditions and the following disclaimer.
+  17              
+  18            * Redistributions in binary form must reproduce the above copyright notice, this 
+  19              list of conditions and the following disclaimer in the documentation and/or other 
+  20              materials provided with the distribution.
+  21          
+  22            THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+  23            CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+  24            INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  25            MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+  26            DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+  27            CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+  28            SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+  29            NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+  30            LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+  31            CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+  32            STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+  33            ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+  34            ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+  35          
+  36          */
+  37          
+  38          /*
+  39          
+  40            field function naming convention
+  41          
+  42              action
+  43                draw_text:                        (rename from draw label)
+  44                draw_str:                      
+  45                btn_jmp   button jump to:                      a button which jumps to a specific form
+  46                btn_exit          button leave:                     a button which leaves the form and places an exi
+             -t code into a uint8 variable
+  47                u8_value_0_9      
+  48                u8_chkbox
+  49                u8_radio
+  50                u8_opt_line       edit value options in the same line
+  51                u8_opt_parent       edit value options parent
+  52                u8_opt_child       edit value options child
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 2   
+
+  53              
+  54              
+  55              field width (not for draw text/str)
+  56                wm                minimum width
+  57                wa                width can be provided via FDS argument
+  58                w1                full display width
+  59                w2                half display size (minus some pixel)
+  60                w3                one/third of the dispay width (minus some pixel)
+  61          
+  62              edit mode  (not for draw text/str, buttons and checkbox)                  
+  63                mse       select: select event will increment the value or activate the field (buttons)
+  64                mud      up/down:  select will enter the up/down edit mode. Next/prev event will increment/decrement
+             - the value
+  65                
+  66              styles (not for draw text/str)
+  67                unselected                selected                        up/down edit                            po
+             -stfix         Use for
+  68                plain                          invers                             invers + gap + frame            pi
+             -                      input elements
+  69                frame                         invers+frame                frame                                     
+             -  fi                  buttons
+  70                
+  71                plain                          frame                              invers + frame                    
+             -     pf               input elements
+  72                invers                        frame                               invers + frame                    
+             -      if              buttons
+  73                
+  74                
+  75              mui_u8g2_[action]_[field_width]_[edit_mode]_[style]
+  76          
+  77            mui _label_u8g2 --> mui_u8g2_draw_text
+  78            mui _goto_frame_button_invers_select_u8g2                              --> mui_u8g2_btn_goto_wm_fi
+  79            mui _goto_half_width_frame_button_invers_select_u8g2           --> mui_u8g2_btn_goto_w2_fi
+  80            mui _goto_line_button_invers_select_u8g2 -->  mui_u8g2_btn_goto_w1_fi
+  81            mui _leave_menu_frame_button_invers_select_u8g2 --> mui_u8g2_btn_exit_wm_fi
+  82            
+  83            mui _input_uint8_invers_select_u8g2 --> mui_u8g2_u8_value_0_9_wm_mse_pi
+  84            mui _single_line_option_invers_select_u8g2     --> mui_u8g2_u8_opt_line_wa_mse_pi
+  85            mui _select_options_parent_invers_select_u8g2  --> mui_u8g2_u8_opt_parent_wa_mse_pi
+  86            mui _select_options_child_invers_select_u8g2  --> mui_u8g2_u8_opt_child_wm_pi
+  87          
+  88            mui _checkbox_invers_select_u8g2 --> mui_u8g2_u8_chkbox_wm_pi
+  89            mui _radio_invers_select_u8g2 --> mui_u8g2_u8_radio_wm_pi
+  90          
+  91            mui _input_char_invers_select_u8g2 --> mui_u8g2_u8_char_wm_mud_pi
+  92          
+  93          
+  94          
+  95            2 Buttons
+  96              Only use "mse", don't use "mud"
+  97            
+  98              Button      Call                            Description
+  99              1                mui_SendSelect()    Activate elements & change values
+ 100              2                mui_NextField()      Goto next field
+ 101              
+ 102            3 Buttons
+ 103              Use "mse" or "mud"
+ 104              Button      Call                            Description
+ 105              1                mui_SendSelect()    Activate elements / change values (mse) / enter "mud" mode (mud)
+ 106              2                mui_NextField()      Goto next field, increment value (mud)
+ 107              3                mui_PrevField()      Goto prev field, decrement value (mud)
+ 108              
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 3   
+
+ 109            4 Buttons
+ 110              Prefer "mse"
+ 111              Button      Call                                            Description
+ 112              1                mui_SendValueIncrement()    Activate elements / increment values (mse)
+ 113              2                mui_SendValueDecrement()   Activate elements / decrement values (mse)
+ 114              3                mui_NextField()                       Goto next field
+ 115              4                mui_PrevField()                        Goto prev field
+ 116          
+ 117            5 Buttons
+ 118              Prefer "mse", use the MUIF_EXECUTE_ON_SELECT_BUTTON on forms to finish the form with the "form select"
+             - button 5
+ 119              Button      Call                                                                                      
+             -      Description
+ 120              1                mui_SendValueIncrement()                                                           Ac
+             -tivate elements / increment values (mse)
+ 121              2                mui_SendValueDecrement()                                                         Acti
+             -vate elements / decrement values (mse)
+ 122              3                mui_NextField()                                                                      
+             -      Goto next field
+ 123              4                mui_PrevField()                                                                     G
+             -oto prev field
+ 124              5                mui_SendSelectWithExecuteOnSelectFieldSearch()             Execute the MUIF_EXECUTE_O
+             -N_SELECT_BUTTON button or activate the current element if there is no EOS button
+ 125              
+ 126            rotary encoder, push&release
+ 127              Prefer "mud"
+ 128              Button      Call                            Description
+ 129              encoder button                 mui_SendSelect()    Activate elements / change values (mse) / enter "mu
+             -d" mode (mud)
+ 130              encoder CW                      mui_NextField()      Goto next field, increment value (mud)
+ 131              encoder CCW                    mui_PrevField()      Goto prev field, decrement value (mud)
+ 132            
+ 133            rotary encoder, push&rotate
+ 134              Prefer "mse"
+ 135              Button                                      Call                                            Descriptio
+             -n
+ 136              encoder CW                                  mui_SendValueIncrement()    Activate elements / increment 
+             -values (mse)
+ 137              encoder CCW                                 mui_SendValueDecrement()   Activate elements / decrement v
+             -alues (mse)
+ 138              encoder CW+button press                mui_NextField()                       Goto next field
+ 139              encoder CCW+button press                mui_PrevField()                        Goto prev field
+ 140          
+ 141          
+ 142          */
+ 143          
+ 144          
+ 145          
+ 146          #include "mui.h"
+ 147          #include "u8g2.h"
+ 148          #include "mui_u8g2.h"
+*** ERROR C141 IN LINE 53 OF ..\u8g2\mui_u8g2.h: syntax error near ',', expected '<id>'
+*** ERROR C141 IN LINE 54 OF ..\u8g2\mui_u8g2.h: syntax error near ')', expected '<id>'
+*** ERROR C141 IN LINE 59 OF ..\u8g2\mui_u8g2.h: syntax error near ';', expected '<id>'
+*** ERROR C141 IN LINE 62 OF ..\u8g2\mui_u8g2.h: syntax error near '}', expected 'hdata'
+ 149          
+ 150          /*
+ 151          
+ 152          uint8_t mui_template(mui_t *ui, uint8_t msg)
+ 153          {
+ 154            //u8g2_t *u8g2 = mui_get_U8g2(ui);
+ 155            //ui->dflags                          MUIF_DFLAG_IS_CURSOR_FOCUS       MUIF_DFLAG_IS_TOUCH_FOCUS
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 4   
+
+ 156            //muif_get_cflags(ui->uif)       MUIF_CFLAG_IS_CURSOR_SELECTABLE
+ 157            //muif_get_data(ui->uif)
+ 158            switch(msg)
+ 159            {
+ 160              case MUIF_MSG_DRAW:
+ 161                break;
+ 162              case MUIF_MSG_FORM_START:
+ 163                break;
+ 164              case MUIF_MSG_FORM_END:
+ 165                break;
+ 166              case MUIF_MSG_CURSOR_ENTER:
+ 167                break;
+ 168              case MUIF_MSG_CURSOR_SELECT:
+ 169                break;
+ 170              case MUIF_MSG_CURSOR_LEAVE:
+ 171                break;
+ 172              case MUIF_MSG_VALUE_INCREMENT:
+ 173                break;
+ 174              case MUIF_MSG_VALUE_DECREMENT:
+ 175                break;
+ 176              case MUIF_MSG_TOUCH_DOWN:
+ 177                break;
+ 178              case MUIF_MSG_TOUCH_UP:
+ 179                break;
+ 180            }
+ 181            return 0;
+ 182          }
+ 183          */
+ 184          
+ 185          /*=========================================================================*/
+ 186          #define MUI_U8G2_V_PADDING 1
+ 187          
+ 188          /*=========================================================================*/
+ 189          /* extra u8g2 drawing functions */
+ 190          
+ 191          static void u8g2_DrawCheckbox(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t w, u8g2_uint_t is_ch
+             -ecked) MUI_NOINLINE;
+ 192          static void u8g2_DrawCheckbox(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t w, u8g2_uint_t is_ch
+             -ecked)
+ 193          {
+ 194   1        u8g2_DrawFrame(u8g2, x, y-w, w, w);
+ 195   1        if ( is_checked )
+ 196   1        {
+ 197   2          w-=4;
+ 198   2          u8g2_DrawBox(u8g2, x+2, y-w-2, w, w);
+ 199   2        }
+ 200   1      }
+ 201          
+ 202          static void u8g2_DrawValueMark(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t w)
+ 203          {
+ 204   1        u8g2_DrawBox(u8g2, x, y-w, w, w);
+ 205   1      }
+ 206          
+ 207          
+ 208          /*=========================================================================*/
+ 209          /* helper function */
+ 210          
+ 211          u8g2_uint_t mui_get_x(mui_t *ui) MUI_NOINLINE;
+ 212          u8g2_uint_t mui_get_x(mui_t *ui)
+ 213          {
+ 214   1        if ( u8g2_GetDisplayWidth(mui_get_U8g2(ui)) >= 255 )
+ 215   1            return ui->x / 2;
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 5   
+
+ 216   1        return ui->x;
+ 217   1      }
+ 218          
+ 219          u8g2_uint_t mui_get_y(mui_t *ui)
+ 220          {
+ 221   1        return ui->y;
+ 222   1      }
+ 223          
+ 224          u8g2_t *mui_get_U8g2(mui_t *ui)
+ 225          {
+ 226   1        return (u8g2_t *)(ui->graphics_data);
+ 227   1      }
+ 228          
+ 229          //void u8g2_DrawButtonUTF8(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t flags, u8g2_uint_t widt
+             -h, u8g2_uint_t padding_h, u8g2_uint_t padding_v, const char *text);
+ 230          void mui_u8g2_draw_button_utf(mui_t *ui, u8g2_uint_t flags, u8g2_uint_t width, u8g2_uint_t padding_h, u8g2
+             -_uint_t padding_v, const char *text)
+ 231          {
+ 232   1        if ( text==NULL)
+ 233   1          text = "";
+ 234   1        u8g2_DrawButtonUTF8(mui_get_U8g2(ui), mui_get_x(ui), mui_get_y(ui), flags, width, padding_h, padding_v, 
+             -text);
+ 235   1      }
+ 236          
+ 237          u8g2_uint_t mui_u8g2_get_pi_flags(mui_t *ui)
+ 238          {
+ 239   1        u8g2_uint_t flags = 0;
+ 240   1        if ( mui_IsCursorFocus(ui) )
+ 241   1        {
+ 242   2          flags |= U8G2_BTN_INV;
+ 243   2          if ( ui->is_mud )
+ 244   2          {
+ 245   3            flags |= U8G2_BTN_XFRAME;
+ 246   3          }      
+ 247   2        }
+ 248   1        return flags;
+ 249   1      }
+ 250          
+ 251          
+ 252          void mui_u8g2_draw_button_pi(mui_t *ui, u8g2_uint_t width, u8g2_uint_t padding_h, const char *text)
+ 253          {
+ 254   1        mui_u8g2_draw_button_utf(ui, mui_u8g2_get_pi_flags(ui), width, padding_h , MUI_U8G2_V_PADDING, text);
+ 255   1      }
+ 256          
+ 257          
+ 258          u8g2_uint_t mui_u8g2_get_fi_flags(mui_t *ui)
+ 259          {
+ 260   1        u8g2_uint_t flags = 1;
+ 261   1        if ( mui_IsCursorFocus(ui) )
+ 262   1        {
+ 263   2          flags |= U8G2_BTN_INV;
+ 264   2          if ( ui->is_mud )
+ 265   2          {
+ 266   3            flags = 1;        // undo INV
+ 267   3          }      
+ 268   2        }
+ 269   1        return flags;
+ 270   1      }
+ 271          
+ 272          void mui_u8g2_draw_button_fi(mui_t *ui, u8g2_uint_t width, u8g2_uint_t padding_h, const char *text)
+ 273          {
+ 274   1        mui_u8g2_draw_button_utf(ui, mui_u8g2_get_fi_flags(ui), width, padding_h , MUI_U8G2_V_PADDING, text);
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 6   
+
+ 275   1      }
+ 276          
+ 277          
+ 278          u8g2_uint_t mui_u8g2_get_pf_flags(mui_t *ui)
+ 279          {
+ 280   1        u8g2_uint_t flags = 0;
+ 281   1        if ( mui_IsCursorFocus(ui) )
+ 282   1        {
+ 283   2          flags |= 1;
+ 284   2          if ( ui->is_mud )
+ 285   2          {
+ 286   3            flags |= U8G2_BTN_INV;
+ 287   3          }      
+ 288   2        }
+ 289   1        return flags;
+ 290   1      }
+ 291          
+ 292          void mui_u8g2_draw_button_pf(mui_t *ui, u8g2_uint_t width, u8g2_uint_t padding_h, const char *text)
+ 293          {
+ 294   1        mui_u8g2_draw_button_utf(ui, mui_u8g2_get_pf_flags(ui), width, padding_h , MUI_U8G2_V_PADDING, text);
+ 295   1      }
+ 296          
+ 297          
+ 298          u8g2_uint_t mui_u8g2_get_if_flags(mui_t *ui)
+ 299          {
+ 300   1        u8g2_uint_t flags = 0;
+ 301   1        if ( mui_IsCursorFocus(ui) )
+ 302   1        {
+ 303   2          if ( ui->is_mud )
+ 304   2          {
+ 305   3            flags |= 1;
+ 306   3            flags |= U8G2_BTN_INV;
+ 307   3          }
+ 308   2          else
+ 309   2          {
+ 310   3            flags |= 1;
+ 311   3          }
+ 312   2        }
+ 313   1        else
+ 314   1        {
+ 315   2            flags |= U8G2_BTN_INV;
+ 316   2        }
+ 317   1        return flags;
+ 318   1      }
+ 319          
+ 320          void mui_u8g2_draw_button_if(mui_t *ui, u8g2_uint_t width, u8g2_uint_t padding_h, const char *text)
+ 321          {
+ 322   1        mui_u8g2_draw_button_utf(ui, mui_u8g2_get_if_flags(ui), width, padding_h , MUI_U8G2_V_PADDING, text);
+ 323   1      }
+ 324          
+ 325          
+ 326          static uint8_t mui_u8g2_handle_scroll_next_prev_events(mui_t *ui, uint8_t msg) MUI_NOINLINE;
+ 327          static uint8_t mui_u8g2_handle_scroll_next_prev_events(mui_t *ui, uint8_t msg)
+ 328          {
+ 329   1        uint8_t arg = ui->arg;
+ 330   1        switch(msg)
+ 331   1        {
+ 332   2          case MUIF_MSG_CURSOR_ENTER:
+ 333   2            if ( (arg > 0) && (ui->form_scroll_top + arg >= ui->form_scroll_total) )
+ 334   2              return 255;
+ 335   2            break;
+ 336   2          case MUIF_MSG_EVENT_NEXT:
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 7   
+
+ 337   2            if ( arg+1 == ui->form_scroll_visible )
+ 338   2            {
+ 339   3              if ( ui->form_scroll_visible + ui->form_scroll_top < ui->form_scroll_total )
+ 340   3              {
+ 341   4                ui->form_scroll_top++;
+ 342   4                return 1;
+ 343   4              }
+ 344   3              else
+ 345   3              {
+ 346   4                ui->form_scroll_top = 0;
+ 347   4              }
+ 348   3            }
+ 349   2            break;
+ 350   2          case MUIF_MSG_EVENT_PREV:
+ 351   2            if ( arg == 0 )
+ 352   2            {
+ 353   3              if ( ui->form_scroll_top > 0 )
+ 354   3              {
+ 355   4                ui->form_scroll_top--;
+ 356   4                return 1;
+ 357   4              }
+ 358   3              else
+ 359   3              {
+ 360   4                if ( ui->form_scroll_total >  ui->form_scroll_visible  )
+ 361   4                {
+ 362   5                  ui->form_scroll_top = ui->form_scroll_total - ui->form_scroll_visible;
+ 363   5                }
+ 364   4                else
+ 365   4                {
+ 366   5                  ui->form_scroll_top = 0;
+ 367   5                }
+ 368   4              }
+ 369   3            }
+ 370   2            break;
+ 371   2        }
+ 372   1        return 0;
+ 373   1      }
+ 374          
+ 375          /*=========================================================================*/
+ 376          /* simplified style function  */
+ 377          
+ 378          /*
+ 379          Used for MUIF_U8G2_FONT_STYLE(n,font)
+ 380          */
+ 381          
+ 382          uint8_t mui_u8g2_set_font_style_function(mui_t *ui, uint8_t msg)
+ 383          {  
+ 384   1        if ( msg == MUIF_MSG_DRAW )
+ 385   1        {
+ 386   2          u8g2_SetFont(mui_get_U8g2(ui), (uint8_t *)muif_get_data(ui->uif));
+*** ERROR C141 IN LINE 386 OF ..\u8g2\mui_u8g2.c: syntax error near 'data', expected '<id>'
+ 387   2        }
+ 388   2        return 0;
+*** ERROR C141 IN LINE 388 OF ..\u8g2\mui_u8g2.c: syntax error near ';', expected ','
+ 389   2      }
+ 390   1      
+ 391   1      
+ 392   1      
+ 393   1      /*=========================================================================*/
+ 394   1      /* field functions */
+ 395   1      
+ 396   1      /*
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 8   
+
+ 397   1        xy: yes, arg: no, text: yes
+ 398   1      */
+ 399   1      
+ 400   1      uint8_t mui_u8g2_draw_text(mui_t *ui, uint8_t msg)
+ 401   1      {
+ 402   2        switch(msg)
+ 403   2        {
+ 404   3          case MUIF_MSG_DRAW:
+ 405   3            u8g2_DrawStr(mui_get_U8g2(ui), mui_get_x(ui), mui_get_y(ui), ui->text);
+ 406   3            break;
+ 407   3          case MUIF_MSG_FORM_START:
+ 408   3            break;
+ 409   3          case MUIF_MSG_FORM_END:
+ 410   3            break;
+ 411   3          case MUIF_MSG_CURSOR_ENTER:
+ 412   3            break;
+ 413   3          case MUIF_MSG_CURSOR_SELECT:
+ 414   3            break;
+ 415   3          case MUIF_MSG_VALUE_INCREMENT:
+ 416   3            break;
+ 417   3          case MUIF_MSG_VALUE_DECREMENT:
+ 418   3            break;
+ 419   3          case MUIF_MSG_CURSOR_LEAVE:
+ 420   3            break;
+ 421   3          case MUIF_MSG_TOUCH_DOWN:
+ 422   3            break;
+ 423   3          case MUIF_MSG_TOUCH_UP:
+ 424   3            break;    
+ 425   3        }
+ 426   2        return 0;
+ 427   2      }
+ 428   1      
+ 429   1      
+ 430   1      /*
+ 431   1      
+ 432   1        uint8_t mui_u8g2_btn_goto_wm_fi(mui_t *ui, uint8_t msg)
+ 433   1      
+ 434   1        Description:
+ 435   1          A button with size equal to button text plus one pixel padding
+ 436   1          The button has a one pixel frame around the text.
+ 437   1          If the selected, then the form will change to the specified form number.
+ 438   1          
+ 439   1        Message Handling: DRAW, CURSOR_SELECT
+ 440   1      
+ 441   1        Style
+ 442   1          No Selection: Text + Frame
+ 443   1          Cursor Selection: Inverted text + Frame
+ 444   1      
+ 445   1        User interface field list (muif):
+ 446   1          flags: MUIF_CFLAG_IS_CURSOR_SELECTABLE
+ 447   1          data: not used
+ 448   1      
+ 449   1        Field definition string (fds):
+ 450   1          xy: Left position of the text (required)
+ 451   1          arg: Form numner (required)
+ 452   1          text: Button label
+ 453   1          
+ 454   1      */
+ 455   1      uint8_t mui_u8g2_btn_goto_wm_fi(mui_t *ui, uint8_t msg)
+ 456   1      {
+ 457   2        switch(msg)
+ 458   2        {
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 9   
+
+ 459   3          case MUIF_MSG_DRAW:
+ 460   3            mui_u8g2_draw_button_utf(ui, U8G2_BTN_HCENTER |mui_u8g2_get_fi_flags(ui), 0, 1, MUI_U8G2_V_PADDING, 
+             -ui->text);
+ 461   3            break;
+ 462   3          case MUIF_MSG_FORM_START:
+ 463   3            break;
+ 464   3          case MUIF_MSG_FORM_END:
+ 465   3            break;
+ 466   3          case MUIF_MSG_CURSOR_ENTER:
+ 467   3            break;
+ 468   3          case MUIF_MSG_CURSOR_SELECT:
+ 469   3          case MUIF_MSG_VALUE_INCREMENT:
+ 470   3          case MUIF_MSG_VALUE_DECREMENT:
+ 471   3            //return mui_GotoForm(ui, ui->arg, 0);
+ 472   3            return mui_GotoFormAutoCursorPosition(ui, ui->arg);
+ 473   3          case MUIF_MSG_CURSOR_LEAVE:
+ 474   3            break;
+ 475   3          case MUIF_MSG_TOUCH_DOWN:
+ 476   3            break;
+ 477   3          case MUIF_MSG_TOUCH_UP:
+ 478   3            break;    
+ 479   3          
+ 480   3        }
+ 481   2        return 0;
+ 482   2      }
+ 483   1      
+ 484   1      uint8_t mui_u8g2_btn_goto_wm_if(mui_t *ui, uint8_t msg)
+ 485   1      {
+ 486   2        switch(msg)
+ 487   2        {
+ 488   3          case MUIF_MSG_DRAW:
+ 489   3            mui_u8g2_draw_button_utf(ui, U8G2_BTN_HCENTER |mui_u8g2_get_if_flags(ui), 0, 1, MUI_U8G2_V_PADDING, 
+             -ui->text);
+ 490   3            break;
+ 491   3          case MUIF_MSG_FORM_START:
+ 492   3            break;
+ 493   3          case MUIF_MSG_FORM_END:
+ 494   3            break;
+ 495   3          case MUIF_MSG_CURSOR_ENTER:
+ 496   3            break;
+ 497   3          case MUIF_MSG_CURSOR_SELECT:
+ 498   3          case MUIF_MSG_VALUE_INCREMENT:
+ 499   3          case MUIF_MSG_VALUE_DECREMENT:
+ 500   3            //return mui_GotoForm(ui, ui->arg, 0);
+ 501   3            return mui_GotoFormAutoCursorPosition(ui, ui->arg);
+ 502   3         case MUIF_MSG_CURSOR_LEAVE:
+ 503   3            break;
+ 504   3          case MUIF_MSG_TOUCH_DOWN:
+ 505   3            break;
+ 506   3          case MUIF_MSG_TOUCH_UP:
+ 507   3            break;    
+ 508   3          
+ 509   3        }
+ 510   2        return 0;
+ 511   2      }
+ 512   1      
+ 513   1      uint8_t mui_u8g2_btn_goto_w2_fi(mui_t *ui, uint8_t msg)
+ 514   1      {
+ 515   2        u8g2_t *u8g2 = mui_get_U8g2(ui);
+ 516   2        switch(msg)
+ 517   2        {
+ 518   3          case MUIF_MSG_DRAW:
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 10  
+
+ 519   3            mui_u8g2_draw_button_utf(ui, U8G2_BTN_HCENTER | mui_u8g2_get_fi_flags(ui), u8g2_GetDisplayWidth(u8g2
+             -)/2 - 10, 0, MUI_U8G2_V_PADDING, ui->text);
+ 520   3            break;
+ 521   3          case MUIF_MSG_FORM_START:
+ 522   3            break;
+ 523   3          case MUIF_MSG_FORM_END:
+ 524   3            break;
+ 525   3          case MUIF_MSG_CURSOR_ENTER:
+ 526   3            break;
+ 527   3          case MUIF_MSG_CURSOR_SELECT:
+ 528   3          case MUIF_MSG_VALUE_INCREMENT:
+ 529   3          case MUIF_MSG_VALUE_DECREMENT:
+ 530   3            //return mui_GotoForm(ui, ui->arg, 0);
+ 531   3            return mui_GotoFormAutoCursorPosition(ui, ui->arg);
+ 532   3          case MUIF_MSG_CURSOR_LEAVE:
+ 533   3            break;
+ 534   3          case MUIF_MSG_TOUCH_DOWN:
+ 535   3            break;
+ 536   3          case MUIF_MSG_TOUCH_UP:
+ 537   3            break;    
+ 538   3        }
+ 539   2        return 0;
+ 540   2      }
+ 541   1      
+ 542   1      uint8_t mui_u8g2_btn_goto_w2_if(mui_t *ui, uint8_t msg)
+ 543   1      {
+ 544   2        u8g2_t *u8g2 = mui_get_U8g2(ui);
+ 545   2        switch(msg)
+ 546   2        {
+ 547   3          case MUIF_MSG_DRAW:
+ 548   3            mui_u8g2_draw_button_utf(ui, U8G2_BTN_HCENTER | mui_u8g2_get_if_flags(ui), u8g2_GetDisplayWidth(u8g2
+             -)/2 - 10, 0, MUI_U8G2_V_PADDING, ui->text);
+ 549   3            break;
+ 550   3          case MUIF_MSG_FORM_START:
+ 551   3            break;
+ 552   3          case MUIF_MSG_FORM_END:
+ 553   3            break;
+ 554   3          case MUIF_MSG_CURSOR_ENTER:
+ 555   3            break;
+ 556   3          case MUIF_MSG_CURSOR_SELECT:
+ 557   3          case MUIF_MSG_VALUE_INCREMENT:
+ 558   3          case MUIF_MSG_VALUE_DECREMENT:
+ 559   3            //return mui_GotoForm(ui, ui->arg, 0);
+ 560   3            return mui_GotoFormAutoCursorPosition(ui, ui->arg);
+ 561   3          case MUIF_MSG_CURSOR_LEAVE:
+ 562   3            break;
+ 563   3          case MUIF_MSG_TOUCH_DOWN:
+ 564   3            break;
+ 565   3          case MUIF_MSG_TOUCH_UP:
+ 566   3            break;    
+ 567   3        }
+ 568   2        return 0;
+ 569   2      }
+ 570   1      
+ 571   1      /*
+ 572   1      
+ 573   1        uint8_t mui_u8g2_btn_exit_wm_fi(mui_t *ui, uint8_t msg)
+ 574   1      
+ 575   1        Description:
+ 576   1          A button with size equal to button text plus one pixel padding
+ 577   1          The button has a one pixel frame around the text.
+ 578   1          If selected, then the menu system will be closed.
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 11  
+
+ 579   1          The arg value will be stored at the specified data location (if not NULL).
+ 580   1          The arg value can be used as an exit value of the button.
+ 581   1          
+ 582   1        Message Handling: DRAW, CURSOR_SELECT
+ 583   1      
+ 584   1        Style
+ 585   1          No Selection: Text + Frame
+ 586   1          Cursor Selection: Inverted text + Frame
+ 587   1      
+ 588   1        User interface field list (muif):
+ 589   1          flags: MUIF_CFLAG_IS_CURSOR_SELECTABLE
+ 590   1          data: Optionally points to uint8_t value which will receive the arg value of the field.
+ 591   1      
+ 592   1        Field definition string (fds):
+ 593   1          xy: Left position of the text (required)
+ 594   1          arg: Value which will be stored at *data (optional)
+ 595   1          text: Button label
+ 596   1          
+ 597   1      */
+ 598   1      uint8_t mui_u8g2_btn_exit_wm_fi(mui_t *ui, uint8_t msg)
+ 599   1      {
+ 600   2        switch(msg)
+ 601   2        {
+ 602   3          case MUIF_MSG_DRAW:
+ 603   3            mui_u8g2_draw_button_utf(ui, U8G2_BTN_HCENTER |mui_u8g2_get_fi_flags(ui), 0, 1, MUI_U8G2_V_PADDING, 
+             -ui->text);
+ 604   3            break;
+ 605   3          case MUIF_MSG_FORM_START:
+ 606   3            break;
+ 607   3          case MUIF_MSG_FORM_END:
+ 608   3            break;
+ 609   3          case MUIF_MSG_CURSOR_ENTER:
+ 610   3            break;
+ 611   3          case MUIF_MSG_CURSOR_SELECT:
+ 612   3          case MUIF_MSG_VALUE_INCREMENT:
+ 613   3          case MUIF_MSG_VALUE_DECREMENT:
+ 614   3            {
+ 615   4              uint8_t *value = (uint8_t *)muif_get_data(ui->uif);
+ 616   4              if ( value != NULL )
+ 617   4                *value = ui->arg;
+ 618   4            }
+ 619   3            mui_LeaveForm(ui);
+ 620   3            return 1;
+ 621   3          case MUIF_MSG_CURSOR_LEAVE:
+ 622   3            break;
+ 623   3          case MUIF_MSG_TOUCH_DOWN:
+ 624   3            break;
+ 625   3          case MUIF_MSG_TOUCH_UP:
+ 626   3            break;    
+ 627   3        }
+ 628   2        return 0;
+ 629   2      }
+ 630   1      
+ 631   1      
+ 632   1      uint8_t mui_u8g2_btn_goto_w1_pi(mui_t *ui, uint8_t msg)
+ 633   1      {
+ 634   2        u8g2_t *u8g2 = mui_get_U8g2(ui);
+ 635   2        switch(msg)
+ 636   2        {
+ 637   3          case MUIF_MSG_DRAW:
+ 638   3            mui_u8g2_draw_button_pi(ui, u8g2_GetDisplayWidth(u8g2)-mui_get_x(ui)*2, mui_get_x(ui) , ui->text);
+ 639   3            //mui_u8g2_draw_button_utf(ui, mui_u8g2_get_pi_flags(ui), u8g2_GetDisplayWidth(u8g2)-mui_get_x(ui)*2
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 12  
+
+             -, mui_get_x(ui) , MUI_U8G2_V_PADDING, ui->text);
+ 640   3            break;
+ 641   3          case MUIF_MSG_FORM_START:
+ 642   3            break;
+ 643   3          case MUIF_MSG_FORM_END:
+ 644   3            break;
+ 645   3          case MUIF_MSG_CURSOR_ENTER:
+ 646   3            break;
+ 647   3          case MUIF_MSG_CURSOR_SELECT:
+ 648   3          case MUIF_MSG_VALUE_INCREMENT:
+ 649   3          case MUIF_MSG_VALUE_DECREMENT:
+ 650   3            //return mui_GotoForm(ui, ui->arg, 0);
+ 651   3            return mui_GotoFormAutoCursorPosition(ui, ui->arg);
+ 652   3          case MUIF_MSG_CURSOR_LEAVE:
+ 653   3            break;
+ 654   3          case MUIF_MSG_TOUCH_DOWN:
+ 655   3            break;
+ 656   3          case MUIF_MSG_TOUCH_UP:
+ 657   3            break;    
+ 658   3        }
+ 659   2        return 0;
+ 660   2      }
+ 661   1      
+ 662   1      
+ 663   1      uint8_t mui_u8g2_btn_goto_w1_fi(mui_t *ui, uint8_t msg)
+ 664   1      {
+ 665   2        u8g2_t *u8g2 = mui_get_U8g2(ui);
+ 666   2        switch(msg)
+ 667   2        {
+ 668   3          case MUIF_MSG_DRAW:
+ 669   3            mui_u8g2_draw_button_fi(ui, u8g2_GetDisplayWidth(u8g2)-mui_get_x(ui)*2, mui_get_x(ui)-1 , ui->text);
+ 670   3            //mui_u8g2_draw_button_utf(ui, mui_u8g2_get_pi_flags(ui), u8g2_GetDisplayWidth(u8g2)-mui_get_x(ui)*2
+             -, mui_get_x(ui) , MUI_U8G2_V_PADDING, ui->text);
+ 671   3            break;
+ 672   3          case MUIF_MSG_FORM_START:
+ 673   3            break;
+ 674   3          case MUIF_MSG_FORM_END:
+ 675   3            break;
+ 676   3          case MUIF_MSG_CURSOR_ENTER:
+ 677   3            break;
+ 678   3          case MUIF_MSG_CURSOR_SELECT:
+ 679   3          case MUIF_MSG_VALUE_INCREMENT:
+ 680   3          case MUIF_MSG_VALUE_DECREMENT:
+ 681   3            //return mui_GotoForm(ui, ui->arg, 0);
+ 682   3            return mui_GotoFormAutoCursorPosition(ui, ui->arg);
+ 683   3          case MUIF_MSG_CURSOR_LEAVE:
+ 684   3            break;
+ 685   3          case MUIF_MSG_TOUCH_DOWN:
+ 686   3            break;
+ 687   3          case MUIF_MSG_TOUCH_UP:
+ 688   3            break;    
+ 689   3        }
+ 690   2        return 0;
+ 691   2      }
+ 692   1      
+ 693   1      /*===============================================================================*/
+ 694   1      
+ 695   1      static void mui_u8g2_u8_vmm_draw_wm_pi(mui_t *ui) MUI_NOINLINE;
+ 696   1      static void mui_u8g2_u8_vmm_draw_wm_pi(mui_t *ui)
+ 697   1      {
+ 698   1        u8g2_t *u8g2 = mui_get_U8g2(ui);
+ 699   1        mui_u8g2_u8_min_max_t *vmm= (mui_u8g2_u8_min_max_t *)muif_get_data(ui->uif);
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 13  
+
+ 700   1        char buf[4] = "999";
+ 701   1        char *s = buf;
+ 702   1        uint8_t *value = mui_u8g2_u8mm_get_valptr(vmm);
+ 703   1        uint8_t min = mui_u8g2_u8mm_get_min(vmm);
+ 704   1        uint8_t max = mui_u8g2_u8mm_get_max(vmm);
+ 705   1        uint8_t cnt = 3;
+ 706   1        
+ 707   1        if ( *value > max ) 
+ 708   1          *value = max;
+ 709   1        if ( *value <= min )
+ 710   1          *value = min;
+ 711   1        if ( max < 100 )
+ 712   1        {
+ 713   2          s++;
+ 714   2          cnt--;
+ 715   2        }
+ 716   1        if ( max < 10 )
+ 717   1        {
+ 718   2          s++;
+ 719   2          cnt--;
+ 720   2        }
+ 721   1        //mui_u8g2_draw_button_utf(ui, mui_u8g2_get_pi_flags(ui), u8g2_GetStrWidth(u8g2, s)+1, 1, MUI_U8G2_V_PAD
+             -DING, u8x8_u8toa(*value, cnt));
+ 722   1        mui_u8g2_draw_button_pi(ui, u8g2_GetStrWidth(u8g2, s)+1, 1, u8x8_u8toa(*value, cnt));
+ 723   1      }
+ 724          
+ 725          
+ 726          uint8_t mui_u8g2_u8_min_max_wm_mse_pi(mui_t *ui, uint8_t msg)
+ 727          {
+ 728   1        mui_u8g2_u8_min_max_t *vmm= (mui_u8g2_u8_min_max_t *)muif_get_data(ui->uif);
+ 729   1        uint8_t *value = mui_u8g2_u8mm_get_valptr(vmm);
+ 730   1        uint8_t min = mui_u8g2_u8mm_get_min(vmm);
+ 731   1        uint8_t max = mui_u8g2_u8mm_get_max(vmm);
+ 732   1        switch(msg)
+ 733   1        {
+ 734   2          case MUIF_MSG_DRAW:
+ 735   2            mui_u8g2_u8_vmm_draw_wm_pi(ui);
+ 736   2            break;
+ 737   2          case MUIF_MSG_FORM_START:
+ 738   2            break;
+ 739   2          case MUIF_MSG_FORM_END:
+ 740   2            break;
+ 741   2          case MUIF_MSG_CURSOR_ENTER:
+ 742   2            break;
+ 743   2          case MUIF_MSG_CURSOR_SELECT:
+ 744   2          case MUIF_MSG_VALUE_INCREMENT:
+ 745   2            (*value)++;
+ 746   2            if ( *value > max ) *value = min;
+ 747   2            break;
+ 748   2          case MUIF_MSG_VALUE_DECREMENT:
+ 749   2            if ( *value > min ) (*value)--; else *value = max;
+ 750   2            break;
+ 751   2          case MUIF_MSG_CURSOR_LEAVE:
+ 752   2            break;
+ 753   2          case MUIF_MSG_TOUCH_DOWN:
+ 754   2            break;
+ 755   2          case MUIF_MSG_TOUCH_UP:
+ 756   2            break;
+ 757   2        }
+ 758   1        return 0;
+ 759   1      }
+ 760          
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 14  
+
+ 761          uint8_t mui_u8g2_u8_min_max_wm_mud_pi(mui_t *ui, uint8_t msg)
+ 762          {
+ 763   1        mui_u8g2_u8_min_max_t *vmm= (mui_u8g2_u8_min_max_t *)muif_get_data(ui->uif);
+ 764   1        uint8_t *value = mui_u8g2_u8mm_get_valptr(vmm);
+ 765   1        uint8_t min = mui_u8g2_u8mm_get_min(vmm);
+ 766   1        uint8_t max = mui_u8g2_u8mm_get_max(vmm);
+ 767   1        switch(msg)
+ 768   1        {
+ 769   2          case MUIF_MSG_DRAW:
+ 770   2            mui_u8g2_u8_vmm_draw_wm_pi(ui);
+ 771   2            break;
+ 772   2          case MUIF_MSG_FORM_START:
+ 773   2            break;
+ 774   2          case MUIF_MSG_FORM_END:
+ 775   2            break;
+ 776   2          case MUIF_MSG_CURSOR_ENTER:
+ 777   2            break;
+ 778   2          case MUIF_MSG_CURSOR_SELECT:
+ 779   2          case MUIF_MSG_VALUE_INCREMENT:
+ 780   2          case MUIF_MSG_VALUE_DECREMENT:
+ 781   2           /* toggle between normal mode and capture next/prev mode */
+ 782   2            ui->is_mud = !ui->is_mud;
+ 783   2            break;
+ 784   2          case MUIF_MSG_CURSOR_LEAVE:
+ 785   2            break;
+ 786   2          case MUIF_MSG_TOUCH_DOWN:
+ 787   2            break;
+ 788   2          case MUIF_MSG_TOUCH_UP:
+ 789   2            break;
+ 790   2          case MUIF_MSG_EVENT_NEXT:
+ 791   2            if ( ui->is_mud )
+ 792   2            {
+ 793   3              (*value)++;
+ 794   3              if ( *value > max )
+ 795   3                *value = min;
+ 796   3              return 1; 
+ 797   3            }
+ 798   2            break;
+ 799   2          case MUIF_MSG_EVENT_PREV:
+ 800   2            if ( ui->is_mud )
+ 801   2            {
+ 802   3              if ( *value <= min )
+ 803   3                *value = max;
+ 804   3              else
+ 805   3                (*value)--;
+ 806   3              return 1;
+ 807   3            }
+ 808   2            break;
+ 809   2        }
+ 810   1        return 0;
+ 811   1      }
+ 812          
+ 813          
+ 814          
+ 815          static void mui_u8g2_u8_vmm_draw_wm_pf(mui_t *ui) MUI_NOINLINE;
+ 816          static void mui_u8g2_u8_vmm_draw_wm_pf(mui_t *ui)
+ 817          {
+ 818   1        u8g2_t *u8g2 = mui_get_U8g2(ui);
+ 819   1        mui_u8g2_u8_min_max_t *vmm= (mui_u8g2_u8_min_max_t *)muif_get_data(ui->uif);
+ 820   1        char buf[4] = "999";
+ 821   1        char *s = buf;
+ 822   1        uint8_t *value = mui_u8g2_u8mm_get_valptr(vmm);
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 15  
+
+ 823   1        uint8_t min = mui_u8g2_u8mm_get_min(vmm);
+ 824   1        uint8_t max = mui_u8g2_u8mm_get_max(vmm);
+ 825   1        uint8_t cnt = 3;
+ 826   1        
+ 827   1        if ( *value > max ) 
+ 828   1          *value = max;
+ 829   1        if ( *value <= min )
+ 830   1          *value = min;
+ 831   1        if ( max < 100 )
+ 832   1        {
+ 833   2          s++;
+ 834   2          cnt--;
+ 835   2        }
+ 836   1        if ( max < 10 )
+ 837   1        {
+ 838   2          s++;
+ 839   2          cnt--;
+ 840   2        }
+ 841   1        //mui_u8g2_draw_button_utf(ui, mui_u8g2_get_pi_flags(ui), u8g2_GetStrWidth(u8g2, s)+1, 1, MUI_U8G2_V_PAD
+             -DING, u8x8_u8toa(*value, cnt));
+ 842   1        mui_u8g2_draw_button_pf(ui, u8g2_GetStrWidth(u8g2, s)+1, 1, u8x8_u8toa(*value, cnt));
+ 843   1      }
+ 844          
+ 845          
+ 846          uint8_t mui_u8g2_u8_min_max_wm_mse_pf(mui_t *ui, uint8_t msg)
+ 847          {
+ 848   1        mui_u8g2_u8_min_max_t *vmm= (mui_u8g2_u8_min_max_t *)muif_get_data(ui->uif);
+ 849   1        uint8_t *value = mui_u8g2_u8mm_get_valptr(vmm);
+ 850   1        uint8_t min = mui_u8g2_u8mm_get_min(vmm);
+ 851   1        uint8_t max = mui_u8g2_u8mm_get_max(vmm);
+ 852   1        switch(msg)
+ 853   1        {
+ 854   2          case MUIF_MSG_DRAW:
+ 855   2            mui_u8g2_u8_vmm_draw_wm_pf(ui);
+ 856   2            break;
+ 857   2          case MUIF_MSG_FORM_START:
+ 858   2            break;
+ 859   2          case MUIF_MSG_FORM_END:
+ 860   2            break;
+ 861   2          case MUIF_MSG_CURSOR_ENTER:
+ 862   2            break;
+ 863   2          case MUIF_MSG_CURSOR_SELECT:
+ 864   2          case MUIF_MSG_VALUE_INCREMENT:
+ 865   2            (*value)++;
+ 866   2            if ( *value > max ) *value = min;
+ 867   2            break;
+ 868   2          case MUIF_MSG_VALUE_DECREMENT:
+ 869   2            if ( *value > min ) (*value)--; else *value = max;
+ 870   2            break;
+ 871   2          case MUIF_MSG_CURSOR_LEAVE:
+ 872   2            break;
+ 873   2          case MUIF_MSG_TOUCH_DOWN:
+ 874   2            break;
+ 875   2          case MUIF_MSG_TOUCH_UP:
+ 876   2            break;
+ 877   2        }
+ 878   1        return 0;
+ 879   1      }
+ 880          
+ 881          uint8_t mui_u8g2_u8_min_max_wm_mud_pf(mui_t *ui, uint8_t msg)
+ 882          {
+ 883   1        mui_u8g2_u8_min_max_t *vmm= (mui_u8g2_u8_min_max_t *)muif_get_data(ui->uif);
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 16  
+
+ 884   1        uint8_t *value = mui_u8g2_u8mm_get_valptr(vmm);
+ 885   1        uint8_t min = mui_u8g2_u8mm_get_min(vmm);
+ 886   1        uint8_t max = mui_u8g2_u8mm_get_max(vmm);
+ 887   1        switch(msg)
+ 888   1        {
+ 889   2          case MUIF_MSG_DRAW:
+ 890   2            mui_u8g2_u8_vmm_draw_wm_pf(ui);
+ 891   2            break;
+ 892   2          case MUIF_MSG_FORM_START:
+ 893   2            break;
+ 894   2          case MUIF_MSG_FORM_END:
+ 895   2            break;
+ 896   2          case MUIF_MSG_CURSOR_ENTER:
+ 897   2            break;
+ 898   2          case MUIF_MSG_CURSOR_SELECT:
+ 899   2          case MUIF_MSG_VALUE_INCREMENT:
+ 900   2          case MUIF_MSG_VALUE_DECREMENT:
+ 901   2            /* toggle between normal mode and capture next/prev mode */
+ 902   2            ui->is_mud = !ui->is_mud;
+ 903   2            break;
+ 904   2          case MUIF_MSG_CURSOR_LEAVE:
+ 905   2            break;
+ 906   2          case MUIF_MSG_TOUCH_DOWN:
+ 907   2            break;
+ 908   2          case MUIF_MSG_TOUCH_UP:
+ 909   2            break;
+ 910   2          case MUIF_MSG_EVENT_NEXT:
+ 911   2            if ( ui->is_mud )
+ 912   2            {
+ 913   3              (*value)++;
+ 914   3              if ( *value > max )
+ 915   3                *value = min;
+ 916   3              return 1;
+ 917   3            }
+ 918   2            break;
+ 919   2          case MUIF_MSG_EVENT_PREV:
+ 920   2            if ( ui->is_mud )
+ 921   2            {
+ 922   3              if ( *value <= min )
+ 923   3                *value = max;
+ 924   3              else
+ 925   3                (*value)--;
+ 926   3              return 1;
+ 927   3            }
+ 928   2            break;
+ 929   2        }
+ 930   1        return 0;
+ 931   1      }
+ 932          
+ 933          
+ 934          /*===============================================================================*/
+ 935          
+ 936          static void mui_u8g2_u8_bar_draw_wm(mui_t *ui, uint8_t flags) MUI_NOINLINE;
+ 937          static void mui_u8g2_u8_bar_draw_wm(mui_t *ui, uint8_t flags)
+ 938          {
+ 939   1        u8g2_t *u8g2 = mui_get_U8g2(ui);
+ 940   1        mui_u8g2_u8_min_max_step_t *vmms= (mui_u8g2_u8_min_max_step_t *)muif_get_data(ui->uif);
+ 941   1        char buf[4] = "999";
+ 942   1        char *s = buf;
+ 943   1        uint8_t *value = mui_u8g2_u8mms_get_valptr(vmms);
+ 944   1        uint8_t min = mui_u8g2_u8mms_get_min(vmms);
+ 945   1        uint8_t max = mui_u8g2_u8mms_get_max(vmms);
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 17  
+
+ 946   1        uint8_t scale = 0;
+ 947   1        //uint8_t step = mui_u8g2_u8mms_get_step(vmms);
+ 948   1        uint8_t mms_flags = mui_u8g2_u8mms_get_flags(vmms);
+ 949   1        uint8_t cnt = 3;
+ 950   1        uint8_t height = u8g2_GetAscent(u8g2);
+ 951   1        int8_t backup_descent;
+ 952   1        u8g2_uint_t x = mui_get_x(ui);
+ 953   1        u8g2_uint_t w = 0;
+ 954   1        
+ 955   1        if ( mms_flags & MUI_MMS_2X_BAR )
+ 956   1          scale |= 1;
+ 957   1        if ( mms_flags & MUI_MMS_4X_BAR )
+ 958   1          scale |= 2;
+ 959   1        
+ 960   1        if ( *value > max ) 
+ 961   1          *value = max;
+ 962   1        if ( *value <= min )
+ 963   1          *value = min;
+ 964   1        if ( max < 100 )
+ 965   1        {
+ 966   2          s++;
+ 967   2          cnt--;
+ 968   2        }
+ 969   1        if ( max < 10 )
+ 970   1        {
+ 971   2          s++;
+ 972   2          cnt--;
+ 973   2        }
+ 974   1        //mui_u8g2_draw_button_utf(ui, mui_u8g2_get_pi_flags(ui), u8g2_GetStrWidth(u8g2, s)+1, 1, MUI_U8G2_V_PAD
+             -DING, u8x8_u8toa(*value, cnt));
+ 975   1        //mui_u8g2_draw_button_pi(ui, u8g2_GetStrWidth(u8g2, s)+1, 1, u8x8_u8toa(*value, cnt));
+ 976   1        
+ 977   1        w += (max<<scale)+2;
+ 978   1        u8g2_DrawFrame( u8g2, x, mui_get_y(ui)-height, w, height);
+ 979   1        u8g2_DrawBox( u8g2, x+1, mui_get_y(ui)-height+1, (*value)<<scale, height-2);
+ 980   1        if ( mms_flags & MUI_MMS_SHOW_VALUE )
+ 981   1        {
+ 982   2          w += 2;
+ 983   2          u8g2_DrawStr(u8g2,  x+w, mui_get_y(ui), u8x8_u8toa(*value, cnt) );
+ 984   2          w += u8g2_GetStrWidth(u8g2, s);
+ 985   2          w += 1; 
+ 986   2        }
+ 987   1        backup_descent = u8g2->font_ref_descent;
+ 988   1        u8g2->font_ref_descent = 0; /* hmm... that's a low level hack so that DrawButtonFrame ignores the descen
+             -t value of the font */
+ 989   1        u8g2_DrawButtonFrame(u8g2, x, mui_get_y(ui), flags, w, 1, 1);
+ 990   1        u8g2->font_ref_descent = backup_descent;
+ 991   1        
+ 992   1      }
+ 993          
+ 994          
+ 995          uint8_t mui_u8g2_u8_bar_wm_mse_pi(mui_t *ui, uint8_t msg)
+ 996          {
+ 997   1        mui_u8g2_u8_min_max_step_t *vmms= (mui_u8g2_u8_min_max_step_t *)muif_get_data(ui->uif);
+ 998   1        uint8_t *value = mui_u8g2_u8mms_get_valptr(vmms);
+ 999   1        uint8_t min = mui_u8g2_u8mms_get_min(vmms);
+1000   1        uint8_t max = mui_u8g2_u8mms_get_max(vmms);
+1001   1        uint8_t step = mui_u8g2_u8mms_get_step(vmms);
+1002   1        switch(msg)
+1003   1        {
+1004   2          case MUIF_MSG_DRAW:
+1005   2            mui_u8g2_u8_bar_draw_wm(ui, mui_u8g2_get_pi_flags(ui));
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 18  
+
+1006   2            break;
+1007   2          case MUIF_MSG_FORM_START:
+1008   2            break;
+1009   2          case MUIF_MSG_FORM_END:
+1010   2            break;
+1011   2          case MUIF_MSG_CURSOR_ENTER:
+1012   2            break;
+1013   2          case MUIF_MSG_CURSOR_SELECT:
+1014   2          case MUIF_MSG_VALUE_INCREMENT:
+1015   2            (*value)+=step;
+1016   2            if ( *value > max ) *value = min;
+1017   2            break;
+1018   2          case MUIF_MSG_VALUE_DECREMENT:
+1019   2            if ( *value >= min+step ) (*value)-=step; else *value = max;
+1020   2            break;
+1021   2          case MUIF_MSG_CURSOR_LEAVE:
+1022   2            break;
+1023   2          case MUIF_MSG_TOUCH_DOWN:
+1024   2            break;
+1025   2          case MUIF_MSG_TOUCH_UP:
+1026   2            break;
+1027   2        }
+1028   1        return 0;
+1029   1      }
+1030          
+1031          
+1032          uint8_t mui_u8g2_u8_bar_wm_mud_pi(mui_t *ui, uint8_t msg)
+1033          {
+1034   1        mui_u8g2_u8_min_max_step_t *vmms= (mui_u8g2_u8_min_max_step_t *)muif_get_data(ui->uif);
+1035   1        uint8_t *value = mui_u8g2_u8mms_get_valptr(vmms);
+1036   1        uint8_t min = mui_u8g2_u8mms_get_min(vmms);
+1037   1        uint8_t max = mui_u8g2_u8mms_get_max(vmms);
+1038   1        uint8_t step = mui_u8g2_u8mms_get_step(vmms);
+1039   1        switch(msg)
+1040   1        {
+1041   2          case MUIF_MSG_DRAW:
+1042   2            mui_u8g2_u8_bar_draw_wm(ui, mui_u8g2_get_pi_flags(ui));
+1043   2            break;
+1044   2          case MUIF_MSG_FORM_START:
+1045   2            break;
+1046   2          case MUIF_MSG_FORM_END:
+1047   2            break;
+1048   2          case MUIF_MSG_CURSOR_ENTER:
+1049   2            break;
+1050   2          case MUIF_MSG_CURSOR_SELECT:
+1051   2          case MUIF_MSG_VALUE_INCREMENT:
+1052   2          case MUIF_MSG_VALUE_DECREMENT:
+1053   2            /* toggle between normal mode and capture next/prev mode */
+1054   2            ui->is_mud = !ui->is_mud;
+1055   2            break;
+1056   2          case MUIF_MSG_CURSOR_LEAVE:
+1057   2            break;
+1058   2          case MUIF_MSG_TOUCH_DOWN:
+1059   2            break;
+1060   2          case MUIF_MSG_TOUCH_UP:
+1061   2            break;
+1062   2          case MUIF_MSG_EVENT_NEXT:
+1063   2            if ( ui->is_mud )
+1064   2            {
+1065   3              (*value)+=step;
+1066   3              if ( *value > max )
+1067   3                *value = min;
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 19  
+
+1068   3              return 1;
+1069   3            }
+1070   2            break;
+1071   2          case MUIF_MSG_EVENT_PREV:
+1072   2            if ( ui->is_mud )
+1073   2            {
+1074   3              if ( *value <= min || *value > max)
+1075   3                *value = max;
+1076   3              else
+1077   3                (*value)-=step;
+1078   3              return 1;
+1079   3            }
+1080   2            break;
+1081   2        }
+1082   1        return 0;
+1083   1      }
+1084          
+1085          uint8_t mui_u8g2_u8_bar_wm_mse_pf(mui_t *ui, uint8_t msg)
+1086          {
+1087   1        mui_u8g2_u8_min_max_step_t *vmms= (mui_u8g2_u8_min_max_step_t *)muif_get_data(ui->uif);
+1088   1        uint8_t *value = mui_u8g2_u8mms_get_valptr(vmms);
+1089   1        uint8_t min = mui_u8g2_u8mms_get_min(vmms);
+1090   1        uint8_t max = mui_u8g2_u8mms_get_max(vmms);
+1091   1        uint8_t step = mui_u8g2_u8mms_get_step(vmms);
+1092   1        switch(msg)
+1093   1        {
+1094   2          case MUIF_MSG_DRAW:
+1095   2            mui_u8g2_u8_bar_draw_wm(ui, mui_u8g2_get_pf_flags(ui));
+1096   2            break;
+1097   2          case MUIF_MSG_FORM_START:
+1098   2            break;
+1099   2          case MUIF_MSG_FORM_END:
+1100   2            break;
+1101   2          case MUIF_MSG_CURSOR_ENTER:
+1102   2            break;
+1103   2          case MUIF_MSG_CURSOR_SELECT:
+1104   2          case MUIF_MSG_VALUE_INCREMENT:
+1105   2            (*value)+=step;
+1106   2            if ( *value > max ) *value = min;
+1107   2            break;
+1108   2          case MUIF_MSG_VALUE_DECREMENT:
+1109   2            if ( *value >= min+step ) (*value)-=step; else *value = max;
+1110   2            break;
+1111   2          case MUIF_MSG_CURSOR_LEAVE:
+1112   2            break;
+1113   2          case MUIF_MSG_TOUCH_DOWN:
+1114   2            break;
+1115   2          case MUIF_MSG_TOUCH_UP:
+1116   2            break;
+1117   2        }
+1118   1        return 0;
+1119   1      }
+1120          
+1121          uint8_t mui_u8g2_u8_bar_wm_mud_pf(mui_t *ui, uint8_t msg)
+1122          {
+1123   1        mui_u8g2_u8_min_max_step_t *vmms= (mui_u8g2_u8_min_max_step_t *)muif_get_data(ui->uif);
+1124   1        uint8_t *value = mui_u8g2_u8mms_get_valptr(vmms);
+1125   1        uint8_t min = mui_u8g2_u8mms_get_min(vmms);
+1126   1        uint8_t max = mui_u8g2_u8mms_get_max(vmms);
+1127   1        uint8_t step = mui_u8g2_u8mms_get_step(vmms);
+1128   1        switch(msg)
+1129   1        {
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 20  
+
+1130   2          case MUIF_MSG_DRAW:
+1131   2            mui_u8g2_u8_bar_draw_wm(ui, mui_u8g2_get_pf_flags(ui));
+1132   2            break;
+1133   2          case MUIF_MSG_FORM_START:
+1134   2            break;
+1135   2          case MUIF_MSG_FORM_END:
+1136   2            break;
+1137   2          case MUIF_MSG_CURSOR_ENTER:
+1138   2            break;
+1139   2          case MUIF_MSG_CURSOR_SELECT:
+1140   2          case MUIF_MSG_VALUE_INCREMENT:
+1141   2          case MUIF_MSG_VALUE_DECREMENT:
+1142   2            /* toggle between normal mode and capture next/prev mode */
+1143   2            ui->is_mud = !ui->is_mud;
+1144   2            break;
+1145   2          case MUIF_MSG_CURSOR_LEAVE:
+1146   2            break;
+1147   2          case MUIF_MSG_TOUCH_DOWN:
+1148   2            break;
+1149   2          case MUIF_MSG_TOUCH_UP:
+1150   2            break;
+1151   2          case MUIF_MSG_EVENT_NEXT:
+1152   2            if ( ui->is_mud )
+1153   2            {
+1154   3              (*value)+=step;
+1155   3              if ( *value > max )
+1156   3                *value = min;
+1157   3              return 1;
+1158   3            }
+1159   2            break;
+1160   2          case MUIF_MSG_EVENT_PREV:
+1161   2            if ( ui->is_mud )
+1162   2            {
+1163   3              if ( *value <= min || *value > max)
+1164   3                *value = max;
+1165   3              else
+1166   3                (*value)-=step;
+1167   3              return 1;
+1168   3            }
+1169   2            break;
+1170   2        }
+1171   1        return 0;
+1172   1      }
+1173          
+1174          /*===============================================================================*/
+1175          
+1176          static uint8_t mui_is_valid_char(uint8_t c) MUI_NOINLINE;
+1177          uint8_t mui_is_valid_char(uint8_t c)
+1178          {
+1179   1        if ( c == 32 )
+1180   1          return 1;
+1181   1        if ( c >= 'A' && c <= 'Z' )
+1182   1          return 1;
+1183   1        if ( c >= 'a' && c <= 'z' )
+1184   1          return 1;
+1185   1        if ( c >= '0' && c <= '9' )
+1186   1          return 1;
+1187   1        return 0;
+1188   1      }
+1189          
+1190          
+1191          
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 21  
+
+1192          uint8_t mui_u8g2_u8_char_wm_mud_pi(mui_t *ui, uint8_t msg)
+1193          {
+1194   1        //ui->dflags                          MUIF_DFLAG_IS_CURSOR_FOCUS       MUIF_DFLAG_IS_TOUCH_FOCUS
+1195   1        //mui_get_cflags(ui->uif)       MUIF_CFLAG_IS_CURSOR_SELECTABLE
+1196   1        u8g2_t *u8g2 = mui_get_U8g2(ui);
+1197   1        uint8_t *value = (uint8_t *)muif_get_data(ui->uif);
+1198   1        char buf[6];
+1199   1        switch(msg)
+1200   1        {
+1201   2          case MUIF_MSG_DRAW:
+1202   2            while( mui_is_valid_char(*value) == 0 )
+1203   2                (*value)++;
+1204   2            buf[0] = *value;
+1205   2            buf[1] = '\0';
+1206   2            mui_u8g2_draw_button_pi(ui, u8g2_GetMaxCharWidth(u8g2), 1, buf);
+1207   2            //mui_u8g2_draw_button_utf(ui, mui_u8g2_get_pi_flags(ui), u8g2_GetMaxCharWidth(u8g2), 1, MUI_U8G2_V_
+             -PADDING, buf);
+1208   2            //u8g2_DrawButtonUTF8(u8g2, mui_get_x(ui), mui_get_y(ui), mui_u8g2_get_pi_flags(ui), u8g2_GetMaxChar
+             -Width(u8g2), 1, MUI_U8G2_V_PADDING, buf);
+1209   2            break;
+1210   2          case MUIF_MSG_FORM_START:
+1211   2            break;
+1212   2          case MUIF_MSG_FORM_END:
+1213   2            break;
+1214   2          case MUIF_MSG_CURSOR_ENTER:
+1215   2            break;
+1216   2          case MUIF_MSG_CURSOR_SELECT:
+1217   2           case MUIF_MSG_VALUE_INCREMENT:
+1218   2          case MUIF_MSG_VALUE_DECREMENT:
+1219   2           /* toggle between normal mode and capture next/prev mode */
+1220   2             ui->is_mud = !ui->is_mud;
+1221   2           break;
+1222   2          case MUIF_MSG_CURSOR_LEAVE:
+1223   2            break;
+1224   2          case MUIF_MSG_TOUCH_DOWN:
+1225   2            break;
+1226   2          case MUIF_MSG_TOUCH_UP:
+1227   2            break;
+1228   2          case MUIF_MSG_EVENT_NEXT:
+1229   2            if ( ui->is_mud )
+1230   2            {
+1231   3              do {
+1232   4                (*value)++;
+1233   4              } while( mui_is_valid_char(*value) == 0 );
+1234   3              return 1;
+1235   3            }
+1236   2            break;
+1237   2          case MUIF_MSG_EVENT_PREV:
+1238   2            if ( ui->is_mud )
+1239   2            {
+1240   3              do {
+1241   4                (*value)--;
+1242   4              } while( mui_is_valid_char(*value) == 0 );
+1243   3              return 1;
+1244   3            }
+1245   2            break;
+1246   2        }
+1247   1        return 0;
+1248   1      }
+1249          
+1250          
+1251          
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 22  
+
+1252          
+1253          
+1254          /*
+1255          
+1256            uint8_t mui_u8g2_u8_opt_line_wa_mse_pi(mui_t *ui, uint8_t msg)
+1257          
+1258            Description:
+1259              Select one of several options. First option has value 0.
+1260              Only one option is visible.
+1261              The visible option is automatically the selected option.
+1262          
+1263            Message Handling: DRAW, SELECT
+1264          
+1265            Style
+1266              No Selection: Text only
+1267              Cursor Selection: Inverted text
+1268          
+1269            User interface field list (muif):
+1270              flags: MUIF_CFLAG_IS_CURSOR_SELECTABLE
+1271              data: uint8_t *, pointer to a uint8_t variable, which contains the selected option 
+1272          
+1273            Field definition string (fds):
+1274              xy: Left position of the text (required)
+1275              arg: total width of the selectable option (optional), 
+1276              text: '|' separated list of options
+1277              
+1278          */
+1279          uint8_t mui_u8g2_u8_opt_line_wa_mse_pi(mui_t *ui, uint8_t msg)
+1280          {
+1281   1        //u8g2_t *u8g2 = mui_get_U8g2(ui);
+1282   1        uint8_t *value = (uint8_t *)muif_get_data(ui->uif);
+1283   1        switch(msg)
+1284   1        {
+1285   1          case MUIF_MSG_DRAW:
+1286   1            if ( mui_fds_get_nth_token(ui, *value) == 0 )
+1287   1            {
+1288   1              *value = 0;
+1289   1              mui_fds_get_nth_token(ui, *value);
+1290   1            }
+1291                mui_u8g2_draw_button_pi(ui, ui->arg, 1, ui->text);
+1292                //mui_u8g2_draw_button_utf(ui, mui_u8g2_get_pi_flags(ui), ui->arg, 1, MUI_U8G2_V_PADDING, ui->text);
+1293                //u8g2_DrawButtonUTF8(u8g2, mui_get_x(ui), mui_get_y(ui), mui_u8g2_get_pi_flags(ui), ui->arg, 1, MUI
+             -_U8G2_V_PADDING, ui->text);
+1294                
+1295                break;
+1296              case MUIF_MSG_FORM_START:
+1297                break;
+1298              case MUIF_MSG_FORM_END:
+1299                break;
+1300              case MUIF_MSG_CURSOR_ENTER:
+1301                break;
+1302              case MUIF_MSG_CURSOR_SELECT:
+1303              case MUIF_MSG_VALUE_INCREMENT:
+1304                (*value)++;
+1305                if ( mui_fds_get_nth_token(ui, *value) == 0 ) 
+1306                  *value = 0;      
+1307                break;
+1308              case MUIF_MSG_VALUE_DECREMENT:
+1309                if ( *value > 0 ) 
+1310                  (*value)--;
+1311                else
+1312                  (*value) = mui_fds_get_token_cnt(ui)-1;
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 23  
+
+1313                break;
+1314              case MUIF_MSG_CURSOR_LEAVE:
+1315                break;
+1316              case MUIF_MSG_TOUCH_DOWN:
+1317                break;
+1318              case MUIF_MSG_TOUCH_UP:
+1319                break;
+1320            }
+1321            return 0;
+1322          }
+1323          
+1324          uint8_t mui_u8g2_u8_opt_line_wa_mse_pf(mui_t *ui, uint8_t msg)
+1325          {
+1326            //u8g2_t *u8g2 = mui_get_U8g2(ui);
+1327            uint8_t *value = (uint8_t *)muif_get_data(ui->uif);
+1328            switch(msg)
+1329            {
+1330              case MUIF_MSG_DRAW:
+1331                if ( mui_fds_get_nth_token(ui, *value) == 0 )
+1332                {
+1333                  *value = 0;
+1334                  mui_fds_get_nth_token(ui, *value);
+1335                }
+1336                mui_u8g2_draw_button_pf(ui, ui->arg, 1, ui->text);
+1337                
+1338                break;
+1339              case MUIF_MSG_FORM_START:
+1340                break;
+1341              case MUIF_MSG_FORM_END:
+1342                break;
+1343              case MUIF_MSG_CURSOR_ENTER:
+1344                break;
+1345              case MUIF_MSG_CURSOR_SELECT:
+1346              case MUIF_MSG_VALUE_INCREMENT:
+1347                (*value)++;
+1348                if ( mui_fds_get_nth_token(ui, *value) == 0 ) 
+1349                  *value = 0;      
+1350                break;
+1351              case MUIF_MSG_VALUE_DECREMENT:
+1352                if ( *value > 0 ) 
+1353                  (*value)--;
+1354                else
+1355                  (*value) = mui_fds_get_token_cnt(ui)-1;
+1356                break;
+1357              case MUIF_MSG_CURSOR_LEAVE:
+1358                break;
+1359              case MUIF_MSG_TOUCH_DOWN:
+1360                break;
+1361              case MUIF_MSG_TOUCH_UP:
+1362                break;
+1363            }
+1364            return 0;
+1365          }
+1366          
+1367          uint8_t mui_u8g2_u8_opt_line_wa_mud_pi(mui_t *ui, uint8_t msg)
+1368          {
+1369            //u8g2_t *u8g2 = mui_get_U8g2(ui);
+1370            uint8_t *value = (uint8_t *)muif_get_data(ui->uif);
+1371            switch(msg)
+1372            {
+1373              case MUIF_MSG_DRAW:
+1374                if ( mui_fds_get_nth_token(ui, *value) == 0 )
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 24  
+
+1375                {
+1376                  *value = 0;
+1377                  mui_fds_get_nth_token(ui, *value);
+1378                }
+1379                mui_u8g2_draw_button_pi(ui, ui->arg, 1, ui->text);
+1380                
+1381                break;
+1382              case MUIF_MSG_FORM_START:
+1383                break;
+1384              case MUIF_MSG_FORM_END:
+1385                break;
+1386              case MUIF_MSG_CURSOR_ENTER:
+1387                break;
+1388              case MUIF_MSG_CURSOR_SELECT:
+1389              case MUIF_MSG_VALUE_INCREMENT:
+1390              case MUIF_MSG_VALUE_DECREMENT:
+1391                /* toggle between normal mode and capture next/prev mode */
+1392                 ui->is_mud = !ui->is_mud;
+1393               break;
+1394              case MUIF_MSG_CURSOR_LEAVE:
+1395                break;
+1396              case MUIF_MSG_TOUCH_DOWN:
+1397                break;
+1398              case MUIF_MSG_TOUCH_UP:
+1399                break;
+1400              case MUIF_MSG_EVENT_NEXT:
+1401                if ( ui->is_mud )
+1402                {
+1403                  (*value)++;
+1404                  if ( mui_fds_get_nth_token(ui, *value) == 0 ) 
+1405                    *value = 0;      
+1406                  return 1;
+1407                }
+1408                break;
+1409              case MUIF_MSG_EVENT_PREV:
+1410                if ( ui->is_mud )
+1411                {
+1412                  if ( *value == 0 )
+1413                    *value = mui_fds_get_token_cnt(ui);
+1414                  (*value)--;
+1415                  return 1;
+1416                }
+1417                break;
+1418            }
+1419            return 0;
+1420          }
+1421          
+1422          uint8_t mui_u8g2_u8_opt_line_wa_mud_pf(mui_t *ui, uint8_t msg)
+1423          {
+1424            //u8g2_t *u8g2 = mui_get_U8g2(ui);
+1425            uint8_t *value = (uint8_t *)muif_get_data(ui->uif);
+1426            switch(msg)
+1427            {
+1428              case MUIF_MSG_DRAW:
+1429                if ( mui_fds_get_nth_token(ui, *value) == 0 )
+1430                {
+1431                  *value = 0;
+1432                  mui_fds_get_nth_token(ui, *value);
+1433                }
+1434                mui_u8g2_draw_button_pf(ui, ui->arg, 1, ui->text);
+1435                
+1436                break;
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 25  
+
+1437              case MUIF_MSG_FORM_START:
+1438                break;
+1439              case MUIF_MSG_FORM_END:
+1440                break;
+1441              case MUIF_MSG_CURSOR_ENTER:
+1442                break;
+1443              case MUIF_MSG_CURSOR_SELECT:
+1444              case MUIF_MSG_VALUE_INCREMENT:
+1445              case MUIF_MSG_VALUE_DECREMENT:
+1446                /* toggle between normal mode and capture next/prev mode */
+1447                 ui->is_mud = !ui->is_mud;
+1448               break;
+1449              case MUIF_MSG_CURSOR_LEAVE:
+1450                break;
+1451              case MUIF_MSG_TOUCH_DOWN:
+1452                break;
+1453              case MUIF_MSG_TOUCH_UP:
+1454                break;
+1455              case MUIF_MSG_EVENT_NEXT:
+1456                if ( ui->is_mud )
+1457                {
+1458                  (*value)++;
+1459                  if ( mui_fds_get_nth_token(ui, *value) == 0 ) 
+1460                    *value = 0;      
+1461                  return 1;
+1462                }
+1463                break;
+1464              case MUIF_MSG_EVENT_PREV:
+1465                if ( ui->is_mud )
+1466                {
+1467                  if ( *value == 0 )
+1468                    *value = mui_fds_get_token_cnt(ui);
+1469                  (*value)--;
+1470                  return 1;
+1471                }
+1472                break;
+1473            }
+1474            return 0;
+1475          }
+1476          
+1477          
+1478          
+1479          /*
+1480          
+1481            uint8_t mui_u8g2_u8_chkbox_wm_pi(mui_t *ui, uint8_t msg)
+1482            
+1483            Description:
+1484              Checkbox with the values 0 (not selected) and 1 (selected). 
+1485          
+1486            Message Handling: DRAW, SELECT
+1487          
+1488            Style
+1489              No Selection: Plain checkbox and text
+1490              Cursor Selection: Checkbox and text is inverted
+1491          
+1492            User interface field list (muif):
+1493              flags: MUIF_CFLAG_IS_CURSOR_SELECTABLE
+1494              data: uint8_t *, pointer to a uint8_t variable, which contains the values 0 or 1
+1495          
+1496            Field definition string (fds):
+1497              xy: Left position of the text (required)
+1498              arg: not used
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 26  
+
+1499              text: Optional: Text will be printed after the checkbox with a small gap
+1500              
+1501          */
+1502          
+1503          uint8_t mui_u8g2_u8_chkbox_wm_pi(mui_t *ui, uint8_t msg)
+1504          {
+1505            u8g2_t *u8g2 = mui_get_U8g2(ui);
+1506            u8g2_uint_t flags = 0;
+1507            uint8_t *value = (uint8_t *)muif_get_data(ui->uif);
+1508            switch(msg)
+1509            {
+1510              case MUIF_MSG_DRAW:
+1511                if ( *value > 1 ) *value = 1;
+1512                if ( mui_IsCursorFocus(ui) )
+1513                {
+1514                  flags |= U8G2_BTN_INV;
+1515                }
+1516                
+1517                {
+1518                  u8g2_uint_t w = 0;
+1519                  u8g2_uint_t a = u8g2_GetAscent(u8g2);
+1520                  if ( *value )
+1521                    u8g2_DrawCheckbox(u8g2, mui_get_x(ui), mui_get_y(ui), a, 1);
+1522                  else
+1523                    u8g2_DrawCheckbox(u8g2, mui_get_x(ui), mui_get_y(ui), a, 0);
+1524                  
+1525                  if ( ui->text[0] != '\0' )
+1526                  {
+1527                    w =  u8g2_GetUTF8Width(u8g2, ui->text);
+1528                    //u8g2_SetFontMode(u8g2, 1);
+1529                    a += 2;       /* add gap between the checkbox and the text area */
+1530                    u8g2_DrawUTF8(u8g2, mui_get_x(ui)+a, mui_get_y(ui), ui->text);
+1531                  }
+1532                  
+1533                  u8g2_DrawButtonFrame(u8g2, mui_get_x(ui), mui_get_y(ui), flags, w+a, 1, MUI_U8G2_V_PADDING);
+1534                }
+1535                break;
+1536              case MUIF_MSG_FORM_START:
+1537                break;
+1538              case MUIF_MSG_FORM_END:
+1539                break;
+1540              case MUIF_MSG_CURSOR_ENTER:
+1541                break;
+1542              case MUIF_MSG_CURSOR_SELECT:
+1543              case MUIF_MSG_VALUE_INCREMENT:
+1544              case MUIF_MSG_VALUE_DECREMENT:
+1545                (*value)++;
+1546                if ( *value > 1 ) *value = 0;      
+1547                break;
+1548              case MUIF_MSG_CURSOR_LEAVE:
+1549                break;
+1550              case MUIF_MSG_TOUCH_DOWN:
+1551                break;
+1552              case MUIF_MSG_TOUCH_UP:
+1553                break;
+1554            }
+1555            return 0;
+1556          }
+1557          
+1558          /*
+1559            radio button style, arg is assigned as value
+1560          */
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 27  
+
+1561          uint8_t mui_u8g2_u8_radio_wm_pi(mui_t *ui, uint8_t msg)
+1562          {
+1563            u8g2_t *u8g2 = mui_get_U8g2(ui);
+1564            u8g2_uint_t flags = 0;
+1565            uint8_t *value = (uint8_t *)muif_get_data(ui->uif);
+1566            switch(msg)
+1567            {
+1568              case MUIF_MSG_DRAW:
+1569                 if ( mui_IsCursorFocus(ui) )
+1570                {
+1571                  flags |= U8G2_BTN_INV;
+1572                }
+1573                
+1574                {
+1575                  u8g2_uint_t w = 0;
+1576                  u8g2_uint_t a = u8g2_GetAscent(u8g2);
+1577                  if ( *value == ui->arg )
+1578                    u8g2_DrawCheckbox(u8g2, mui_get_x(ui), mui_get_y(ui), a, 1);
+1579                  else
+1580                    u8g2_DrawCheckbox(u8g2, mui_get_x(ui), mui_get_y(ui), a, 0);
+1581                  
+1582                  if ( ui->text[0] != '\0' )
+1583                  {
+1584                    w =  u8g2_GetUTF8Width(u8g2, ui->text);
+1585                    //u8g2_SetFontMode(u8g2, 1);
+1586                    a += 2;       /* add gap between the checkbox and the text area */
+1587                    u8g2_DrawUTF8(u8g2, mui_get_x(ui)+a, mui_get_y(ui), ui->text);
+1588                  }
+1589                  
+1590                  u8g2_DrawButtonFrame(u8g2, mui_get_x(ui), mui_get_y(ui), flags, w+a, 1, MUI_U8G2_V_PADDING);
+1591                }
+1592                break;
+1593             case MUIF_MSG_FORM_START:
+1594                break;
+1595              case MUIF_MSG_FORM_END:
+1596                break;
+1597              case MUIF_MSG_CURSOR_ENTER:
+1598                break;
+1599              case MUIF_MSG_CURSOR_SELECT:
+1600              case MUIF_MSG_VALUE_INCREMENT:
+1601              case MUIF_MSG_VALUE_DECREMENT:
+1602                *value = ui->arg;
+1603                break;
+1604              case MUIF_MSG_CURSOR_LEAVE:
+1605                break;
+1606              case MUIF_MSG_TOUCH_DOWN:
+1607                break;
+1608              case MUIF_MSG_TOUCH_UP:
+1609                break;
+1610            }
+1611            return 0;  
+1612          }
+1613          
+1614          
+1615          uint8_t mui_u8g2_u8_opt_parent_wm_pi(mui_t *ui, uint8_t msg)
+1616          {
+1617            uint8_t *value = (uint8_t *)muif_get_data(ui->uif);
+1618            switch(msg)
+1619            {
+1620              case MUIF_MSG_DRAW:
+1621                if ( mui_fds_get_nth_token(ui, *value) == 0 )
+1622                {
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 28  
+
+1623                  *value = 0;
+1624                  mui_fds_get_nth_token(ui, *value);
+1625                }      
+1626                mui_u8g2_draw_button_pi(ui, 0, 1, ui->text);
+1627                //mui_u8g2_draw_button_utf(ui, mui_u8g2_get_pi_flags(ui), 0, 1, MUI_U8G2_V_PADDING, ui->text);
+1628                
+1629                break;
+1630              case MUIF_MSG_FORM_START:
+1631                break;
+1632              case MUIF_MSG_FORM_END:
+1633                break;
+1634              case MUIF_MSG_CURSOR_ENTER:
+1635                break;
+1636              case MUIF_MSG_CURSOR_SELECT:
+1637              case MUIF_MSG_VALUE_INCREMENT:
+1638              case MUIF_MSG_VALUE_DECREMENT:
+1639                mui_SaveForm(ui);          // store the current form and position so that the child can jump back
+1640                mui_GotoForm(ui, ui->arg, *value);  // assumes that the selectable values are at the beginning of th
+             -e form definition
+1641                break;
+1642              case MUIF_MSG_CURSOR_LEAVE:
+1643                break;
+1644              case MUIF_MSG_TOUCH_DOWN:
+1645                break;
+1646              case MUIF_MSG_TOUCH_UP:
+1647                break;
+1648            }
+1649            return 0;
+1650          }
+1651          
+1652          
+1653          uint8_t mui_u8g2_u8_opt_child_mse_common(mui_t *ui, uint8_t msg)
+1654          {
+1655            uint8_t *value = (uint8_t *)muif_get_data(ui->uif);
+1656            uint8_t arg = ui->arg;        // remember the arg value, because it might be overwritten
+1657            
+1658            switch(msg)
+1659            {
+1660              case MUIF_MSG_DRAW:
+1661                /* done by the calling function */
+1662                break;
+1663              case MUIF_MSG_FORM_START:
+1664                /* we can assume that the list starts at the top. It will be adjisted by cursor down events later */
+1665                /* ui->form_scroll_top = 0 and all other form_scroll values are set to 0 if a new form is entered in
+             - mui_EnterForm() */
+1666                if ( ui->form_scroll_visible <= arg )
+1667                  ui->form_scroll_visible = arg+1;
+1668                if ( ui->form_scroll_total == 0 )
+1669                    ui->form_scroll_total = mui_GetSelectableFieldOptionCnt(ui, ui->last_form_fds);
+1670                //printf("MUIF_MSG_FORM_START: arg=%d visible=%d top=%d total=%d\n", arg, ui->form_scroll_visible, u
+             -i->form_scroll_top, ui->form_scroll_total);
+1671                break;
+1672              case MUIF_MSG_FORM_END:  
+1673                break;
+1674              case MUIF_MSG_CURSOR_ENTER:
+1675                return mui_u8g2_handle_scroll_next_prev_events(ui, msg);
+1676              case MUIF_MSG_CURSOR_SELECT:
+1677              case MUIF_MSG_VALUE_INCREMENT:
+1678              case MUIF_MSG_VALUE_DECREMENT:
+1679                if ( value != NULL )
+1680                  *value = ui->form_scroll_top + arg;
+1681                mui_RestoreForm(ui);
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 29  
+
+1682                break;
+1683              case MUIF_MSG_CURSOR_LEAVE:
+1684                break;
+1685              case MUIF_MSG_TOUCH_DOWN:
+1686                break;
+1687              case MUIF_MSG_TOUCH_UP:
+1688                break;
+1689              case MUIF_MSG_EVENT_NEXT:
+1690                return mui_u8g2_handle_scroll_next_prev_events(ui, msg);
+1691              case MUIF_MSG_EVENT_PREV:
+1692                return mui_u8g2_handle_scroll_next_prev_events(ui, msg);
+1693            }
+1694            return 0;
+1695          }
+1696          
+1697          
+1698          uint8_t mui_u8g2_u8_opt_radio_child_wm_pi(mui_t *ui, uint8_t msg)
+1699          {
+1700            u8g2_t *u8g2 = mui_get_U8g2(ui);
+1701            uint8_t *value = (uint8_t *)muif_get_data(ui->uif);
+1702            uint8_t arg = ui->arg;        // remember the arg value, because it might be overwritten
+1703            
+1704            switch(msg)
+1705            {
+1706              case MUIF_MSG_DRAW:
+1707                {
+1708                  u8g2_uint_t w = 0;
+1709                  u8g2_uint_t a = u8g2_GetAscent(u8g2) - 2;
+1710                  u8g2_uint_t x = mui_get_x(ui);   // if mui_GetSelectableFieldTextOption is called, then field vars
+             - are overwritten, so get the value
+1711                  u8g2_uint_t y = mui_get_y(ui);  // if mui_GetSelectableFieldTextOption is called, then field vars 
+             -are overwritten, so get the value
+1712                  uint8_t is_focus = mui_IsCursorFocus(ui);
+1713                  if ( *value == arg + ui->form_scroll_top )
+1714                    u8g2_DrawValueMark(u8g2, x, y, a);
+1715          
+1716                  if ( ui->text[0] == '\0' )
+1717                  {
+1718                    /* if the text is not provided, then try to get the text from the previous (saved) element, assu
+             -ming that this contains the selection */
+1719                    /* this will overwrite all ui member functions, so we must not access any ui members (except ui-
+             ->text) any more */
+1720                    mui_GetSelectableFieldTextOption(ui, ui->last_form_fds, arg + ui->form_scroll_top);
+1721                  }
+1722                  
+1723                  if ( ui->text[0] != '\0' )
+1724                  {
+1725                    w =  u8g2_GetUTF8Width(u8g2, ui->text);
+1726                    //u8g2_SetFontMode(u8g2, 1);
+1727                    a += 2;       /* add gap between the checkbox and the text area */
+1728                    u8g2_DrawUTF8(u8g2, x+a, y, ui->text);
+1729                  }        
+1730                  if ( is_focus )
+1731                  {
+1732                    u8g2_DrawButtonFrame(u8g2, x, y, U8G2_BTN_INV, w+a, 1, MUI_U8G2_V_PADDING);
+1733                  }
+1734                }
+1735                break;
+1736              default:
+1737                return mui_u8g2_u8_opt_child_mse_common(ui, msg);
+1738            }
+1739            return 0;
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 30  
+
+1740          }
+1741          
+1742          
+1743          uint8_t mui_u8g2_u8_opt_radio_child_w1_pi(mui_t *ui, uint8_t msg)
+1744          {
+1745            u8g2_t *u8g2 = mui_get_U8g2(ui);
+1746            uint8_t *value = (uint8_t *)muif_get_data(ui->uif);
+1747            uint8_t arg = ui->arg;        // remember the arg value, because it might be overwritten
+1748            
+1749            switch(msg)
+1750            {
+1751              case MUIF_MSG_DRAW:
+1752                {
+1753                  //u8g2_uint_t w = 0;
+1754                  u8g2_uint_t a = u8g2_GetAscent(u8g2) - 2;
+1755                  u8g2_uint_t x = mui_get_x(ui);   // if mui_GetSelectableFieldTextOption is called, then field vars
+             - are overwritten, so get the value
+1756                  u8g2_uint_t y = mui_get_y(ui);  // if mui_GetSelectableFieldTextOption is called, then field vars 
+             -are overwritten, so get the value
+1757                  uint8_t is_focus = mui_IsCursorFocus(ui);
+1758                  
+1759                  if ( *value == arg + ui->form_scroll_top )
+1760                    u8g2_DrawValueMark(u8g2, x, y, a);
+1761          
+1762                  if ( ui->text[0] == '\0' )
+1763                  {
+1764                    /* if the text is not provided, then try to get the text from the previous (saved) element, assu
+             -ming that this contains the selection */
+1765                    /* this will overwrite all ui member functions, so we must not access any ui members (except ui-
+             ->text) any more */
+1766                    mui_GetSelectableFieldTextOption(ui, ui->last_form_fds, arg + ui->form_scroll_top);
+1767                  }
+1768                  
+1769                  if ( ui->text[0] != '\0' )
+1770                  {
+1771                    //w =  u8g2_GetUTF8Width(u8g2, ui->text);
+1772                    //u8g2_SetFontMode(u8g2, 1);
+1773                    a += 2;       /* add gap between the checkbox and the text area */
+1774                    u8g2_DrawUTF8(u8g2, x+a, y, ui->text);
+1775                  }        
+1776                  if ( is_focus )
+1777                  {
+1778                    u8g2_DrawButtonFrame(u8g2, 0, y, U8G2_BTN_INV, u8g2_GetDisplayWidth(u8g2), 0, MUI_U8G2_V_PADDING
+             -);
+1779                  }
+1780                }
+1781                break;
+1782              default:
+1783                return mui_u8g2_u8_opt_child_mse_common(ui, msg);
+1784            }
+1785            return 0;
+1786          }
+1787          
+1788          
+1789          uint8_t mui_u8g2_u8_opt_child_wm_pi(mui_t *ui, uint8_t msg)
+1790          {
+1791            u8g2_t *u8g2 = mui_get_U8g2(ui);
+1792            //uint8_t *value = (uint8_t *)muif_get_data(ui->uif);
+1793            uint8_t arg = ui->arg;        // remember the arg value, because it might be overwritten
+1794            
+1795            switch(msg)
+1796            {
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 31  
+
+1797              case MUIF_MSG_DRAW:
+1798                {
+1799                  //u8g2_uint_t w = 0;
+1800                  u8g2_uint_t x = mui_get_x(ui);   // if mui_GetSelectableFieldTextOption is called, then field vars
+             - are overwritten, so get the value
+1801                  u8g2_uint_t y = mui_get_y(ui);  // if mui_GetSelectableFieldTextOption is called, then field vars 
+             -are overwritten, so get the value
+1802                  uint8_t flags = mui_u8g2_get_pi_flags(ui);
+1803                  //if ( mui_IsCursorFocus(ui) )
+1804                  //{
+1805                  //  flags = U8G2_BTN_INV;
+1806                  //}
+1807          
+1808                  if ( ui->text[0] == '\0' )
+1809                  {
+1810                    /* if the text is not provided, then try to get the text from the previous (saved) element, assu
+             -ming that this contains the selection */
+1811                    /* this will overwrite all ui member functions, so we must not access any ui members (except ui-
+             ->text) any more */
+1812                    mui_GetSelectableFieldTextOption(ui, ui->last_form_fds, arg + ui->form_scroll_top);
+1813                  }
+1814                  if ( ui->text[0] != '\0' )
+1815                  {
+1816                    u8g2_DrawButtonUTF8(u8g2, x, y, flags, 0, 1, MUI_U8G2_V_PADDING, ui->text);
+1817                  }        
+1818                }
+1819                break;
+1820              default:
+1821                return mui_u8g2_u8_opt_child_mse_common(ui, msg);
+1822            }
+1823            return 0;
+1824          }
+1825          
+1826          /* 
+1827            an invisible field (which will not show anything). It should also not be selectable 
+1828            it just provides the menu entries, see "mui_u8g2_u8_opt_child_mse_common" and friends 
+1829            as a consequence it does not have width, input mode and style
+1830          
+1831            MUIF: MUIF_RO()
+1832            FDS: MUI_DATA()
+1833          
+1834            mui_u8g2_goto_parent --> mui_u8g2_goto_data
+1835          
+1836            Used together with mui_u8g2_goto_form_w1_pi
+1837          
+1838          */
+1839          uint8_t mui_u8g2_goto_data(mui_t *ui, uint8_t msg)
+1840          {
+1841            switch(msg)
+1842            {
+1843              case MUIF_MSG_DRAW:
+1844                break;
+1845              case MUIF_MSG_FORM_START:
+1846                // store the field (and the corresponding elements) in the last_form_fds variable.
+1847                // last_form_fds is later used to access the elements (see mui_u8g2_u8_opt_child_mse_common and frie
+             -nds)
+1848                ui->last_form_fds = ui->fds;
+1849                break;
+1850              case MUIF_MSG_FORM_END:
+1851                break;
+1852              case MUIF_MSG_CURSOR_ENTER:
+1853                break;
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 32  
+
+1854              case MUIF_MSG_CURSOR_SELECT:
+1855                break;
+1856              case MUIF_MSG_CURSOR_LEAVE:
+1857                break;
+1858              case MUIF_MSG_TOUCH_DOWN:
+1859                break;
+1860              case MUIF_MSG_TOUCH_UP:
+1861                break;
+1862            }
+1863            return 0;
+1864          }
+1865          
+1866          
+1867          /*
+1868          mui_u8g2_goto_child_w1_mse_pi --> mui_u8g2_goto_form_w1_pi
+1869          */
+1870          uint8_t mui_u8g2_goto_form_w1_pi(mui_t *ui, uint8_t msg)
+1871          {
+1872            u8g2_t *u8g2 = mui_get_U8g2(ui);
+1873            uint8_t arg = ui->arg;        // remember the arg value, because it might be overwritten  
+1874            switch(msg)
+1875            {
+1876              case MUIF_MSG_DRAW:
+1877                if ( mui_GetSelectableFieldTextOption(ui, ui->last_form_fds, arg + ui->form_scroll_top) )
+1878                  mui_u8g2_draw_button_pi(ui, u8g2_GetDisplayWidth(u8g2)-mui_get_x(ui)*2, mui_get_x(ui), ui->text+1)
+             -;
+1879                break;
+1880              case MUIF_MSG_CURSOR_SELECT:
+1881                if ( mui_GetSelectableFieldTextOption(ui, ui->last_form_fds, ui->arg + ui->form_scroll_top) )
+1882                {
+1883                  mui_SaveCursorPosition(ui, ui->arg + ui->form_scroll_top);     // store the current cursor positio
+             -n, so that the user can jump back to the corresponding cursor position
+1884                  return mui_GotoFormAutoCursorPosition(ui, (uint8_t)ui->text[0]);
+1885                }
+1886                break;
+1887              default:
+1888                return mui_u8g2_u8_opt_child_mse_common(ui, msg);
+1889            }
+1890            return 0;
+1891          }
+1892          
+1893          uint8_t mui_u8g2_goto_form_w1_pf(mui_t *ui, uint8_t msg)
+1894          {
+1895            u8g2_t *u8g2 = mui_get_U8g2(ui);
+1896            uint8_t arg = ui->arg;        // remember the arg value, because it might be overwritten  
+1897            switch(msg)
+1898            {
+1899              case MUIF_MSG_DRAW:
+1900                if ( mui_GetSelectableFieldTextOption(ui, ui->last_form_fds, arg + ui->form_scroll_top) )
+1901                  mui_u8g2_draw_button_pf(ui, u8g2_GetDisplayWidth(u8g2)-mui_get_x(ui)*2, mui_get_x(ui)-1, ui->text+
+             -1);
+1902                break;
+1903              case MUIF_MSG_CURSOR_SELECT:
+1904                if ( mui_GetSelectableFieldTextOption(ui, ui->last_form_fds, ui->arg + ui->form_scroll_top) )
+1905                {
+1906                  mui_SaveCursorPosition(ui, ui->arg + ui->form_scroll_top);     // store the current cursor positio
+             -n, so that the user can jump back to the corresponding cursor position
+1907                  return mui_GotoFormAutoCursorPosition(ui, (uint8_t)ui->text[0]);
+1908               }
+1909                break;
+1910              default:
+1911                return mui_u8g2_u8_opt_child_mse_common(ui, msg);
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 33  
+
+1912            }
+1913            return 0;
+1914          }
+1915          
+1916          
+1917          /*
+1918            data: mui_u8g2_list_t *
+1919          */
+1920          uint8_t mui_u8g2_u16_list_line_wa_mse_pi(mui_t *ui, uint8_t msg)
+1921          {
+1922            //u8g2_t *u8g2 = mui_get_U8g2(ui);
+1923            mui_u8g2_list_t *list = (mui_u8g2_list_t *)muif_get_data(ui->uif);
+1924            uint16_t *selection =  mui_u8g2_list_get_selection_ptr(list);
+1925            void *data = mui_u8g2_list_get_data_ptr(list);
+1926            mui_u8g2_get_list_element_cb element_cb =  mui_u8g2_list_get_element_cb(list);
+1927            mui_u8g2_get_list_count_cb count_cb = mui_u8g2_list_get_count_cb(list);
+1928            
+1929            switch(msg)
+1930            {
+1931              case MUIF_MSG_DRAW:
+1932                mui_u8g2_draw_button_pi(ui, ui->arg, 1, element_cb(data, *selection));
+1933                //mui_u8g2_draw_button_utf(ui, mui_u8g2_get_pi_flags(ui), ui->arg, 1, MUI_U8G2_V_PADDING, element_cb
+             -(data, *selection));
+1934                break;
+1935              case MUIF_MSG_FORM_START:
+1936                break;
+1937              case MUIF_MSG_FORM_END:
+1938                break;
+1939              case MUIF_MSG_CURSOR_ENTER:
+1940                break;
+1941              case MUIF_MSG_CURSOR_SELECT:
+1942              case MUIF_MSG_VALUE_INCREMENT:
+1943                (*selection)++;
+1944                if ( *selection >= count_cb(data) ) 
+1945                  *selection = 0;
+1946                break;
+1947              case MUIF_MSG_VALUE_DECREMENT:
+1948                if ( *selection > 0 )
+1949                  (*selection)--;
+1950                else
+1951                  (*selection) = count_cb(data)-1;
+1952                break;
+1953              case MUIF_MSG_CURSOR_LEAVE:
+1954                break;
+1955              case MUIF_MSG_TOUCH_DOWN:
+1956                break;
+1957              case MUIF_MSG_TOUCH_UP:
+1958                break;
+1959            }
+1960            return 0;
+1961          }
+1962          
+1963          uint8_t mui_u8g2_u16_list_line_wa_mud_pi(mui_t *ui, uint8_t msg)
+1964          {
+1965            //u8g2_t *u8g2 = mui_get_U8g2(ui);
+1966            mui_u8g2_list_t *list = (mui_u8g2_list_t *)muif_get_data(ui->uif);
+1967            uint16_t *selection =  mui_u8g2_list_get_selection_ptr(list);
+1968            void *data = mui_u8g2_list_get_data_ptr(list);
+1969            mui_u8g2_get_list_element_cb element_cb =  mui_u8g2_list_get_element_cb(list);
+1970            mui_u8g2_get_list_count_cb count_cb = mui_u8g2_list_get_count_cb(list);
+1971            
+1972            switch(msg)
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 34  
+
+1973            {
+1974              case MUIF_MSG_DRAW:
+1975                mui_u8g2_draw_button_pi(ui, ui->arg, 1, element_cb(data, *selection));
+1976                //mui_u8g2_draw_button_utf(ui, mui_u8g2_get_pi_flags(ui), ui->arg, 1, MUI_U8G2_V_PADDING, element_cb
+             -(data, *selection));
+1977                break;
+1978              case MUIF_MSG_FORM_START:
+1979                break;
+1980              case MUIF_MSG_FORM_END:
+1981                break;
+1982              case MUIF_MSG_CURSOR_ENTER:
+1983                break;
+1984              case MUIF_MSG_CURSOR_SELECT:
+1985              case MUIF_MSG_VALUE_INCREMENT:
+1986              case MUIF_MSG_VALUE_DECREMENT:
+1987                /* toggle between normal mode and capture next/prev mode */
+1988                 ui->is_mud = !ui->is_mud;
+1989                break;
+1990              case MUIF_MSG_CURSOR_LEAVE:
+1991                break;
+1992              case MUIF_MSG_TOUCH_DOWN:
+1993                break;
+1994              case MUIF_MSG_TOUCH_UP:
+1995                break;
+1996              case MUIF_MSG_EVENT_NEXT:
+1997                if ( ui->is_mud )
+1998                {
+1999                  (*selection)++;
+2000                  if ( *selection >= count_cb(data)  ) 
+2001                    *selection = 0;      
+2002                  return 1;
+2003                }
+2004                break;
+2005              case MUIF_MSG_EVENT_PREV:
+2006                if ( ui->is_mud )
+2007                {
+2008                  if ( *selection == 0 )
+2009                    *selection = count_cb(data);
+2010                  (*selection)--;
+2011                  return 1;
+2012                }
+2013                break;
+2014            }
+2015            return 0;
+2016          }
+2017          
+2018          /*
+2019            MUIF: MUIF_U8G2_U16_LIST
+2020            FDS: MUI_XYA, arg=form id
+2021            data: mui_u8g2_list_t *
+2022          */
+2023          uint8_t mui_u8g2_u16_list_parent_wm_pi(mui_t *ui, uint8_t msg)
+2024          {
+2025            //u8g2_t *u8g2 = mui_get_U8g2(ui);
+2026            mui_u8g2_list_t *list = (mui_u8g2_list_t *)muif_get_data(ui->uif);
+2027            uint16_t *selection =  mui_u8g2_list_get_selection_ptr(list);
+2028            void *data = mui_u8g2_list_get_data_ptr(list);
+2029            mui_u8g2_get_list_element_cb element_cb =  mui_u8g2_list_get_element_cb(list);
+2030            //mui_u8g2_get_list_count_cb count_cb = mui_u8g2_list_get_count_cb(list);
+2031            switch(msg)
+2032            {
+2033              case MUIF_MSG_DRAW:
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 35  
+
+2034                mui_u8g2_draw_button_pi(ui, 0, 1, element_cb(data, *selection));
+2035                //mui_u8g2_draw_button_utf(ui, mui_u8g2_get_pi_flags(ui), ui->arg, 1, MUI_U8G2_V_PADDING, element_cb
+             -(data, *selection));
+2036                break;
+2037              case MUIF_MSG_FORM_START:
+2038                break;
+2039              case MUIF_MSG_FORM_END:
+2040                break;
+2041              case MUIF_MSG_CURSOR_ENTER:
+2042                break;
+2043              case MUIF_MSG_CURSOR_SELECT:
+2044              case MUIF_MSG_VALUE_INCREMENT:
+2045              case MUIF_MSG_VALUE_DECREMENT:
+2046                mui_SaveForm(ui);          // store the current form and position so that the child can jump back
+2047                mui_GotoForm(ui, ui->arg, *selection);  // assumes that the selectable values are at the beginning o
+             -f the form definition
+2048                break;
+2049              case MUIF_MSG_CURSOR_LEAVE:
+2050                break;
+2051              case MUIF_MSG_TOUCH_DOWN:
+2052                break;
+2053              case MUIF_MSG_TOUCH_UP:
+2054                break;
+2055            }
+2056            return 0;
+2057          }
+2058          
+2059          static uint8_t mui_u8g2_u16_list_child_mse_common(mui_t *ui, uint8_t msg)
+2060          {
+2061            mui_u8g2_list_t *list = (mui_u8g2_list_t *)muif_get_data(ui->uif);
+2062            uint16_t *selection =  mui_u8g2_list_get_selection_ptr(list);
+2063            void *data = mui_u8g2_list_get_data_ptr(list);
+2064            //mui_u8g2_get_list_element_cb element_cb =  mui_u8g2_list_get_element_cb(list);
+2065            mui_u8g2_get_list_count_cb count_cb = mui_u8g2_list_get_count_cb(list);
+2066          
+2067            uint8_t arg = ui->arg;        // remember the arg value, because it might be overwritten  
+2068            
+2069            switch(msg)
+2070            {
+2071              case MUIF_MSG_DRAW:
+2072                /* done by the calling function */
+2073                break;
+2074              case MUIF_MSG_FORM_START:
+2075                /* we can assume that the list starts at the top. It will be adjisted by cursor down events later */
+2076                ui->form_scroll_top = 0;
+2077                if ( ui->form_scroll_visible <= arg )
+2078                  ui->form_scroll_visible = arg+1;
+2079                if ( ui->form_scroll_total == 0 )
+2080                    ui->form_scroll_total = count_cb(data);
+2081                break;
+2082              case MUIF_MSG_FORM_END:
+2083                break;
+2084              case MUIF_MSG_CURSOR_ENTER:
+2085                return mui_u8g2_handle_scroll_next_prev_events(ui, msg);
+2086              case MUIF_MSG_CURSOR_SELECT:
+2087              case MUIF_MSG_VALUE_INCREMENT:
+2088              case MUIF_MSG_VALUE_DECREMENT:
+2089                if ( selection != NULL )
+2090                  *selection = ui->form_scroll_top + arg;
+2091                mui_RestoreForm(ui);
+2092                break;
+2093              case MUIF_MSG_CURSOR_LEAVE:
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 36  
+
+2094                break;
+2095              case MUIF_MSG_TOUCH_DOWN:
+2096                break;
+2097              case MUIF_MSG_TOUCH_UP:
+2098                break;
+2099              case MUIF_MSG_EVENT_NEXT:
+2100                return mui_u8g2_handle_scroll_next_prev_events(ui, msg);
+2101              case MUIF_MSG_EVENT_PREV:
+2102                return mui_u8g2_handle_scroll_next_prev_events(ui, msg);
+2103            }
+2104            return 0;
+2105          }
+2106          
+2107          uint8_t mui_u8g2_u16_list_child_w1_pi(mui_t *ui, uint8_t msg)
+2108          {
+2109            u8g2_t *u8g2 = mui_get_U8g2(ui);
+2110            mui_u8g2_list_t *list = (mui_u8g2_list_t *)muif_get_data(ui->uif);
+2111            uint16_t *selection =  mui_u8g2_list_get_selection_ptr(list);
+2112            void *data = mui_u8g2_list_get_data_ptr(list);
+2113            mui_u8g2_get_list_element_cb element_cb =  mui_u8g2_list_get_element_cb(list);
+2114            mui_u8g2_get_list_count_cb count_cb = mui_u8g2_list_get_count_cb(list);
+2115            uint16_t pos = ui->arg;        // remember the arg value, because it might be overwritten  
+2116            switch(msg)
+2117            {
+2118              case MUIF_MSG_DRAW:
+2119                {
+2120                  //u8g2_uint_t w = 0;
+2121                  u8g2_uint_t a = u8g2_GetAscent(u8g2) - 2;
+2122                  u8g2_uint_t x = mui_get_x(ui);   // if mui_GetSelectableFieldTextOption is called, then field vars
+             - are overwritten, so get the value
+2123                  u8g2_uint_t y = mui_get_y(ui);  // if mui_GetSelectableFieldTextOption is called, then field vars 
+             -are overwritten, so get the value
+2124                  uint8_t is_focus = mui_IsCursorFocus(ui);
+2125          
+2126                  pos += ui->form_scroll_top;
+2127                  
+2128                  if ( *selection == pos )
+2129                    u8g2_DrawValueMark(u8g2, x, y, a);
+2130          
+2131                  //u8g2_SetFontMode(u8g2, 1);
+2132                  a += 2;       /* add gap between the checkbox and the text area */
+2133                  if ( pos < count_cb(data) )
+2134                    u8g2_DrawUTF8(u8g2, x+a, y, element_cb(data, pos));
+2135                  if ( is_focus )
+2136                  {
+2137                    u8g2_DrawButtonFrame(u8g2, 0, y, U8G2_BTN_INV, u8g2_GetDisplayWidth(u8g2), 0, MUI_U8G2_V_PADDING
+             -);
+2138                  }
+2139                }
+2140                break;
+2141              default:
+2142                return mui_u8g2_u16_list_child_mse_common(ui, msg);
+2143            }
+2144            return 0;
+2145          }
+2146          
+2147          uint8_t mui_u8g2_u16_list_goto_w1_pi(mui_t *ui, uint8_t msg)
+2148          {
+2149            u8g2_t *u8g2 = mui_get_U8g2(ui);
+2150            mui_u8g2_list_t *list = (mui_u8g2_list_t *)muif_get_data(ui->uif);
+2151            uint16_t *selection =  mui_u8g2_list_get_selection_ptr(list);
+2152            void *data = mui_u8g2_list_get_data_ptr(list);
+C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 37  
+
+2153            mui_u8g2_get_list_element_cb element_cb =  mui_u8g2_list_get_element_cb(list);
+2154            //mui_u8g2_get_list_count_cb count_cb = mui_u8g2_list_get_count_cb(list);
+2155          
+2156            uint16_t pos = ui->arg;        // remember the arg value, because it might be overwritten  
+2157            pos += ui->form_scroll_top;
+2158            
+2159            switch(msg)
+2160            {
+2161              case MUIF_MSG_DRAW:
+2162                mui_u8g2_draw_button_pi(ui, u8g2_GetDisplayWidth(u8g2)-mui_get_x(ui)*2, mui_get_x(ui), element_cb(da
+             -ta, pos)+1);
+2163                //mui_u8g2_draw_button_utf(ui, mui_u8g2_get_pi_flags(ui), u8g2_GetDisplayWidth(u8g2)-mui_get_x(ui)*2
+             -, mui_get_x(ui), MUI_U8G2_V_PADDING, element_cb(data, pos)+1);
+2164                break;
+2165              case MUIF_MSG_CURSOR_SELECT:
+2166              case MUIF_MSG_VALUE_INCREMENT:
+2167              case MUIF_MSG_VALUE_DECREMENT:
+2168                if ( selection != NULL )
+2169                  *selection = pos;
+2170                mui_SaveCursorPosition(ui, pos >= 255 ? 0 : pos);     // store the current cursor position, so that 
+             -the user can jump back to the corresponding cursor position
+2171                mui_GotoFormAutoCursorPosition(ui, (uint8_t)element_cb(data, pos)[0]); 
+2172                break;
+2173              default:
+2174                return mui_u8g2_u16_list_child_mse_common(ui, msg);
+2175            }
+2176            return 0;
+2177          }
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  6 ERROR(S)

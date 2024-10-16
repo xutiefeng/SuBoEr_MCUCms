@@ -1,0 +1,1453 @@
+C51 COMPILER V9.60.7.0   U8G2_FONT                                                         10/16/2024 16:37:10 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE U8G2_FONT
+OBJECT MODULE PLACED IN .\Objects\u8g2_font.obj
+COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE ..\u8g2\u8g2_font.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\Device\C
+                    -MS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\u8g2_font.lst) TABS(2) OBJECT(.\
+                    -Objects\u8g2_font.obj)
+
+line level    source
+
+   1          /*
+   2          
+   3            u8g2_font.c
+   4          
+   5            Universal 8bit Graphics Library (https://github.com/olikraus/u8g2/)
+   6          
+   7            Copyright (c) 2016, olikraus@gmail.com
+   8            All rights reserved.
+   9          
+  10            Redistribution and use in source and binary forms, with or without modification, 
+  11            are permitted provided that the following conditions are met:
+  12          
+  13            * Redistributions of source code must retain the above copyright notice, this list 
+  14              of conditions and the following disclaimer.
+  15              
+  16            * Redistributions in binary form must reproduce the above copyright notice, this 
+  17              list of conditions and the following disclaimer in the documentation and/or other 
+  18              materials provided with the distribution.
+  19          
+  20            THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+  21            CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+  22            INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  23            MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+  24            DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+  25            CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+  26            SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+  27            NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+  28            LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+  29            CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+  30            STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+  31            ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+  32            ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+  33          
+  34          */
+  35          
+  36          #include "u8g2.h"
+  37          
+  38          /* size of the font data structure, there is no struct or class... */
+  39          /* this is the size for the new font format */
+  40          #define U8G2_FONT_DATA_STRUCT_SIZE 23
+  41          
+  42          /*
+  43            font data:
+  44          
+  45            offset  bytes description
+  46            0   1   glyph_cnt   number of glyphs
+  47            1   1   bbx_mode  0: proportional, 1: common height, 2: monospace, 3: multiple of 8
+  48            2   1   bits_per_0  glyph rle parameter
+  49            3   1   bits_per_1  glyph rle parameter
+  50          
+  51            4   1   bits_per_char_width   glyph rle parameter
+  52            5   1   bits_per_char_height  glyph rle parameter
+  53            6   1   bits_per_char_x   glyph rle parameter
+C51 COMPILER V9.60.7.0   U8G2_FONT                                                         10/16/2024 16:37:10 PAGE 2   
+
+  54            7   1   bits_per_char_y   glyph rle parameter
+  55            8   1   bits_per_delta_x    glyph rle parameter
+  56          
+  57            9   1   max_char_width
+  58            10    1   max_char_height
+  59            11    1   x offset
+  60            12    1   y offset (descent)
+  61            
+  62            13    1   ascent (capital A)
+  63            14    1   descent (lower g)
+  64            15    1   ascent '('
+  65            16    1   descent ')'
+  66            
+  67            17    1   start pos 'A' high byte
+  68            18    1   start pos 'A' low byte
+  69          
+  70            19    1   start pos 'a' high byte
+  71            20    1   start pos 'a' low byte
+  72          
+  73            21    1   start pos unicode high byte
+  74            22    1   start pos unicode low byte
+  75          
+  76            Font build mode, 0: proportional, 1: common height, 2: monospace, 3: multiple of 8
+  77          
+  78            Font build mode 0:    
+  79              - "t"
+  80              - Ref height mode: U8G2_FONT_HEIGHT_MODE_TEXT, U8G2_FONT_HEIGHT_MODE_XTEXT or U8G2_FONT_HEIGHT_MODE_AL
+             -L
+  81              - use in transparent mode only (does not look good in solid mode)
+  82              - most compact format
+  83              - different font heights possible
+  84              
+  85            Font build mode 1:    
+  86              - "h"
+  87              - Ref height mode: U8G2_FONT_HEIGHT_MODE_ALL
+  88              - transparent or solid mode
+  89              - The height of the glyphs depend on the largest glyph in the font. This means font height depends on 
+             -postfix "r", "f" and "n".
+  90          
+  91          */
+  92          
+  93          /* use case: What is the width and the height of the minimal box into which string s fints? */
+  94          void u8g2_font_GetStrSize(const void *font, const char *s, u8g2_uint_t *width, u8g2_uint_t *height);
+  95          void u8g2_font_GetStrSizeP(const void *font, const char *s, u8g2_uint_t *width, u8g2_uint_t *height);
+  96          
+  97          /* use case: lower left edge of a minimal box is known, what is the correct x, y position for the string d
+             -raw procedure */
+  98          void u8g2_font_AdjustXYToDraw(const void *font, const char *s, u8g2_uint_t *x, u8g2_uint_t *y);
+  99          void u8g2_font_AdjustXYToDrawP(const void *font, const char *s, u8g2_uint_t *x, u8g2_uint_t *y);
+ 100          
+ 101          /* use case: Baseline origin known, return minimal box */
+ 102          void u8g2_font_GetStrMinBox(u8g2_t *u8g2, const void *font, const char *s, u8g2_uint_t *x, u8g2_uint_t *y,
+             - u8g2_uint_t *width, u8g2_uint_t *height);
+ 103          
+ 104          /* procedures */
+ 105          
+ 106          /*========================================================================*/
+ 107          /* low level byte and word access */
+ 108          
+ 109          /* removed NOINLINE, because it leads to smaller code, might also be faster */
+ 110          //static uint8_t u8g2_font_get_byte(const uint8_t *font, uint8_t offset) U8G2_NOINLINE;
+ 111          static uint8_t u8g2_font_get_byte(const uint8_t *font, uint8_t offset)
+C51 COMPILER V9.60.7.0   U8G2_FONT                                                         10/16/2024 16:37:10 PAGE 3   
+
+ 112          {
+ 113   1        font += offset;
+ 114   1        return u8x8_pgm_read( font );  
+ 115   1      }
+ 116          
+ 117          static uint16_t u8g2_font_get_word(const uint8_t *font, uint8_t offset) U8G2_NOINLINE; 
+ 118          static uint16_t u8g2_font_get_word(const uint8_t *font, uint8_t offset)
+ 119          {
+ 120   1          uint16_t pos;
+ 121   1          font += offset;
+ 122   1          pos = u8x8_pgm_read( font );
+ 123   1          font++;
+ 124   1          pos <<= 8;
+ 125   1          pos += u8x8_pgm_read( font);
+ 126   1          return pos;
+ 127   1      }
+ 128          
+ 129          /*========================================================================*/
+ 130          /* new font format */
+ 131          void u8g2_read_font_info(u8g2_font_info_t *font_info, const uint8_t *font)
+ 132          {
+ 133   1        /* offset 0 */
+ 134   1        font_info->glyph_cnt = u8g2_font_get_byte(font, 0);
+ 135   1        font_info->bbx_mode = u8g2_font_get_byte(font, 1);
+ 136   1        font_info->bits_per_0 = u8g2_font_get_byte(font, 2);
+ 137   1        font_info->bits_per_1 = u8g2_font_get_byte(font, 3);
+ 138   1        
+ 139   1        /* offset 4 */
+ 140   1        font_info->bits_per_char_width = u8g2_font_get_byte(font, 4);
+ 141   1        font_info->bits_per_char_height = u8g2_font_get_byte(font, 5);
+ 142   1        font_info->bits_per_char_x = u8g2_font_get_byte(font, 6);
+ 143   1        font_info->bits_per_char_y = u8g2_font_get_byte(font, 7);
+ 144   1        font_info->bits_per_delta_x = u8g2_font_get_byte(font, 8);
+ 145   1        
+ 146   1        /* offset 9 */
+ 147   1        font_info->max_char_width = u8g2_font_get_byte(font, 9);
+ 148   1        font_info->max_char_height = u8g2_font_get_byte(font, 10);
+ 149   1        font_info->x_offset = u8g2_font_get_byte(font, 11);
+ 150   1        font_info->y_offset = u8g2_font_get_byte(font, 12);
+ 151   1        
+ 152   1        /* offset 13 */
+ 153   1        font_info->ascent_A = u8g2_font_get_byte(font, 13);
+ 154   1        font_info->descent_g = u8g2_font_get_byte(font, 14);
+ 155   1        font_info->ascent_para = u8g2_font_get_byte(font, 15);
+ 156   1        font_info->descent_para = u8g2_font_get_byte(font, 16);
+ 157   1        
+ 158   1        /* offset 17 */
+ 159   1        font_info->start_pos_upper_A = u8g2_font_get_word(font, 17);
+ 160   1        font_info->start_pos_lower_a = u8g2_font_get_word(font, 19); 
+ 161   1        
+ 162   1        /* offset 21 */
+ 163   1      #ifdef U8G2_WITH_UNICODE
+ 164   1        font_info->start_pos_unicode = u8g2_font_get_word(font, 21); 
+ 165   1      #endif
+ 166   1      }
+ 167          
+ 168          
+ 169          /* calculate the overall length of the font, only used to create the picture for the google wiki */
+ 170          size_t u8g2_GetFontSize(const uint8_t *font_arg)
+ 171          {
+ 172   1        uint16_t e;
+ 173   1        const uint8_t *font = font_arg;
+C51 COMPILER V9.60.7.0   U8G2_FONT                                                         10/16/2024 16:37:10 PAGE 4   
+
+ 174   1        font += U8G2_FONT_DATA_STRUCT_SIZE;
+ 175   1        
+ 176   1        for(;;)
+ 177   1        {
+ 178   2          if ( u8x8_pgm_read( font + 1 ) == 0 )
+ 179   2            break;
+ 180   2          font += u8x8_pgm_read( font + 1 );
+ 181   2        }
+ 182   1        
+ 183   1        /* continue with unicode section */
+ 184   1        font += 2;
+ 185   1      
+ 186   1        /* skip unicode lookup table */
+ 187   1        font += u8g2_font_get_word(font, 0);
+ 188   1        
+ 189   1        for(;;)
+ 190   1        {
+ 191   2          e = u8x8_pgm_read( font );
+ 192   2          e <<= 8;
+ 193   2          e |= u8x8_pgm_read( font + 1 );
+ 194   2          if ( e == 0 )
+ 195   2            break;
+ 196   2          font += u8x8_pgm_read( font + 2 );    
+ 197   2        }
+ 198   1        
+ 199   1        return (font - font_arg) + 2;
+ 200   1      }
+ 201          
+ 202          /*========================================================================*/
+ 203          /* u8g2 interface, font access */
+ 204          
+ 205          uint8_t u8g2_GetFontBBXWidth(u8g2_t *u8g2)
+ 206          {
+ 207   1        return u8g2->font_info.max_char_width;    /* new font info structure */
+ 208   1      }
+ 209          
+ 210          uint8_t u8g2_GetFontBBXHeight(u8g2_t *u8g2)
+ 211          {
+ 212   1        return u8g2->font_info.max_char_height;   /* new font info structure */
+ 213   1      }
+ 214          
+ 215          int8_t u8g2_GetFontBBXOffX(u8g2_t *u8g2) U8G2_NOINLINE;
+ 216          int8_t u8g2_GetFontBBXOffX(u8g2_t *u8g2)
+ 217          {
+ 218   1        return u8g2->font_info.x_offset;    /* new font info structure */
+ 219   1      }
+ 220          
+ 221          int8_t u8g2_GetFontBBXOffY(u8g2_t *u8g2) U8G2_NOINLINE;
+ 222          int8_t u8g2_GetFontBBXOffY(u8g2_t *u8g2)
+ 223          {
+ 224   1        return u8g2->font_info.y_offset;    /* new font info structure */
+ 225   1      }
+ 226          
+ 227          uint8_t u8g2_GetFontCapitalAHeight(u8g2_t *u8g2) U8G2_NOINLINE; 
+ 228          uint8_t u8g2_GetFontCapitalAHeight(u8g2_t *u8g2)
+ 229          {
+ 230   1        return u8g2->font_info.ascent_A;    /* new font info structure */
+ 231   1      }
+ 232          
+ 233          /*========================================================================*/
+ 234          /* glyph handling */
+ 235          
+C51 COMPILER V9.60.7.0   U8G2_FONT                                                         10/16/2024 16:37:10 PAGE 5   
+
+ 236          /* optimized */
+ 237          uint8_t u8g2_font_decode_get_unsigned_bits(u8g2_font_decode_t *f, uint8_t cnt) 
+ 238          {
+ 239   1        uint8_t val;
+ 240   1        uint8_t bit_pos = f->decode_bit_pos;
+ 241   1        uint8_t bit_pos_plus_cnt;
+ 242   1        
+ 243   1        //val = *(f->decode_ptr);
+ 244   1        val = u8x8_pgm_read( f->decode_ptr );  
+ 245   1        
+ 246   1        val >>= bit_pos;
+ 247   1        bit_pos_plus_cnt = bit_pos;
+ 248   1        bit_pos_plus_cnt += cnt;
+ 249   1        if ( bit_pos_plus_cnt >= 8 )
+ 250   1        {
+ 251   2          uint8_t s = 8;
+ 252   2          s -= bit_pos;
+ 253   2          f->decode_ptr++;
+ 254   2          //val |= *(f->decode_ptr) << (8-bit_pos);
+ 255   2          val |= u8x8_pgm_read( f->decode_ptr ) << (s);
+ 256   2          //bit_pos -= 8;
+ 257   2          bit_pos_plus_cnt -= 8;
+ 258   2        }
+ 259   1        val &= (1U<<cnt)-1;
+ 260   1        //bit_pos += cnt;
+ 261   1        
+ 262   1        f->decode_bit_pos = bit_pos_plus_cnt;
+ 263   1        return val;
+ 264   1      }
+ 265          
+ 266          
+ 267          /*
+ 268              2 bit --> cnt = 2
+ 269                -2,-1,0. 1
+ 270          
+ 271              3 bit --> cnt = 3
+ 272                -2,-1,0. 1
+ 273                -4,-3,-2,-1,0,1,2,3
+ 274          
+ 275                if ( x < 0 )
+ 276            r = bits(x-1)+1;
+ 277              else
+ 278            r = bits(x)+1;
+ 279          
+ 280          */
+ 281          /* optimized */
+ 282          int8_t u8g2_font_decode_get_signed_bits(u8g2_font_decode_t *f, uint8_t cnt)
+ 283          {
+ 284   1        int8_t v, d;
+ 285   1        v = (int8_t)u8g2_font_decode_get_unsigned_bits(f, cnt);
+ 286   1        d = 1;
+ 287   1        cnt--;
+ 288   1        d <<= cnt;
+ 289   1        v -= d;
+ 290   1        return v;
+ 291   1        //return (int8_t)u8g2_font_decode_get_unsigned_bits(f, cnt) - ((1<<cnt)>>1);
+ 292   1      }
+ 293          
+ 294          
+ 295          #ifdef U8G2_WITH_FONT_ROTATION
+ 296          u8g2_uint_t u8g2_add_vector_y(u8g2_uint_t dy, int8_t x, int8_t y, uint8_t dir)
+ 297          {
+C51 COMPILER V9.60.7.0   U8G2_FONT                                                         10/16/2024 16:37:10 PAGE 6   
+
+ 298   1        switch(dir)
+ 299   1        {
+ 300   2          case 0:
+ 301   2            dy += y;
+ 302   2            break;
+ 303   2          case 1:
+ 304   2            dy += x;
+ 305   2            break;
+ 306   2          case 2:
+ 307   2            dy -= y;
+ 308   2            break;
+ 309   2          default:
+ 310   2            dy -= x;
+ 311   2            break;      
+ 312   2        }
+ 313   1        return dy;
+ 314   1      }
+ 315          
+ 316          u8g2_uint_t u8g2_add_vector_x(u8g2_uint_t dx, int8_t x, int8_t y, uint8_t dir)
+ 317          {
+ 318   1        switch(dir)
+ 319   1        {
+ 320   2          case 0:
+ 321   2            dx += x;
+ 322   2            break;
+ 323   2          case 1:
+ 324   2            dx -= y;
+ 325   2            break;
+ 326   2          case 2:
+ 327   2            dx -= x;
+ 328   2            break;
+ 329   2          default:
+ 330   2            dx += y;
+ 331   2            break;      
+ 332   2        }
+ 333   1        return dx;
+ 334   1      }
+ 335          
+ 336          /*
+ 337          // does not make sense, 50 bytes more required on avr
+ 338          void u8g2_add_vector(u8g2_uint_t *xp, u8g2_uint_t *yp, int8_t x, int8_t y, uint8_t dir)
+ 339          {
+ 340            u8g2_uint_t x_ = *xp;
+ 341            u8g2_uint_t y_ = *yp;
+ 342            switch(dir)
+ 343            {
+ 344              case 0:
+ 345                y_ += y;
+ 346                x_ += x;
+ 347                break;
+ 348              case 1:
+ 349                y_ += x;
+ 350                x_ -= y;
+ 351                break;
+ 352              case 2:
+ 353                y_ -= y;
+ 354                x_ -= x;
+ 355                break;
+ 356              default:
+ 357                y_ -= x;
+ 358                x_ += y;
+ 359                break;      
+C51 COMPILER V9.60.7.0   U8G2_FONT                                                         10/16/2024 16:37:10 PAGE 7   
+
+ 360            }
+ 361            *xp = x_;
+ 362            *yp = y_;
+ 363          }
+ 364          */
+ 365          #endif
+ 366          
+ 367          
+ 368          
+ 369          /*
+ 370            Description:
+ 371              Draw a run-length area of the glyph. "len" can have any size and the line
+ 372              length has to be wrapped at the glyph border.
+ 373            Args:
+ 374              len:          Length of the line
+ 375              is_foreground     foreground/background?
+ 376              u8g2->font_decode.target_x    X position
+ 377              u8g2->font_decode.target_y    Y position
+ 378              u8g2->font_decode.is_transparent  Transparent mode
+ 379            Return:
+ 380              -
+ 381            Calls:
+ 382              u8g2_Draw90Line()
+ 383            Called by:
+ 384              u8g2_font_decode_glyph()
+ 385          */
+ 386          /* optimized */
+ 387          void u8g2_font_decode_len(u8g2_t *u8g2, uint8_t len, uint8_t is_foreground)
+ 388          {
+ 389   1        uint8_t cnt;  /* total number of remaining pixels, which have to be drawn */
+ 390   1        uint8_t rem;  /* remaining pixel to the right edge of the glyph */
+ 391   1        uint8_t current;  /* number of pixels, which need to be drawn for the draw procedure */
+ 392   1          /* current is either equal to cnt or equal to rem */
+ 393   1        
+ 394   1        /* local coordinates of the glyph */
+ 395   1        uint8_t lx,ly;
+ 396   1        
+ 397   1        /* target position on the screen */
+ 398   1        u8g2_uint_t x, y;
+ 399   1        
+ 400   1        u8g2_font_decode_t *decode = &(u8g2->font_decode);
+ 401   1        
+ 402   1        cnt = len;
+ 403   1        
+ 404   1        /* get the local position */
+ 405   1        lx = decode->x;
+ 406   1        ly = decode->y;
+ 407   1        
+ 408   1        for(;;)
+ 409   1        {
+ 410   2          /* calculate the number of pixel to the right edge of the glyph */
+ 411   2          rem = decode->glyph_width;
+ 412   2          rem -= lx;
+ 413   2          
+ 414   2          /* calculate how many pixel to draw. This is either to the right edge */
+ 415   2          /* or lesser, if not enough pixel are left */
+ 416   2          current = rem;
+ 417   2          if ( cnt < rem )
+ 418   2            current = cnt;
+ 419   2          
+ 420   2          
+ 421   2          /* now draw the line, but apply the rotation around the glyph target position */
+C51 COMPILER V9.60.7.0   U8G2_FONT                                                         10/16/2024 16:37:10 PAGE 8   
+
+ 422   2          //u8g2_font_decode_draw_pixel(u8g2, lx,ly,current, is_foreground);
+ 423   2      
+ 424   2          /* get target position */
+ 425   2          x = decode->target_x;
+ 426   2          y = decode->target_y;
+ 427   2      
+ 428   2          /* apply rotation */
+ 429   2      #ifdef U8G2_WITH_FONT_ROTATION
+ 430   2          
+ 431   2          x = u8g2_add_vector_x(x, lx, ly, decode->dir);
+ 432   2          y = u8g2_add_vector_y(y, lx, ly, decode->dir);
+ 433   2          
+ 434   2          //u8g2_add_vector(&x, &y, lx, ly, decode->dir);
+ 435   2          
+ 436   2      #else
+                  x += lx;
+                  y += ly;
+              #endif
+ 440   2          
+ 441   2          /* draw foreground and background (if required) */
+ 442   2          if ( is_foreground )
+ 443   2          {
+ 444   3            u8g2->draw_color = decode->fg_color;      /* draw_color will be restored later */
+ 445   3            u8g2_DrawHVLine(u8g2, 
+ 446   3        x, 
+ 447   3        y, 
+ 448   3        current, 
+ 449   3      #ifdef U8G2_WITH_FONT_ROTATION
+ 450   3        /* dir */ decode->dir
+ 451   3      #else
+                0
+              #endif
+ 454   3            );
+ 455   3          }
+ 456   2          else if ( decode->is_transparent == 0 )    
+ 457   2          {
+ 458   3            u8g2->draw_color = decode->bg_color;      /* draw_color will be restored later */
+ 459   3            u8g2_DrawHVLine(u8g2, 
+ 460   3        x, 
+ 461   3        y, 
+ 462   3        current, 
+ 463   3      #ifdef U8G2_WITH_FONT_ROTATION
+ 464   3        /* dir */ decode->dir
+ 465   3      #else
+                0
+              #endif
+ 468   3            );   
+ 469   3          }
+ 470   2          
+ 471   2          /* check, whether the end of the run length code has been reached */
+ 472   2          if ( cnt < rem )
+ 473   2            break;
+ 474   2          cnt -= rem;
+ 475   2          lx = 0;
+ 476   2          ly++;
+ 477   2        }
+ 478   1        lx += cnt;
+ 479   1        
+ 480   1        decode->x = lx;
+ 481   1        decode->y = ly;
+ 482   1        
+ 483   1      }
+C51 COMPILER V9.60.7.0   U8G2_FONT                                                         10/16/2024 16:37:10 PAGE 9   
+
+ 484          
+ 485          static void u8g2_font_setup_decode(u8g2_t *u8g2, const uint8_t *glyph_data)
+ 486          {
+ 487   1        u8g2_font_decode_t *decode = &(u8g2->font_decode);
+ 488   1        decode->decode_ptr = glyph_data;
+ 489   1        decode->decode_bit_pos = 0;
+ 490   1        
+ 491   1        /* 8 Nov 2015, this is already done in the glyph data search procedure */
+ 492   1        /*
+ 493   1        decode->decode_ptr += 1;
+ 494   1        decode->decode_ptr += 1;
+ 495   1        */
+ 496   1        
+ 497   1        decode->glyph_width = u8g2_font_decode_get_unsigned_bits(decode, u8g2->font_info.bits_per_char_width);
+ 498   1        decode->glyph_height = u8g2_font_decode_get_unsigned_bits(decode,u8g2->font_info.bits_per_char_height);
+ 499   1        
+ 500   1        decode->fg_color = u8g2->draw_color;
+ 501   1        decode->bg_color = (decode->fg_color == 0 ? 1 : 0);
+ 502   1      }
+ 503          
+ 504          
+ 505          /*
+ 506            Description:
+ 507              Decode and draw a glyph.
+ 508            Args:
+ 509              glyph_data:           Pointer to the compressed glyph data of the font
+ 510              u8g2->font_decode.target_x    X position
+ 511              u8g2->font_decode.target_y    Y position
+ 512              u8g2->font_decode.is_transparent  Transparent mode
+ 513            Return:
+ 514              Width (delta x advance) of the glyph.
+ 515            Calls:
+ 516              u8g2_font_decode_len()
+ 517          */
+ 518          /* optimized */
+ 519          int8_t u8g2_font_decode_glyph(u8g2_t *u8g2, const uint8_t *glyph_data)
+ 520          {
+ 521   1        uint8_t a, b;
+ 522   1        int8_t x, y;
+ 523   1        int8_t d;
+ 524   1        int8_t h;
+ 525   1        u8g2_font_decode_t *decode = &(u8g2->font_decode);
+ 526   1          
+ 527   1        u8g2_font_setup_decode(u8g2, glyph_data);     /* set values in u8g2->font_decode data structure */
+ 528   1        h = u8g2->font_decode.glyph_height;
+ 529   1        
+ 530   1        x = u8g2_font_decode_get_signed_bits(decode, u8g2->font_info.bits_per_char_x);
+ 531   1        y = u8g2_font_decode_get_signed_bits(decode, u8g2->font_info.bits_per_char_y);
+ 532   1        d = u8g2_font_decode_get_signed_bits(decode, u8g2->font_info.bits_per_delta_x);
+ 533   1        
+ 534   1        if ( decode->glyph_width > 0 )
+ 535   1        {
+ 536   2      #ifdef U8G2_WITH_FONT_ROTATION
+ 537   2          decode->target_x = u8g2_add_vector_x(decode->target_x, x, -(h+y), decode->dir);
+ 538   2          decode->target_y = u8g2_add_vector_y(decode->target_y, x, -(h+y), decode->dir);
+ 539   2          
+ 540   2          //u8g2_add_vector(&(decode->target_x), &(decode->target_y), x, -(h+y), decode->dir);
+ 541   2      
+ 542   2      #else
+                  decode->target_x += x;
+                  decode->target_y -= h+y;
+              #endif
+C51 COMPILER V9.60.7.0   U8G2_FONT                                                         10/16/2024 16:37:10 PAGE 10  
+
+ 546   2          //u8g2_add_vector(&(decode->target_x), &(decode->target_y), x, -(h+y), decode->dir);
+ 547   2      
+ 548   2      #ifdef U8G2_WITH_INTERSECTION
+ 549   2          {
+ 550   3            u8g2_uint_t x0, x1, y0, y1;
+ 551   3            x0 = decode->target_x;
+ 552   3            y0 = decode->target_y;
+ 553   3            x1 = x0;
+ 554   3            y1 = y0;
+ 555   3            
+ 556   3      #ifdef U8G2_WITH_FONT_ROTATION
+ 557   3            switch(decode->dir)
+ 558   3            {
+ 559   4        case 0:
+ 560   4            x1 += decode->glyph_width;
+ 561   4            y1 += h;
+ 562   4            break;
+ 563   4        case 1:
+ 564   4            x0 -= h;
+ 565   4            x0++; /* shift down, because of assymetric boundaries for the interseciton test */
+ 566   4            x1++;
+ 567   4            y1 += decode->glyph_width;
+ 568   4            break;
+ 569   4        case 2:
+ 570   4            x0 -= decode->glyph_width;
+ 571   4            x0++; /* shift down, because of assymetric boundaries for the interseciton test */
+ 572   4            x1++;
+ 573   4            y0 -= h;
+ 574   4            y0++; /* shift down, because of assymetric boundaries for the interseciton test */
+ 575   4            y1++;
+ 576   4            break;    
+ 577   4        case 3:
+ 578   4            x1 += h;
+ 579   4            y0 -= decode->glyph_width;
+ 580   4            y0++; /* shift down, because of assymetric boundaries for the interseciton test */
+ 581   4            y1++;
+ 582   4            break;    
+ 583   4            }
+ 584   3      #else /* U8G2_WITH_FONT_ROTATION */
+                    x1 += decode->glyph_width;
+                    y1 += h;      
+              #endif
+ 588   3            
+ 589   3            if ( u8g2_IsIntersection(u8g2, x0, y0, x1, y1) == 0 ) 
+ 590   3        return d;
+ 591   3          }
+ 592   2      #endif /* U8G2_WITH_INTERSECTION */
+ 593   2         
+ 594   2          /* reset local x/y position */
+ 595   2          decode->x = 0;
+ 596   2          decode->y = 0;
+ 597   2          
+ 598   2          /* decode glyph */
+ 599   2          for(;;)
+ 600   2          {
+ 601   3            a = u8g2_font_decode_get_unsigned_bits(decode, u8g2->font_info.bits_per_0);
+ 602   3            b = u8g2_font_decode_get_unsigned_bits(decode, u8g2->font_info.bits_per_1);
+ 603   3            do
+ 604   3            {
+ 605   4        u8g2_font_decode_len(u8g2, a, 0);
+ 606   4        u8g2_font_decode_len(u8g2, b, 1);
+ 607   4            } while( u8g2_font_decode_get_unsigned_bits(decode, 1) != 0 );
+C51 COMPILER V9.60.7.0   U8G2_FONT                                                         10/16/2024 16:37:10 PAGE 11  
+
+ 608   3      
+ 609   3            if ( decode->y >= h )
+ 610   3        break;
+ 611   3          }
+ 612   2          
+ 613   2          /* restore the u8g2 draw color, because this is modified by the decode algo */
+ 614   2          u8g2->draw_color = decode->fg_color;
+ 615   2        }
+ 616   1        return d;
+ 617   1      }
+ 618          
+ 619          /*
+ 620            Description:
+ 621              Find the starting point of the glyph data.
+ 622            Args:
+ 623              encoding: Encoding (ASCII or Unicode) of the glyph
+ 624            Return:
+ 625              Address of the glyph data or NULL, if the encoding is not avialable in the font.
+ 626          */
+ 627          const uint8_t *u8g2_font_get_glyph_data(u8g2_t *u8g2, uint16_t encoding)
+ 628          {
+ 629   1        const uint8_t *font = u8g2->font;
+ 630   1        font += U8G2_FONT_DATA_STRUCT_SIZE;
+ 631   1      
+ 632   1        
+ 633   1        if ( encoding <= 255 )
+ 634   1        {
+ 635   2          if ( encoding >= 'a' )
+ 636   2          {
+ 637   3            font += u8g2->font_info.start_pos_lower_a;
+ 638   3          }
+ 639   2          else if ( encoding >= 'A' )
+ 640   2          {
+ 641   3            font += u8g2->font_info.start_pos_upper_A;
+ 642   3          }
+ 643   2          
+ 644   2          for(;;)
+ 645   2          {
+ 646   3            if ( u8x8_pgm_read( font + 1 ) == 0 )
+ 647   3        break;
+ 648   3            if ( u8x8_pgm_read( font ) == encoding )
+ 649   3            {
+ 650   4        return font+2;  /* skip encoding and glyph size */
+ 651   4            }
+ 652   3            font += u8x8_pgm_read( font + 1 );
+ 653   3          }
+ 654   2        }
+ 655   1      #ifdef U8G2_WITH_UNICODE
+ 656   1        else
+ 657   1        {
+ 658   2          uint16_t e;
+ 659   2          const uint8_t *unicode_lookup_table;
+ 660   2          
+ 661   2      // removed, there is now the new index table
+ 662   2      //#ifdef  __unix__
+ 663   2      //    if ( u8g2->last_font_data != NULL && encoding >= u8g2->last_unicode )
+ 664   2      //    {
+ 665   2      //  font = u8g2->last_font_data;
+ 666   2      //    }
+ 667   2      //    else
+ 668   2      //#endif 
+ 669   2      
+C51 COMPILER V9.60.7.0   U8G2_FONT                                                         10/16/2024 16:37:10 PAGE 12  
+
+ 670   2          font += u8g2->font_info.start_pos_unicode;
+ 671   2          unicode_lookup_table = font; 
+ 672   2        
+ 673   2          /* issue 596: search for the glyph start in the unicode lookup table */
+ 674   2          do
+ 675   2          {
+ 676   3            font += u8g2_font_get_word(unicode_lookup_table, 0);
+ 677   3            e = u8g2_font_get_word(unicode_lookup_table, 2);
+ 678   3            unicode_lookup_table+=4;
+ 679   3          } while( e < encoding );
+ 680   2          
+ 681   2        
+ 682   2          for(;;)
+ 683   2          {
+ 684   3            e = u8x8_pgm_read( font );
+ 685   3            e <<= 8;
+ 686   3            e |= u8x8_pgm_read( font + 1 );
+ 687   3        
+ 688   3      // removed, there is now the new index table  
+ 689   3      //#ifdef  __unix__
+ 690   3      //      if ( encoding < e )
+ 691   3      //        break;
+ 692   3      //#endif 
+ 693   3      
+ 694   3            if ( e == 0 )
+ 695   3        break;
+ 696   3        
+ 697   3            if ( e == encoding )
+ 698   3            {
+ 699   4      // removed, there is now the new index table
+ 700   4      //#ifdef  __unix__
+ 701   4      //  u8g2->last_font_data = font;
+ 702   4      //  u8g2->last_unicode = encoding;
+ 703   4      //#endif 
+ 704   4        return font+3;  /* skip encoding and glyph size */
+ 705   4            }
+ 706   3            font += u8x8_pgm_read( font + 2 );
+ 707   3          }  
+ 708   2        }
+ 709   1      #endif
+ 710   1        
+ 711   1        return NULL;
+ 712   1      }
+ 713          
+ 714          static u8g2_uint_t u8g2_font_draw_glyph(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, uint16_t encoding)
+ 715          {
+ 716   1        u8g2_uint_t dx = 0;
+ 717   1        u8g2->font_decode.target_x = x;
+ 718   1        u8g2->font_decode.target_y = y;
+ 719   1        //u8g2->font_decode.is_transparent = is_transparent; this is already set
+ 720   1        //u8g2->font_decode.dir = dir;
+ 721   1        const uint8_t *glyph_data = u8g2_font_get_glyph_data(u8g2, encoding);
+*** ERROR C141 IN LINE 721 OF ..\u8g2\u8g2_font.c: syntax error near 'const', expected '__asm'
+*** ERROR C202 IN LINE 721 OF ..\u8g2\u8g2_font.c: 'glyph_data': undefined identifier
+ 722   1        if ( glyph_data != NULL )
+*** ERROR C202 IN LINE 722 OF ..\u8g2\u8g2_font.c: 'glyph_data': undefined identifier
+ 723   1        {
+ 724   2          dx = u8g2_font_decode_glyph(u8g2, glyph_data);
+*** ERROR C202 IN LINE 724 OF ..\u8g2\u8g2_font.c: 'glyph_data': undefined identifier
+ 725   2        }
+ 726   1        return dx;
+ 727   1      }
+C51 COMPILER V9.60.7.0   U8G2_FONT                                                         10/16/2024 16:37:10 PAGE 13  
+
+ 728          
+ 729          
+ 730          
+ 731          uint8_t u8g2_IsGlyph(u8g2_t *u8g2, uint16_t requested_encoding)
+ 732          {
+ 733   1        /* updated to new code */
+ 734   1        if ( u8g2_font_get_glyph_data(u8g2, requested_encoding) != NULL )
+ 735   1          return 1;
+ 736   1        return 0;
+ 737   1      }
+ 738          
+ 739          /* side effect: updates u8g2->font_decode and u8g2->glyph_x_offset */
+ 740          int8_t u8g2_GetGlyphWidth(u8g2_t *u8g2, uint16_t requested_encoding)
+ 741          {
+ 742   1        const uint8_t *glyph_data = u8g2_font_get_glyph_data(u8g2, requested_encoding);
+ 743   1        if ( glyph_data == NULL )
+ 744   1          return 0; 
+ 745   1        
+ 746   1        u8g2_font_setup_decode(u8g2, glyph_data);
+ 747   1        u8g2->glyph_x_offset = u8g2_font_decode_get_signed_bits(&(u8g2->font_decode), u8g2->font_info.bits_per_c
+             -har_x);
+ 748   1        u8g2_font_decode_get_signed_bits(&(u8g2->font_decode), u8g2->font_info.bits_per_char_y);
+ 749   1        
+ 750   1        /* glyph width is here: u8g2->font_decode.glyph_width */
+ 751   1      
+ 752   1        return u8g2_font_decode_get_signed_bits(&(u8g2->font_decode), u8g2->font_info.bits_per_delta_x);
+ 753   1      }
+ 754          
+ 755          
+ 756          /*
+ 757            set one of:
+ 758              U8G2_FONT_MODE_TRANSPARENT
+ 759              U8G2_FONT_MODE_SOLID
+ 760              U8G2_FONT_MODE_NONE
+ 761            This has been changed for the new font procedures  
+ 762          */
+ 763          void u8g2_SetFontMode(u8g2_t *u8g2, uint8_t is_transparent)
+ 764          {
+ 765   1        u8g2->font_decode.is_transparent = is_transparent;    // new font procedures
+ 766   1      }
+ 767          
+ 768          u8g2_uint_t u8g2_DrawGlyph(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, uint16_t encoding)
+ 769          {
+ 770   1      #ifdef U8G2_WITH_FONT_ROTATION
+ 771   1        switch(u8g2->font_decode.dir)
+ 772   1        {
+ 773   2          case 0:
+ 774   2            y += u8g2->font_calc_vref(u8g2);
+ 775   2            break;
+ 776   2          case 1:
+ 777   2            x -= u8g2->font_calc_vref(u8g2);
+ 778   2            break;
+ 779   2          case 2:
+ 780   2            y -= u8g2->font_calc_vref(u8g2);
+ 781   2            break;
+ 782   2          case 3:
+ 783   2            x += u8g2->font_calc_vref(u8g2);
+ 784   2            break;
+ 785   2        }
+ 786   1      #else
+                y += u8g2->font_calc_vref(u8g2);
+              #endif
+C51 COMPILER V9.60.7.0   U8G2_FONT                                                         10/16/2024 16:37:10 PAGE 14  
+
+ 789   1        return u8g2_font_draw_glyph(u8g2, x, y, encoding);
+ 790   1      }
+ 791          
+ 792          static u8g2_uint_t u8g2_draw_string(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, const char *str) U8G2_NOIN
+             -LINE;
+ 793          static u8g2_uint_t u8g2_draw_string(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, const char *str)
+ 794          {
+ 795   1        uint16_t e;
+ 796   1        u8g2_uint_t delta, sum;
+ 797   1        u8x8_utf8_init(u8g2_GetU8x8(u8g2));
+ 798   1        sum = 0;
+ 799   1        for(;;)
+ 800   1        {
+ 801   2          e = u8g2->u8x8.next_cb(u8g2_GetU8x8(u8g2), (uint8_t)*str);
+ 802   2          if ( e == 0x0ffff )
+ 803   2            break;
+ 804   2          str++;
+ 805   2          if ( e != 0x0fffe )
+ 806   2          {
+ 807   3            delta = u8g2_DrawGlyph(u8g2, x, y, e);
+ 808   3          
+ 809   3      #ifdef U8G2_WITH_FONT_ROTATION
+ 810   3            switch(u8g2->font_decode.dir)
+ 811   3            {
+ 812   4        case 0:
+ 813   4          x += delta;
+ 814   4          break;
+ 815   4        case 1:
+ 816   4          y += delta;
+ 817   4          break;
+ 818   4        case 2:
+ 819   4          x -= delta;
+ 820   4          break;
+ 821   4        case 3:
+ 822   4          y -= delta;
+ 823   4          break;
+ 824   4            }
+ 825   3            
+ 826   3            /*
+ 827   3            // requires 10 bytes more on avr
+ 828   3            x = u8g2_add_vector_x(x, delta, 0, u8g2->font_decode.dir);
+ 829   3            y = u8g2_add_vector_y(y, delta, 0, u8g2->font_decode.dir);
+ 830   3            */
+ 831   3      
+ 832   3      #else
+                    x += delta;
+              #endif
+ 835   3      
+ 836   3            sum += delta;    
+ 837   3          }
+ 838   2        }
+ 839   1        return sum;
+ 840   1      }
+ 841          
+ 842          u8g2_uint_t u8g2_DrawStr(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, const char *str)
+ 843          {
+ 844   1        u8g2->u8x8.next_cb = u8x8_ascii_next;
+ 845   1        return u8g2_draw_string(u8g2, x, y, str);
+ 846   1      }
+ 847          
+ 848          /*
+ 849          source: https://en.wikipedia.org/wiki/UTF-8
+C51 COMPILER V9.60.7.0   U8G2_FONT                                                         10/16/2024 16:37:10 PAGE 15  
+
+ 850          Bits  from    to      bytes Byte 1    Byte 2    Byte 3    Byte 4    Byte 5    Byte 6
+ 851            7   U+0000    U+007F    1     0xxxxxxx
+ 852          11  U+0080    U+07FF    2     110xxxxx  10xxxxxx
+ 853          16  U+0800    U+FFFF    3     1110xxxx  10xxxxxx  10xxxxxx
+ 854          21  U+10000   U+1FFFFF  4     11110xxx  10xxxxxx  10xxxxxx  10xxxxxx
+ 855          26  U+200000  U+3FFFFFF   5     111110xx  10xxxxxx  10xxxxxx  10xxxxxx  10xxxxxx
+ 856          31  U+4000000   U+7FFFFFFF  6     1111110x  10xxxxxx  10xxxxxx  10xxxxxx  10xxxxxx  10xxxxxx  
+ 857          */
+ 858          u8g2_uint_t u8g2_DrawUTF8(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, const char *str)
+ 859          {
+ 860   1        u8g2->u8x8.next_cb = u8x8_utf8_next;
+ 861   1        return u8g2_draw_string(u8g2, x, y, str);
+ 862   1      }
+ 863          
+ 864          
+ 865          
+ 866          u8g2_uint_t u8g2_DrawExtendedUTF8(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, uint8_t to_left, u8g2_kernin
+             -g_t *kerning, const char *str)
+ 867          {
+ 868   1        u8g2->u8x8.next_cb = u8x8_utf8_next;
+ 869   1        uint16_t e_prev = 0x0ffff;
+*** ERROR C141 IN LINE 869 OF ..\u8g2\u8g2_font.c: syntax error near 'uint16_t', expected '__asm'
+*** ERROR C202 IN LINE 869 OF ..\u8g2\u8g2_font.c: 'e_prev': undefined identifier
+ 870   1        uint16_t e;
+*** ERROR C141 IN LINE 870 OF ..\u8g2\u8g2_font.c: syntax error near 'uint16_t', expected '__asm'
+*** ERROR C202 IN LINE 870 OF ..\u8g2\u8g2_font.c: 'e': undefined identifier
+ 871   1        u8g2_uint_t delta, sum, k;
+*** ERROR C141 IN LINE 871 OF ..\u8g2\u8g2_font.c: syntax error near 'u8g2_uint_t', expected '__asm'
+*** ERROR C202 IN LINE 871 OF ..\u8g2\u8g2_font.c: 'delta': undefined identifier
+ 872   1        u8x8_utf8_init(u8g2_GetU8x8(u8g2));
+ 873   1        sum = 0;
+*** ERROR C202 IN LINE 873 OF ..\u8g2\u8g2_font.c: 'sum': undefined identifier
+ 874   1        for(;;)
+ 875   1        {
+ 876   2          e = u8g2->u8x8.next_cb(u8g2_GetU8x8(u8g2), (uint8_t)*str);
+*** ERROR C202 IN LINE 876 OF ..\u8g2\u8g2_font.c: 'e': undefined identifier
+ 877   2          if ( e == 0x0ffff )
+*** ERROR C202 IN LINE 877 OF ..\u8g2\u8g2_font.c: 'e': undefined identifier
+ 878   2            break;
+ 879   2          str++;
+ 880   2          if ( e != 0x0fffe )
+*** ERROR C202 IN LINE 880 OF ..\u8g2\u8g2_font.c: 'e': undefined identifier
+ 881   2          {
+ 882   3            delta = u8g2_GetGlyphWidth(u8g2, e);
+*** ERROR C202 IN LINE 882 OF ..\u8g2\u8g2_font.c: 'delta': undefined identifier
+ 883   3            
+ 884   3            if ( to_left )
+ 885   3            {
+ 886   4              k = u8g2_GetKerning(u8g2, kerning, e, e_prev);
+*** ERROR C202 IN LINE 886 OF ..\u8g2\u8g2_font.c: 'k': undefined identifier
+ 887   4        delta -= k;
+*** ERROR C202 IN LINE 887 OF ..\u8g2\u8g2_font.c: 'delta': undefined identifier
+ 888   4        x -= delta;
+*** ERROR C202 IN LINE 888 OF ..\u8g2\u8g2_font.c: 'delta': undefined identifier
+ 889   4            }
+ 890   3            else
+ 891   3            {
+ 892   4              k = u8g2_GetKerning(u8g2, kerning, e_prev, e);
+*** ERROR C202 IN LINE 892 OF ..\u8g2\u8g2_font.c: 'k': undefined identifier
+ 893   4        delta -= k;
+*** ERROR C202 IN LINE 893 OF ..\u8g2\u8g2_font.c: 'delta': undefined identifier
+ 894   4            }
+C51 COMPILER V9.60.7.0   U8G2_FONT                                                         10/16/2024 16:37:10 PAGE 16  
+
+ 895   3            e_prev = e;
+*** ERROR C202 IN LINE 895 OF ..\u8g2\u8g2_font.c: 'e_prev': undefined identifier
+ 896   3      
+ 897   3            u8g2_DrawGlyph(u8g2, x, y, e);
+*** ERROR C202 IN LINE 897 OF ..\u8g2\u8g2_font.c: 'e': undefined identifier
+ 898   3            if ( to_left )
+ 899   3            {
+ 900   4            }
+ 901   3            else
+ 902   3            {
+ 903   4        x += delta;
+*** ERROR C202 IN LINE 903 OF ..\u8g2\u8g2_font.c: 'delta': undefined identifier
+ 904   4        x -= k;
+*** ERROR C202 IN LINE 904 OF ..\u8g2\u8g2_font.c: 'k': undefined identifier
+ 905   4            }
+ 906   3            
+ 907   3            sum += delta;    
+*** ERROR C202 IN LINE 907 OF ..\u8g2\u8g2_font.c: 'sum': undefined identifier
+ 908   3          }
+ 909   2        }
+ 910   1        return sum;
+*** ERROR C202 IN LINE 910 OF ..\u8g2\u8g2_font.c: 'sum': undefined identifier
+ 911   1      }
+ 912          
+ 913          u8g2_uint_t u8g2_DrawExtUTF8(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, uint8_t to_left, const uint16_t *
+             -kerning_table, const char *str)
+ 914          {
+ 915   1        u8g2->u8x8.next_cb = u8x8_utf8_next;
+ 916   1        uint16_t e_prev = 0x0ffff;
+*** ERROR C141 IN LINE 916 OF ..\u8g2\u8g2_font.c: syntax error near 'uint16_t', expected '__asm'
+*** ERROR C202 IN LINE 916 OF ..\u8g2\u8g2_font.c: 'e_prev': undefined identifier
+ 917   1        uint16_t e;
+*** ERROR C141 IN LINE 917 OF ..\u8g2\u8g2_font.c: syntax error near 'uint16_t', expected '__asm'
+*** ERROR C202 IN LINE 917 OF ..\u8g2\u8g2_font.c: 'e': undefined identifier
+ 918   1        u8g2_uint_t delta, sum, k;
+*** ERROR C141 IN LINE 918 OF ..\u8g2\u8g2_font.c: syntax error near 'u8g2_uint_t', expected '__asm'
+*** ERROR C202 IN LINE 918 OF ..\u8g2\u8g2_font.c: 'delta': undefined identifier
+ 919   1        u8x8_utf8_init(u8g2_GetU8x8(u8g2));
+ 920   1        sum = 0;
+*** ERROR C202 IN LINE 920 OF ..\u8g2\u8g2_font.c: 'sum': undefined identifier
+ 921   1        for(;;)
+ 922   1        {
+ 923   2          e = u8g2->u8x8.next_cb(u8g2_GetU8x8(u8g2), (uint8_t)*str);
+*** ERROR C202 IN LINE 923 OF ..\u8g2\u8g2_font.c: 'e': undefined identifier
+ 924   2          if ( e == 0x0ffff )
+*** ERROR C202 IN LINE 924 OF ..\u8g2\u8g2_font.c: 'e': undefined identifier
+ 925   2            break;
+ 926   2          str++;
+ 927   2          if ( e != 0x0fffe )
+*** ERROR C202 IN LINE 927 OF ..\u8g2\u8g2_font.c: 'e': undefined identifier
+ 928   2          {
+ 929   3            delta = u8g2_GetGlyphWidth(u8g2, e);
+*** ERROR C202 IN LINE 929 OF ..\u8g2\u8g2_font.c: 'delta': undefined identifier
+ 930   3            
+ 931   3            if ( to_left )
+ 932   3            {
+ 933   4              k = u8g2_GetKerningByTable(u8g2, kerning_table, e, e_prev);
+*** ERROR C202 IN LINE 933 OF ..\u8g2\u8g2_font.c: 'k': undefined identifier
+ 934   4        delta -= k;
+*** ERROR C202 IN LINE 934 OF ..\u8g2\u8g2_font.c: 'delta': undefined identifier
+ 935   4        x -= delta;
+*** ERROR C202 IN LINE 935 OF ..\u8g2\u8g2_font.c: 'delta': undefined identifier
+C51 COMPILER V9.60.7.0   U8G2_FONT                                                         10/16/2024 16:37:10 PAGE 17  
+
+ 936   4            }
+ 937   3            else
+ 938   3            {
+ 939   4              k = u8g2_GetKerningByTable(u8g2, kerning_table, e_prev, e);
+*** ERROR C202 IN LINE 939 OF ..\u8g2\u8g2_font.c: 'k': undefined identifier
+ 940   4        delta -= k;
+*** ERROR C202 IN LINE 940 OF ..\u8g2\u8g2_font.c: 'delta': undefined identifier
+ 941   4            }
+ 942   3            e_prev = e;
+*** ERROR C202 IN LINE 942 OF ..\u8g2\u8g2_font.c: 'e_prev': undefined identifier
+ 943   3      
+ 944   3            if ( to_left )
+ 945   3            {
+ 946   4            }
+ 947   3            else
+ 948   3            {
+ 949   4        x += delta;
+*** ERROR C202 IN LINE 949 OF ..\u8g2\u8g2_font.c: 'delta': undefined identifier
+ 950   4            }
+ 951   3            u8g2_DrawGlyph(u8g2, x, y, e);
+*** ERROR C202 IN LINE 951 OF ..\u8g2\u8g2_font.c: 'e': undefined identifier
+ 952   3            if ( to_left )
+ 953   3            {
+ 954   4            }
+ 955   3            else
+ 956   3            {
+ 957   4        //x += delta;
+ 958   4        //x -= k;
+ 959   4            }
+ 960   3            
+ 961   3            sum += delta;    
+*** ERROR C202 IN LINE 961 OF ..\u8g2\u8g2_font.c: 'sum': undefined identifier
+ 962   3          }
+ 963   2        }
+ 964   1        return sum;
+*** ERROR C202 IN LINE 964 OF ..\u8g2\u8g2_font.c: 'sum': undefined identifier
+ 965   1      }
+ 966          
+ 967          
+ 968          
+ 969          /*===============================================*/
+ 970          
+ 971          /* set ascent/descent for reference point calculation */
+ 972          
+ 973          void u8g2_UpdateRefHeight(u8g2_t *u8g2)
+ 974          {
+ 975   1        if ( u8g2->font == NULL )
+ 976   1          return;
+ 977   1        u8g2->font_ref_ascent = u8g2->font_info.ascent_A;
+ 978   1        u8g2->font_ref_descent = u8g2->font_info.descent_g;
+ 979   1        if ( u8g2->font_height_mode == U8G2_FONT_HEIGHT_MODE_TEXT )
+ 980   1        {
+ 981   2        }
+ 982   1        else if ( u8g2->font_height_mode == U8G2_FONT_HEIGHT_MODE_XTEXT )
+ 983   1        {
+ 984   2          if ( u8g2->font_ref_ascent < u8g2->font_info.ascent_para )
+ 985   2            u8g2->font_ref_ascent = u8g2->font_info.ascent_para;
+ 986   2          if ( u8g2->font_ref_descent > u8g2->font_info.descent_para )
+ 987   2            u8g2->font_ref_descent = u8g2->font_info.descent_para;
+ 988   2        }
+ 989   1        else
+ 990   1        {
+C51 COMPILER V9.60.7.0   U8G2_FONT                                                         10/16/2024 16:37:10 PAGE 18  
+
+ 991   2          if ( u8g2->font_ref_ascent < u8g2->font_info.max_char_height+u8g2->font_info.y_offset )
+ 992   2            u8g2->font_ref_ascent = u8g2->font_info.max_char_height+u8g2->font_info.y_offset;
+ 993   2          if ( u8g2->font_ref_descent > u8g2->font_info.y_offset )
+ 994   2            u8g2->font_ref_descent = u8g2->font_info.y_offset;
+ 995   2        }  
+ 996   1      }
+ 997          
+ 998          void u8g2_SetFontRefHeightText(u8g2_t *u8g2)
+ 999          {
+1000   1        u8g2->font_height_mode = U8G2_FONT_HEIGHT_MODE_TEXT;
+1001   1        u8g2_UpdateRefHeight(u8g2);
+1002   1      }
+1003          
+1004          void u8g2_SetFontRefHeightExtendedText(u8g2_t *u8g2)
+1005          {
+1006   1        u8g2->font_height_mode = U8G2_FONT_HEIGHT_MODE_XTEXT;
+1007   1        u8g2_UpdateRefHeight(u8g2);
+1008   1      }
+1009          
+1010          void u8g2_SetFontRefHeightAll(u8g2_t *u8g2)
+1011          {
+1012   1        u8g2->font_height_mode = U8G2_FONT_HEIGHT_MODE_ALL;
+1013   1        u8g2_UpdateRefHeight(u8g2);
+1014   1      }
+1015          
+1016          /*===============================================*/
+1017          /* callback procedures to correct the y position */
+1018          
+1019          u8g2_uint_t u8g2_font_calc_vref_font(U8X8_UNUSED u8g2_t *u8g2)
+1020          {
+1021   1        return 0;
+1022   1      }
+1023          
+1024          void u8g2_SetFontPosBaseline(u8g2_t *u8g2)
+1025          {
+1026   1        u8g2->font_calc_vref = u8g2_font_calc_vref_font;
+1027   1      }
+1028          
+1029          
+1030          u8g2_uint_t u8g2_font_calc_vref_bottom(u8g2_t *u8g2)
+1031          {
+1032   1        return (u8g2_uint_t)(u8g2->font_ref_descent);
+1033   1      }
+1034          
+1035          void u8g2_SetFontPosBottom(u8g2_t *u8g2)
+1036          {
+1037   1        u8g2->font_calc_vref = u8g2_font_calc_vref_bottom;
+1038   1      }
+1039          
+1040          u8g2_uint_t u8g2_font_calc_vref_top(u8g2_t *u8g2)
+1041          {
+1042   1        u8g2_uint_t tmp;
+1043   1        /* reference pos is one pixel above the upper edge of the reference glyph */
+1044   1        tmp = (u8g2_uint_t)(u8g2->font_ref_ascent);
+1045   1        tmp++;
+1046   1        return tmp;
+1047   1      }
+1048          
+1049          void u8g2_SetFontPosTop(u8g2_t *u8g2)
+1050          {
+1051   1        u8g2->font_calc_vref = u8g2_font_calc_vref_top;
+1052   1      }
+C51 COMPILER V9.60.7.0   U8G2_FONT                                                         10/16/2024 16:37:10 PAGE 19  
+
+1053          
+1054          u8g2_uint_t u8g2_font_calc_vref_center(u8g2_t *u8g2)
+1055          {
+1056   1        int8_t tmp;
+1057   1        tmp = u8g2->font_ref_ascent;
+1058   1        tmp -= u8g2->font_ref_descent;
+1059   1        tmp /= 2;
+1060   1        tmp += u8g2->font_ref_descent;  
+1061   1        return tmp;
+1062   1      }
+1063          
+1064          void u8g2_SetFontPosCenter(u8g2_t *u8g2)
+1065          {
+1066   1        u8g2->font_calc_vref = u8g2_font_calc_vref_center;
+1067   1      }
+1068          
+1069          /*===============================================*/
+1070          
+1071          void u8g2_SetFont(u8g2_t *u8g2, const uint8_t  *font)
+1072          {
+1073   1        if ( u8g2->font != font )
+1074   1        {
+1075   2      //#ifdef  __unix__
+1076   2      //  u8g2->last_font_data = NULL;
+1077   2      //  u8g2->last_unicode = 0x0ffff;
+1078   2      //#endif 
+1079   2          u8g2->font = font;
+1080   2          u8g2_read_font_info(&(u8g2->font_info), font);
+1081   2          u8g2_UpdateRefHeight(u8g2);
+1082   2          /* u8g2_SetFontPosBaseline(u8g2); */ /* removed with issue 195 */
+1083   2        }
+1084   1      }
+1085          
+1086          /*===============================================*/
+1087          
+1088          static uint8_t u8g2_is_all_valid(u8g2_t *u8g2, const char *str) U8G2_NOINLINE;
+1089          static uint8_t u8g2_is_all_valid(u8g2_t *u8g2, const char *str)
+1090          {
+1091   1        uint16_t e;
+1092   1        u8x8_utf8_init(u8g2_GetU8x8(u8g2));
+1093   1        for(;;)
+1094   1        {
+1095   2          e = u8g2->u8x8.next_cb(u8g2_GetU8x8(u8g2), (uint8_t)*str);
+1096   2          if ( e == 0x0ffff )
+1097   2            break;
+1098   2          str++;
+1099   2          if ( e != 0x0fffe )
+1100   2          {
+1101   3            if ( u8g2_font_get_glyph_data(u8g2, e) == NULL )
+1102   3        return 0;
+1103   3          }
+1104   2        }
+1105   1        return 1;
+1106   1      }
+1107          
+1108          uint8_t u8g2_IsAllValidUTF8(u8g2_t *u8g2, const char *str)
+1109          {
+1110   1        u8g2->u8x8.next_cb = u8x8_utf8_next;
+1111   1        return u8g2_is_all_valid(u8g2, str);
+1112   1      }
+1113          
+1114          
+C51 COMPILER V9.60.7.0   U8G2_FONT                                                         10/16/2024 16:37:10 PAGE 20  
+
+1115          /* string calculation is stilll not 100% perfect as it addes the initial string offset to the overall size
+             - */
+1116          static u8g2_uint_t u8g2_string_width(u8g2_t *u8g2, const char *str) U8G2_NOINLINE;
+1117          static u8g2_uint_t u8g2_string_width(u8g2_t *u8g2, const char *str)
+1118          {
+1119   1        uint16_t e;
+1120   1        u8g2_uint_t  w, dx;
+1121   1      #ifdef U8G2_BALANCED_STR_WIDTH_CALCULATION
+1122   1        int8_t initial_x_offset = -64;
+1123   1      #endif 
+1124   1        
+1125   1        u8g2->font_decode.glyph_width = 0;
+1126   1        u8x8_utf8_init(u8g2_GetU8x8(u8g2));
+1127   1        
+1128   1        /* reset the total width to zero, this will be expanded during calculation */
+1129   1        w = 0;
+1130   1        dx = 0;
+1131   1      
+1132   1        // printf("str=<%s>\n", str);
+1133   1        
+1134   1        for(;;)
+1135   1        {
+1136   2          e = u8g2->u8x8.next_cb(u8g2_GetU8x8(u8g2), (uint8_t)*str);
+1137   2          if ( e == 0x0ffff )
+1138   2            break;
+1139   2          str++;
+1140   2          if ( e != 0x0fffe )
+1141   2          {
+1142   3            dx = u8g2_GetGlyphWidth(u8g2, e);   /* delta x value of the glyph */
+1143   3      #ifdef U8G2_BALANCED_STR_WIDTH_CALCULATION
+1144   3            if ( initial_x_offset == -64 )
+1145   3              initial_x_offset = u8g2->glyph_x_offset;
+1146   3      #endif 
+1147   3            //printf("'%c' x=%d dx=%d w=%d io=%d ", e, u8g2->glyph_x_offset, dx, u8g2->font_decode.glyph_width, 
+             -initial_x_offset);
+1148   3            w += dx;
+1149   3          }
+1150   2        }
+1151   1        //printf("\n");
+1152   1        
+1153   1        /* adjust the last glyph, check for issue #16: do not adjust if width is 0 */
+1154   1        if ( u8g2->font_decode.glyph_width != 0 )
+1155   1        {
+1156   2          //printf("string width adjust dx=%d glyph_width=%d x-offset=%d\n", dx, u8g2->font_decode.glyph_width, 
+             -u8g2->glyph_x_offset);
+1157   2          w -= dx;
+1158   2          w += u8g2->font_decode.glyph_width;  /* the real pixel width of the glyph, sideeffect of GetGlyphWidth
+             - */
+1159   2          /* issue #46: we have to add the x offset also */
+1160   2          w += u8g2->glyph_x_offset;  /* this value is set as a side effect of u8g2_GetGlyphWidth() */
+1161   2      #ifdef U8G2_BALANCED_STR_WIDTH_CALCULATION
+1162   2          /* https://github.com/olikraus/u8g2/issues/1561 */
+1163   2          if ( initial_x_offset > 0 )
+1164   2            w+=initial_x_offset;
+1165   2      #endif 
+1166   2        }
+1167   1        // printf("w=%d \n", w);
+1168   1        
+1169   1        return w;  
+1170   1      }
+1171          
+1172          static void u8g2_GetGlyphHorizontalProperties(u8g2_t *u8g2, uint16_t requested_encoding, uint8_t *w, int8_
+C51 COMPILER V9.60.7.0   U8G2_FONT                                                         10/16/2024 16:37:10 PAGE 21  
+
+             -t *ox, int8_t *dx)
+1173          {
+1174   1        const uint8_t *glyph_data = u8g2_font_get_glyph_data(u8g2, requested_encoding);
+1175   1        if ( glyph_data == NULL )
+1176   1          return; 
+1177   1        
+1178   1        u8g2_font_setup_decode(u8g2, glyph_data);
+1179   1        *w = u8g2->font_decode.glyph_width;
+1180   1        *ox =  u8g2_font_decode_get_signed_bits(&(u8g2->font_decode), u8g2->font_info.bits_per_char_x);
+1181   1        u8g2_font_decode_get_signed_bits(&(u8g2->font_decode), u8g2->font_info.bits_per_char_y);
+1182   1        *dx = u8g2_font_decode_get_signed_bits(&(u8g2->font_decode), u8g2->font_info.bits_per_delta_x);
+1183   1      }
+1184          
+1185          /* u8g compatible GetStrX function */
+1186          int8_t u8g2_GetStrX(u8g2_t *u8g2, const char *s)
+1187          {
+1188   1        uint8_t w;
+1189   1        int8_t dx;
+1190   1        int8_t ox = 0;
+1191   1        u8g2_GetGlyphHorizontalProperties(u8g2, *s, &w, &ox, &dx);
+1192   1        return ox;
+1193   1      }
+1194          
+1195          
+1196          /*
+1197          Warning: This function needs to be fixed. I think it was taken over from u8glib, but not fixed as of now 
+1198          The main difference for this procedure compared to the normal get width, should be, that the initial
+1199          offset is removed
+1200          
+1201          Idea: for the user interface it probably would be better to add the xoffset of the first char to the end, 
+             -so that the overall word looks better.
+1202          Maybe then the procedure should be called differently, maybe balanced width instead of exact width
+1203          
+1204          u8g2_calculate_exact_string_width is now OBSOLETE, instead the above str width calculation has been update
+             -d:
+1205          https://github.com/olikraus/u8g2/issues/1561
+1206          */
+1207          #ifdef OBSOLETE
+              static u8g2_uint_t u8g2_calculate_exact_string_width(u8g2_t *u8g2, const char *str)
+              {
+                const char *s = str;
+                uint16_t enc;
+                u8g2_uint_t  w;
+                uint8_t cnt;
+                uint8_t gw; 
+                int8_t ox, dx;
+                
+                /* reset the total minimal width to zero, this will be expanded during calculation */
+                w = 0;
+                  
+                
+                /* check for empty string, width is already 0 */
+                cnt = 0;
+                
+                for(;;)
+                {
+                  enc = u8g2->u8x8.next_cb(u8g2_GetU8x8(u8g2), (uint8_t)*s);
+                  if ( enc == 0x0ffff )
+                    break;    
+                  s++;
+                  if ( enc != 0x0fffe )
+                  {
+C51 COMPILER V9.60.7.0   U8G2_FONT                                                         10/16/2024 16:37:10 PAGE 22  
+
+                    if ( cnt == 0 )
+                    {
+                      /* get glyph properties of the first char */
+                      u8g2_GetGlyphHorizontalProperties(u8g2, enc, &gw, &ox, &dx);  
+                    }        
+                    cnt++;
+                    if ( cnt > 2 )
+                      break;
+                  }
+                }
+                
+                if ( cnt == 0 )
+                  return 0;
+                 
+                if ( cnt == 1 )
+                   return gw;
+              
+                /* strlen(s) == 1:       width = width(s[0]) */
+                /* strlen(s) == 2:       width = - offx(s[0]) + deltax(s[0]) + offx(s[1]) + width(s[1]) */
+                /* strlen(s) == 3:       width = - offx(s[0]) + deltax(s[0]) + deltax(s[1]) + offx(s[2]) + width(s[2]) *
+             -/
+                
+                /* assume that the string has size 2 or more, than start with negative offset-x */
+                /* for string with size 1, this will be nullified after the loop */
+                w = -ox;  
+                for(;;)
+                {
+                  enc = u8g2->u8x8.next_cb(u8g2_GetU8x8(u8g2), (uint8_t)*str);
+                  if ( enc== 0x0ffff )
+                    break;
+                  str++;
+                  if ( enc != 0x0fffe )
+                  {
+                    u8g2_GetGlyphHorizontalProperties(u8g2, enc, &gw, &ox, &dx);        
+                    /* if there are still more characters, add the delta to the next glyph */
+                    w += dx;    
+                  }
+                }
+                
+                /* finally calculate the width of the last char */
+                /* here is another exception, if the last char is a blank, use the dx value instead */
+                if ( gw != 0 )
+                {
+                  w -= dx;    /* remove the last dx */
+                  /* if g was not updated in the for loop (strlen() == 1), then the initial offset x gets removed */
+                  w += gw;
+                  w += ox;
+                }
+                else
+                {
+                  //w += dx;
+                }
+                
+                
+                return w;
+                
+              }
+              #endif
+1289          
+1290          
+1291          
+1292          
+C51 COMPILER V9.60.7.0   U8G2_FONT                                                         10/16/2024 16:37:10 PAGE 23  
+
+1293          
+1294          u8g2_uint_t u8g2_GetStrWidth(u8g2_t *u8g2, const char *s)
+1295          {
+1296   1        u8g2->u8x8.next_cb = u8x8_ascii_next;
+1297   1        return u8g2_string_width(u8g2, s);
+1298   1      }
+1299          
+1300          /* OBSOLETE
+1301          u8g2_uint_t u8g2_GetExactStrWidth(u8g2_t *u8g2, const char *s)
+1302          {
+1303            u8g2->u8x8.next_cb = u8x8_ascii_next;
+1304            return u8g2_calculate_exact_string_width(u8g2, s);
+1305          }
+1306          */
+1307          
+1308          /*
+1309          source: https://en.wikipedia.org/wiki/UTF-8
+1310          Bits  from    to      bytes Byte 1    Byte 2    Byte 3    Byte 4    Byte 5    Byte 6
+1311            7   U+0000    U+007F    1     0xxxxxxx
+1312          11  U+0080    U+07FF    2     110xxxxx  10xxxxxx
+1313          16  U+0800    U+FFFF    3     1110xxxx  10xxxxxx  10xxxxxx
+1314          21  U+10000   U+1FFFFF  4     11110xxx  10xxxxxx  10xxxxxx  10xxxxxx
+1315          26  U+200000  U+3FFFFFF   5     111110xx  10xxxxxx  10xxxxxx  10xxxxxx  10xxxxxx
+1316          31  U+4000000   U+7FFFFFFF  6     1111110x  10xxxxxx  10xxxxxx  10xxxxxx  10xxxxxx  10xxxxxx  
+1317          */
+1318          u8g2_uint_t u8g2_GetUTF8Width(u8g2_t *u8g2, const char *str)
+1319          {
+1320   1        u8g2->u8x8.next_cb = u8x8_utf8_next;
+1321   1        return u8g2_string_width(u8g2, str);
+1322   1      }
+1323          
+1324          
+1325          
+1326          void u8g2_SetFontDirection(u8g2_t *u8g2, uint8_t dir)
+1327          {
+1328   1      #ifdef U8G2_WITH_FONT_ROTATION  
+1329   1        u8g2->font_decode.dir = dir;
+1330   1      #endif
+1331   1      }
+1332          
+1333          
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  47 ERROR(S)

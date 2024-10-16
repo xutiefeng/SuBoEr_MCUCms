@@ -1,0 +1,357 @@
+C51 COMPILER V9.60.7.0   U8G2_BUTTON                                                       10/16/2024 15:44:13 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE U8G2_BUTTON
+OBJECT MODULE PLACED IN .\Objects\u8g2_button.obj
+COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE ..\u8g2\u8g2_button.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\Device
+                    -\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\u8g2_button.lst) TABS(2) OBJEC
+                    -T(.\Objects\u8g2_button.obj)
+
+line level    source
+
+   1          /*
+   2          
+   3            u8g2_button.c
+   4          
+   5            Universal 8bit Graphics Library (https://github.com/olikraus/u8g2/)
+   6          
+   7            Copyright (c) 2016, olikraus@gmail.com
+   8            All rights reserved.
+   9          
+  10            Redistribution and use in source and binary forms, with or without modification, 
+  11            are permitted provided that the following conditions are met:
+  12          
+  13            * Redistributions of source code must retain the above copyright notice, this list 
+  14              of conditions and the following disclaimer.
+  15              
+  16            * Redistributions in binary form must reproduce the above copyright notice, this 
+  17              list of conditions and the following disclaimer in the documentation and/or other 
+  18              materials provided with the distribution.
+  19          
+  20            THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+  21            CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+  22            INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  23            MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+  24            DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+  25            CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+  26            SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+  27            NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+  28            LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+  29            CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+  30            STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+  31            ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+  32            ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+  33          
+  34          */
+  35          
+  36          #include "u8g2.h"
+  37          
+  38          
+  39          /*
+  40          
+  41            Description: 
+  42              Draws normal or inverted text with optional frame around text.
+  43              The text (and the frame) can be horizontally centered around the provided reference position.
+  44              This procedure will use the current draw color and current font. The height of the frame
+  45              depends on the setting of setFontRefHeightText(), setFontRefHeightExtendedText() or setFontRefHeightAl
+             -l()
+  46          
+  47          
+  48            Note 1: drawColor 2 (XOR) is not supported. Result will be broken with draw color 2.
+  49            Note 2: This procedure will enforce font mode 1 (transparent mode)
+  50            Note 3: Some fonts may add an extra gap on the right side. This is a font problem and can not be avoided
+             - (for example inb16 has this problem).
+  51            
+C51 COMPILER V9.60.7.0   U8G2_BUTTON                                                       10/16/2024 15:44:13 PAGE 2   
+
+  52          
+  53            The height of the button is defined by the current font and
+  54              setFontRefHeightText,
+  55              setFontRefHeightExtendedText
+  56              setFontRefHeightAll
+  57            Right padding might be influenced by the font.
+  58            For example u8g2_font_inb16 may add an extra pixel gap (increase padding by one) 
+  59            on the right side.
+  60            The current draw color is considered, but only draw color 0 and 1 are supported
+  61            
+  62            This function requires transparent font mode: setFontMode(1)
+  63            
+  64            Side effect: Font transparent mode is enabled setFontMode(1)
+  65          
+  66          */
+  67          
+  68          
+  69          
+  70          /*
+  71          
+  72            flags:
+  73          
+  74              U8G2_BTN_BW1 0x01
+  75              U8G2_BTN_BW2 0x02
+  76              U8G2_BTN_BW3 0x03
+  77          
+  78          
+  79              U8G2_BTN_SHADOW0 0x08
+  80              U8G2_BTN_SHADOW1 0x10
+  81              U8G2_BTN_SHADOW2 0x18
+  82          
+  83              U8G2_BTN_INV 0x20
+  84          
+  85              U8G2_BTN_HCENTER 0x40
+  86          
+  87              U8G2_BTN_XFRAME 0x80
+  88          
+  89            Total size without shadow: width+2*padding_h+2*border
+  90            Total size with U8G2_BTN_SHADOW0: width+2*padding_h+3*border
+  91            Total size with U8G2_BTN_SHADOW1: width+2*padding_h+3*border+1
+  92            Total size with U8G2_BTN_SHADOW2: width+2*padding_h+3*border+2
+  93            
+  94            U8G2_BTN_XFRAME:
+  95              draw another one pixel frame with one pixel gap, will not look good with shadow
+  96          */
+  97          
+  98          void u8g2_DrawButtonFrame(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t flags, u8g2_uint_t text_
+             -width, u8g2_uint_t padding_h, u8g2_uint_t padding_v)
+  99          {
+ 100   1        u8g2_uint_t w = text_width;
+ 101   1        
+ 102   1        u8g2_uint_t xx, yy, ww, hh;
+ 103   1        
+ 104   1        u8g2_uint_t gap_frame = U8G2_BTN_BW_MASK+1;
+ 105   1          
+ 106   1        u8g2_uint_t border_width = flags & U8G2_BTN_BW_MASK;
+ 107   1      
+ 108   1        int8_t a = u8g2_GetAscent(u8g2);
+ 109   1        int8_t d = u8g2_GetDescent(u8g2);
+ 110   1        
+ 111   1        uint8_t color_backup = u8g2->draw_color;
+ 112   1        
+C51 COMPILER V9.60.7.0   U8G2_BUTTON                                                       10/16/2024 15:44:13 PAGE 3   
+
+ 113   1        
+ 114   1        if ( flags & U8G2_BTN_XFRAME )
+ 115   1        {
+ 116   2          border_width++;
+ 117   2          gap_frame = border_width;
+ 118   2          border_width++;
+ 119   2        }
+ 120   1        
+ 121   1      
+ 122   1        
+ 123   1        for(;;)
+ 124   1        {
+ 125   2      
+ 126   2          xx = x;
+ 127   2          xx -= padding_h;
+ 128   2          xx -= border_width;
+ 129   2          ww = w+2*padding_h+2*border_width;
+ 130   2          
+ 131   2          yy = y;
+ 132   2          yy += u8g2->font_calc_vref(u8g2);
+ 133   2          yy -= a;
+ 134   2          yy -= padding_v;
+ 135   2          yy -= border_width;
+ 136   2          hh = a-d+2*padding_v+2*border_width;
+ 137   2          if ( border_width == 0 )
+ 138   2            break;
+ 139   2          if ( border_width == gap_frame )
+ 140   2          {
+ 141   3            u8g2_SetDrawColor(u8g2, color_backup == 0 ? 1 : 0);
+ 142   3          }
+ 143   2          u8g2_DrawFrame(u8g2, xx, yy, ww, hh);
+ 144   2          u8g2_SetDrawColor(u8g2, color_backup);
+ 145   2          
+ 146   2          if ( flags & U8G2_BTN_SHADOW_MASK )
+ 147   2          {
+ 148   3            if ( border_width == (flags & U8G2_BTN_BW_MASK) )
+ 149   3            {
+ 150   4              u8g2_uint_t i;
+ 151   4              u8g2_uint_t shadow_gap = (flags & U8G2_BTN_SHADOW_MASK) >> U8G2_BTN_SHADOW_POS;
+ 152   4              shadow_gap--;
+ 153   4              for( i = 0; i < border_width; i++ )
+ 154   4              {
+ 155   5                u8g2_DrawHLine(u8g2, xx+border_width+shadow_gap,yy+hh+i+shadow_gap,ww);
+ 156   5                u8g2_DrawVLine(u8g2, xx+ww+i+shadow_gap,yy+border_width+shadow_gap,hh);
+ 157   5              }
+ 158   4            }
+ 159   3          }
+ 160   2          border_width--;
+ 161   2        } /* for */
+ 162   1        
+ 163   1        if ( flags & U8G2_BTN_INV )
+ 164   1        {
+ 165   2          u8g2_SetDrawColor(u8g2, 2);         /* XOR */
+ 166   2          u8g2_DrawBox(u8g2, xx, yy, ww, hh);
+ 167   2          u8g2_SetDrawColor(u8g2, color_backup);
+ 168   2        }
+ 169   1      }
+ 170          
+ 171          void u8g2_DrawButtonUTF8(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t flags, u8g2_uint_t width,
+             - u8g2_uint_t padding_h, u8g2_uint_t padding_v, const char *text)
+ 172          {
+ 173   1        u8g2_uint_t w = u8g2_GetUTF8Width(u8g2, text);
+C51 COMPILER V9.60.7.0   U8G2_BUTTON                                                       10/16/2024 15:44:13 PAGE 4   
+
+ 174   1        
+ 175   1        u8g2_uint_t text_x_offset = 0; 
+ 176   1      
+ 177   1        if ( flags & U8G2_BTN_HCENTER )
+ 178   1          x -= (w+1)/2;
+ 179   1      
+ 180   1        if ( w < width )
+ 181   1        {
+ 182   2          if ( flags & U8G2_BTN_HCENTER )
+ 183   2          {
+ 184   3            text_x_offset = (width-w)/2;
+ 185   3          }
+ 186   2          w = width;
+ 187   2        }
+ 188   1        
+ 189   1        u8g2_SetFontMode(u8g2, 1);    
+ 190   1        u8g2_DrawUTF8(u8g2, x,y, text);
+ 191   1        u8g2_DrawButtonFrame(u8g2, x-text_x_offset, y, flags, w, padding_h, padding_v);
+ 192   1        
+ 193   1      }
+ 194          
+ 195          
+ 196          
+ 197          #ifdef NOT_USED
+              void u8g2_Draw4Pixel(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t w)
+              {
+                u8g2_DrawPixel(u8g2, x,y-1);
+                u8g2_DrawPixel(u8g2, x+w-1,y-1);
+                u8g2_DrawPixel(u8g2, x+w-1,y-w);
+                u8g2_DrawPixel(u8g2, x,y-w);
+              }
+              
+              void u8g2_DrawRadio(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t w, u8g2_uint_t is_checked)
+              {
+                uint8_t color_backup = u8g2->draw_color;
+                u8g2_DrawCheckbox(u8g2, x,y,w,is_checked);
+                u8g2_SetDrawColor(u8g2, 2);
+                u8g2_Draw4Pixel(u8g2, x,y,w);
+                if ( is_checked )
+                {
+                  //u8g2_Draw4Pixel(u8g2, x+2,y-2,w-4);
+                }
+                
+                u8g2_SetDrawColor(u8g2, color_backup );
+              }
+              #endif
+ 220           
+ 221          
+ 222          #ifdef _THIS_CODE_SHOULD_BE_REWRITTEN_WITHOUT_PADWIDTH_
+              
+              /*
+                Shadow is not supported
+                Note: radius must be at least as high as the border width
+              
+                border width | good radius values
+                1             | 3, 5, 7, 8, ...
+                2             | 3, 5, 7, 8, ...
+                
+              */
+              
+              void u8g2_DrawRButtonUTF8(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t flags, u8g2_uint_t paddi
+             -ng_h_or_width, u8g2_uint_t padding_v, u8g2_uint_t r, const char *text)
+C51 COMPILER V9.60.7.0   U8G2_BUTTON                                                       10/16/2024 15:44:13 PAGE 5   
+
+              {
+                u8g2_uint_t w = u8g2_GetUTF8Width(u8g2, text);
+                //u8g2_uint_t w = u8g2_GetExactStrWidth(u8g2, text);
+                
+                u8g2_uint_t xx, yy, ww, hh;
+                
+                u8g2_uint_t border_width = flags & U8G2_BTN_BW_MASK;
+                u8g2_uint_t padding_h = padding_h_or_width;
+                u8g2_uint_t text_x_offset = 0;        // used for U8G2_BTN_PADWIDTH mode
+              
+                int8_t a = u8g2_GetAscent(u8g2);
+                int8_t d = u8g2_GetDescent(u8g2);
+                uint8_t color_backup = u8g2->draw_color;
+              
+              
+                if ( flags & U8G2_BTN_HCENTER )
+                  x -= w/2;
+              
+                if ( flags & U8G2_BTN_PADWIDTH )
+                {
+                  padding_h = 0;
+                  if ( w < padding_h_or_width )
+                  {
+                    if ( flags & U8G2_BTN_HCENTER )
+                    {
+                      text_x_offset = (padding_h_or_width-w)/2;
+                    }
+                    w = padding_h_or_width;
+                  }
+                }
+                
+                
+                u8g2_SetFontMode(u8g2, 1);
+                  
+                for(;;)
+                {
+                  if ( padding_h >= u8g2_GetDisplayWidth(u8g2)/2 )    // padding_h is zero if U8G2_BTN_PADWIDTH is set
+                  {
+                    xx = (flags & U8G2_BTN_BW_MASK) - border_width;
+                    ww = u8g2_GetDisplayWidth(u8g2);
+                    ww -= 2*((flags & U8G2_BTN_BW_MASK) - border_width);
+                    //printf("xx=%d ww=%d\n", xx, ww);
+                    //printf("clip_x1=%d clip_x0=%d\n", u8g2->clip_x1, u8g2->clip_x0);
+                  }
+                  else
+                  {
+                    xx = x;
+                    xx -= text_x_offset;
+                    xx -= padding_h;
+                    xx -= border_width;
+                    ww = w+2*padding_h+2*border_width;
+                  }
+                  
+                  yy = y;
+                  yy += u8g2->font_calc_vref(u8g2);
+                  yy -= a;
+                  yy -= padding_v;
+                  yy -= border_width;
+                  hh = a-d+2*padding_v+2*border_width;
+                  if ( border_width == 0 )
+                    break;
+                  u8g2_DrawRFrame(u8g2, xx, yy, ww, hh, r);
+C51 COMPILER V9.60.7.0   U8G2_BUTTON                                                       10/16/2024 15:44:13 PAGE 6   
+
+                  if ( (flags & U8G2_BTN_BW_MASK) > 1 )
+                    u8g2_DrawRFrame(u8g2, xx, yy, ww, hh, r+1);
+                  
+                  border_width--;
+                  if ( r > 1 )
+                    r--;
+                }
+                if ( flags & U8G2_BTN_INV )
+                {
+                  u8g2_DrawRBox(u8g2, xx, yy, ww, hh,r);
+                  u8g2_SetDrawColor(u8g2, 1-u8g2->draw_color);
+                }
+                u8g2_DrawUTF8(u8g2, x,y, text);
+                u8g2_SetDrawColor(u8g2, color_backup);
+              }
+              
+              #endif
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    507    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      35
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

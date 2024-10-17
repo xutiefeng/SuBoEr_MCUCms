@@ -1,0 +1,118 @@
+C51 COMPILER V9.60.7.0   GUI                                                               10/17/2024 00:13:24 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE GUI
+OBJECT MODULE PLACED IN .\Objects\gui.obj
+COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE ..\GUI\gui.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\Device\CMS8S699
+                    -0\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\gui.lst) TABS(2) OBJECT(.\Objects\gui.o
+                    -bj)
+
+line level    source
+
+   1          #include "gui.h"
+*** WARNING C318 IN LINE 4 OF ..\GUI\gui.h: can't open file 'types.h'
+*** ERROR C129 IN LINE 9 OF ..\GUI\gui.h: missing ';' before 'DispVirRAM'
+   2          #include <string.h>
+   3          #include "gui_material.h"
+*** WARNING C318 IN LINE 3 OF ..\GUI\gui_material.h: can't open file 'types.h'
+   4          
+   5          //u8 DispVirRAM[LCD_HEIGHT / 8][LCD_WIDTH];
+   6          u8 DispVirRAM[LCD_HEIGHT / 8][LCD_WIDTH];
+   7          u8 wallRAM[LCD_HEIGHT / 8 - 1][LCD_WIDTH];
+   8          static const u8  Mask[8] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80};
+   9          
+  10          #define POINT     DispVirRAM[y/8][x]
+  11          #define PMASK     Mask[y&0x07]
+  12          
+  13          void Clr_DispRAM(void)
+  14          {
+  15            memset(DispVirRAM, 0, sizeof(DispVirRAM));
+  16          }
+  17          void Clr_DispRAM_Statusbar(void)
+  18          {
+  19            memset(DispVirRAM, 0, LCD_WIDTH*2);
+  20          }
+  21          void Clr_DispRAM_Content(void)
+  22          {
+  23            memset(&DispVirRAM[2][0], 0, sizeof(DispVirRAM) - LCD_WIDTH*2);
+  24          }
+  25          
+  26          void Fill_DispRAM(u8 a)
+  27          {
+  28            memset(DispVirRAM, a, sizeof(DispVirRAM));
+  29          }
+  30          
+  31          
+  32          void GUI_DrawPoint(short x, short y, u8 color)
+  33          {
+  34            if(y > LCD_HEIGHT - 1 || x > LCD_WIDTH - 1) {
+  35              return;
+  36            }
+  37          
+  38            if(color == 1) {
+  39              POINT |= PMASK;
+  40            } else if(color == 0) {
+  41              POINT &= ~PMASK;
+  42            } else {
+  43              POINT ^= PMASK;
+  44            }
+  45          }
+  46          
+  47          /* »æÖÆÒ»ÌõË®Æ½Ïß */
+  48          void GUI_HLine(uint16_t x0, uint16_t x1, uint16_t y, u8 color)
+  49          {
+  50            if(x0 > x1) {
+C51 COMPILER V9.60.7.0   GUI                                                               10/17/2024 00:13:24 PAGE 2   
+
+  51              SWAP(x0, x1);
+  52            }
+  53          
+  54            do {
+  55              GUI_DrawPoint(x0, y, color);
+  56              x0++;
+  57            } while(x1 >= x0);
+  58          }
+  59          
+  60          
+  61          void GUI_RLine(uint16_t x, uint16_t y0, uint16_t y1, u8 color)
+  62          {
+  63            if(y0 > y1) {
+  64              SWAP(y0, y1);
+  65            }
+  66            do {
+  67              GUI_DrawPoint(x, y0, color);
+  68              y0++;
+  69            } while(y1 >= y0);
+  70          }
+  71          
+  72          void GUI_Rectangle_Fill(uint16_t x0, uint16_t y0, uint16_t width, uint16_t high, u8 color)
+  73          {
+  74            uint16_t x1, y1;
+  75          
+  76            x1 = x0 + width - 1;
+  77            y1 = y0 + high - 1;
+  78          
+  79            if(x0 > x1) {
+  80              SWAP(x0, x1);
+  81            }
+  82            if(y0 > y1) {
+  83              SWAP(y0, y1);
+  84            }
+  85          
+  86            if(y0 == y1) {
+  87              GUI_HLine(x0, x1, y0, color);
+  88              return;
+  89            }
+  90            if(x0 == x1) {
+  91              GUI_RLine(x0, y0, y1, color);
+  92              return;
+  93            }
+  94          
+  95            while(y0 <= y1) {
+  96              GUI_HLine(x0, x1, y0, color);
+  97              y0++;
+  98            }
+  99          }
+ 100          
+
+C51 COMPILATION COMPLETE.  2 WARNING(S),  1 ERROR(S)

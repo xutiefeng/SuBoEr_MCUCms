@@ -1,0 +1,1 @@
+"..\u8g2\u8x8_cad.c" OMF2 OPTIMIZE (8,SPEED) BROWSE INCDIR(..\Libary\Device\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\u8x8_cad.lst) TABS (2) OBJECT(.\Objects\u8x8_cad.obj)

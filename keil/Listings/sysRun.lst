@@ -1,0 +1,372 @@
+C51 COMPILER V9.60.7.0   SYSRUN                                                            10/17/2024 01:09:02 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE SYSRUN
+OBJECT MODULE PLACED IN .\Objects\sysRun.obj
+COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE ..\BSP\sysRun.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\Device\CMS8S
+                    -6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\sysRun.lst) TABS(2) OBJECT(.\Objects
+                    -\sysRun.obj)
+
+line level    source
+
+   1          
+   2          ////////min sys//////
+   3          //#include "globe.h"
+   4          //#include "clib.h"
+   5          //#include "FuncTab.h"
+   6          //#include "sysRun.h"
+   7          //#include "buzzer.h"
+   8          //#include "string.h"
+   9          #include "includeall.h"
+  10          //#include "AiP4952_Apply.h"  
+  11          //#include "Dispaly,h"
+  12          //extern void SetSysRunTime(u8 v);
+  13          //extern u8 GetSysRunTime(void);
+  14          //extern void  LED_Scan(void);
+  15          //extern void display_hex(u8 v);
+  16          //extern void display_dec(u8 v);
+  17          //extern void display_log(u8 v);
+  18          //extern void SetIcon_DingShi_1628(u8 v);
+  19          //extern void SetIcon_ShuShui_1628(u8 v);
+  20          //extern void SetIcon_ChuMan_1628 (u8 v);
+  21          //extern void LED_Key_1628(u8 v1,u8 v2);
+  22          //extern void display_process(u8 u);
+  23          //void CloseFuZai(void)
+  24          //{
+  25          //  HEAT_io =  0;
+  26          //}
+  27          
+  28          //void sysRest(void)
+  29          //{
+  30          //   SetSysRunTime(gSetSysRunTime);
+  31          //   memset(gbFlagData,0,sizeof(gbFlagData));
+  32          //   memset(&gstRDsysTick,0,sizeof(gstRDsysTick));
+  33          //   CloseFuZai();
+  34          //   Auto1Flag = 0;
+  35          //   Auto2Flag = 0;
+  36          //   Auto3Flag = 0;
+  37          //   SysRunFlag = 0;
+  38          //   gstFactory.RunTimeMax = 0;
+  39          //   
+  40          //   gStep.Bit.sStep = 0;
+  41          //   BuzzerFlag = 1;
+  42          //   SetNoKeyTime(200);
+  43          //   HeatInit();
+  44          //   SetLED_Init();
+  45          //   CheckFinishFlag = 0;
+  46          //}
+  47          
+  48          //void DaiJiMode(void)
+  49          //{
+  50          //   SetSysRunTime(gSetSysRunTime);
+  51          //   CloseFuZai();
+  52          //   display_Close();
+  53          //   display_standby();
+C51 COMPILER V9.60.7.0   SYSRUN                                                            10/17/2024 01:09:02 PAGE 2   
+
+  54          //}
+  55          
+  56          //u8 SelfCheck(void)
+  57          //{
+  58          //  u8 sw;
+  59          //  
+  60          //  if(SysRunFlag)
+  61          //    return 0;
+  62          //  
+  63          //  if(CheckFinishFlag)
+  64          //    return 0;
+  65          
+  66          //  switch(gStep.Bit.sStep)
+  67          //  {
+  68          //    case 0:
+  69          //    
+  70          //      sw = AccompanyFunc_OnOffHandle1(&gHeatTime,gStep.Bit.sStep,LEDOnOffTimeTab);
+  71          //      
+  72          //      if(sw == 1)
+  73          //      {
+  74          //          display_Heat(ON);
+  75          //          SetIcon_AllLight_ON();
+  76          //      }
+  77          //      else
+  78          //      {
+  79          //          display_Heat(OFF);
+  80          //      }
+  81          //      
+  82          //      if(gHeatTime == 0)
+  83          //      {
+  84          //          CheckFinishFlag = 1;
+  85          //      }
+  86          
+  87          //    break;
+  88          //    
+  89          //    default:
+  90          //      break;
+  91          
+  92          //    return 0;
+  93          //  }
+  94          //}
+  95          //void display_logic(void)
+  96          //{
+  97          //  extern  void SetIconH_1628(u8 v);
+  98          //  extern  void SetIconC_1628(u8 v);
+  99          //    static xdata u8 sBlinkTime;
+ 100          //    u8 sw;
+ 101          
+ 102          //    if(!CheckFinishFlag)
+ 103          //      return;
+ 104          //    if(SysRunFlag)
+ 105          //    {
+ 106          //        
+ 107          //        if(Auto3Flag && !JieDianDisplayFlag)
+ 108          //        {
+ 109          //            display_hex(0xf0);
+ 110          //            SetIconH_1628(OFF);
+ 111          //            SetIconC_1628(OFF);
+ 112          //            SetIcon_ChuMan_1628(ON);
+ 113          //            SetIcon_ShuShui_1628(OFF);
+ 114          //            SetIcon_DingShi_1628(OFF);
+ 115          //        }
+C51 COMPILER V9.60.7.0   SYSRUN                                                            10/17/2024 01:09:02 PAGE 3   
+
+ 116          //        else if(Auto1Flag && !JieDianDisplayFlag)
+ 117          //        {
+ 118          //            display_dec(36);
+ 119          //            SetIconC_1628(ON);
+ 120          //            SetIconH_1628(OFF);
+ 121          //            SetIcon_ChuMan_1628(OFF);
+ 122          //            SetIcon_ShuShui_1628(ON);
+ 123          //            SetIcon_DingShi_1628(OFF);
+ 124          //        }
+ 125          //        else if(Auto2Flag && !JieDianDisplayFlag)
+ 126          //        {           
+ 127          //            SetIcon_DingShi_1628(ON);
+ 128          //            SetIcon_ShuShui_1628(OFF);
+ 129          //            SetIcon_ChuMan_1628(OFF);
+ 130          //          
+ 131          //            sw = AccompanyFunc_OnOffHandle1(&sBlinkTime,0,LED_BinkTimeTab);           
+ 132          //            
+ 133          //            if(sw == 1)
+ 134          //            {
+ 135          //                display_dec(gSetSysRunTime);
+ 136          //            }
+ 137          //            else
+ 138          //            {
+ 139          //                display_Close();
+ 140          //            } 
+ 141          //            SetIconH_1628(ON);
+ 142          //            SetIconC_1628(OFF);
+ 143          //        }
+ 144          //        else
+ 145          //        {     
+ 146          //            if(sKey_yyy.Bit.gNoKeyTime  == 0)
+ 147          //            {
+ 148          //                display_Close();
+ 149          //                SetIconC_1628(OFF);
+ 150          //                display_log(OFF);
+ 151          //            }
+ 152          //            else
+ 153          //            {     
+ 154          //                display_dec(getHeatLevel());
+ 155          //                SetIconC_1628(ON);
+ 156          //                SetIconH_1628(OFF);
+ 157          //                display_log(ON);
+ 158          //            }
+ 159          //            
+ 160          //            if(DaiJiDispalyFlag)
+ 161          //            {
+ 162          //                display_standby();
+ 163          //                SetIcon_ChuMan(OFF);                
+ 164          //            }
+ 165          //            
+ 166          //            if(Auto3Flag)
+ 167          //            {
+ 168          //                SetIcon_ChuMan(ON);
+ 169          //            }
+ 170          //            else if(Auto1Flag)
+ 171          //            {
+ 172          //                SetIcon_ShuShui_1628(ON);
+ 173          //            }
+ 174          //            else
+ 175          //            {
+ 176          //                SetIcon_DingShi_1628(ON);
+ 177          //            }
+C51 COMPILER V9.60.7.0   SYSRUN                                                            10/17/2024 01:09:02 PAGE 4   
+
+ 178          //        }     
+ 179          //        if(GetKeySongKai_time())
+ 180          //        {
+ 181          //            LED_Key_1628(0xff,0xff);//LED_Key(ON);
+ 182          //        }
+ 183          //        else
+ 184          //        {
+ 185          //            LED_Key_1628(OFF,OFF);//LED_Key(OFF);
+ 186          //        }
+ 187          //    }
+ 188          //    else
+ 189          //    {
+ 190          //      if(GetKeySongKai_time()== 0)
+ 191          //      {   
+ 192          //          display_Close();
+ 193          //          //display_log(OFF);
+ 194          //      }
+ 195          //      else if(GetKeySongKai_time()<= 100 )
+ 196          //      {
+ 197          //          //SetIcon_C(OFF);
+ 198          //          display_standby();
+ 199          //          LED_Key_1628(OFF,OFF);//LED_Key(OFF);//LED_Key(OFF);//PowerLed_OFF
+ 200          //          
+ 201          //      }
+ 202          //      else
+ 203          //      {
+ 204          //          LED_Key_1628(0xff,0xff);//LED_Key(OFF);//LED_Key(ON);
+ 205          //          
+ 206          //          display_dec(25);
+ 207          //          SetIconC_1628(ON);
+ 208          //          SetIconH_1628(OFF);
+ 209          //          display_log(ON);
+ 210          //      }       
+ 211          //    }
+ 212          //    
+ 213          //    if(getHeatLevel() == 0)
+ 214          //    {
+ 215          //      display_Heat(OFF);        
+ 216          //    }
+ 217          //    else
+ 218          //    {
+ 219          //      display_Heat(ON);
+ 220          //    }
+ 221          //}
+ 222          ///*******************************************************************************************************
+             -*********************************** 
+ 223          //* 函数名称  SysRunTime
+ 224          //* 功能说明  ：功能运行时间倒计时，最小单位S
+ 225          //* 输入：   无
+ 226          //* 输出：   无
+ 227          //* 注意 无
+ 228          //********************************************************************************************************
+             -**********************************/
+ 229          //void SysRunTime(void)
+ 230          //{
+ 231          //    if(!SysRunFlag)
+ 232          //      return ;
+ 233          //    
+ 234          //    if(gSysRunTime >0)
+ 235          //    {
+ 236          //        gSysRunTime--;
+ 237          //        
+C51 COMPILER V9.60.7.0   SYSRUN                                                            10/17/2024 01:09:02 PAGE 5   
+
+ 238          //        if(gSysRunTime == 0)
+ 239          //        {
+ 240          //            SetLHeatLevel(GetHeatUnit(),0);
+ 241          //            DaiJiDispalyFlag =1;
+ 242          //        }       
+ 243          //    }
+ 244          //    
+ 245          //}
+ 246          
+ 247          
+ 248          ///*******************************************************************************************************
+             -*********************************** 
+ 249          //* 函数名称  SetSysRunTime
+ 250          //* 功能说明  ：设置功能运行时间
+ 251          //* 输入：   时间，单位h  
+ 252          //* 输出：   无
+ 253          //*注意 无
+ 254          //********************************************************************************************************
+             -**********************************/
+ 255          //void SetSysRunTime(u8 v)
+ 256          //{
+ 257          //  gSetSysRunTime = v;
+ 258          //  gSysRunTime = gSetSysRunTime*3600;
+ 259          //}
+ 260          
+ 261          ///*******************************************************************************************************
+             -*********************************** 
+ 262          //* 函数名称  GetSysRunTime
+ 263          //* 功能说明  ：获取系统时间时长
+ 264          //* 输入：   无 
+ 265          //* 输出：   已经设置的系统时间时长
+ 266          //* 注意 无
+ 267          //********************************************************************************************************
+             -**********************************/
+ 268          //u8 GetSysRunTime(void)
+ 269          //{
+ 270          //  return gSetSysRunTime;
+ 271          //}
+ 272          
+ 273          ///*******************************************************************************************************
+             -*********************************** 
+ 274          //* 函数名称: sysRuning
+ 275          //* 功能说明: 逻辑框架运行
+ 276          //* 输    入: 无
+ 277          //* 输    出: 无
+ 278          //********************************************************************************************************
+             -**********************************/
+ 279          
+ 280          void sysRuning(void)
+ 281          { 
+ 282   1          
+ 283   1        EventCollect();
+ 284   1          switch(PopEvent())
+ 285   1          {  
+ 286   2          case evSysRest:
+ 287   2      
+ 288   2          break;
+ 289   2      
+ 290   2          case ev5MS:       
+ 291   2          {
+ 292   3        
+ 293   3          } 
+C51 COMPILER V9.60.7.0   SYSRUN                                                            10/17/2024 01:09:02 PAGE 6   
+
+ 294   2          break;  
+ 295   2          
+ 296   2          case ev20MS:
+ 297   2          {
+ 298   3      //      Kye_Scan();                   
+ 299   3          }
+ 300   2          break;
+ 301   2      
+ 302   2          case ev50MS:
+ 303   2          {
+ 304   3      //      KeyProsess();                     
+ 305   3          }
+ 306   2          break;
+ 307   2              
+ 308   2          case ev100MS:
+ 309   2          {       
+ 310   3                  
+ 311   3          }
+ 312   2          break;
+ 313   2              
+ 314   2          case ev1S:
+ 315   2          { 
+ 316   3      
+ 317   3          }
+ 318   2              break;
+ 319   2              
+ 320   2              default:
+ 321   2              break;
+ 322   2          }
+ 323   1          
+ 324   1      }
+*** WARNING C316 IN LINE 324 OF ..\BSP\sysRun.c: unterminated conditionals
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =      7    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)

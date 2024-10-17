@@ -1,0 +1,245 @@
+C51 COMPILER V9.60.7.0   U8X8_DISPLAY                                                      10/16/2024 16:37:12 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE U8X8_DISPLAY
+OBJECT MODULE PLACED IN .\Objects\u8x8_display.obj
+COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE ..\u8g2\u8x8_display.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\Devic
+                    -e\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\u8x8_display.lst) TABS(2) OBJ
+                    -ECT(.\Objects\u8x8_display.obj)
+
+line level    source
+
+   1          /*
+   2            
+   3            u8x8_display.c
+   4            
+   5            Universal 8bit Graphics Library (https://github.com/olikraus/u8g2/)
+   6          
+   7            Copyright (c) 2016, olikraus@gmail.com
+   8            All rights reserved.
+   9          
+  10            Redistribution and use in source and binary forms, with or without modification, 
+  11            are permitted provided that the following conditions are met:
+  12          
+  13            * Redistributions of source code must retain the above copyright notice, this list 
+  14              of conditions and the following disclaimer.
+  15              
+  16            * Redistributions in binary form must reproduce the above copyright notice, this 
+  17              list of conditions and the following disclaimer in the documentation and/or other 
+  18              materials provided with the distribution.
+  19          
+  20            THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+  21            CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+  22            INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  23            MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+  24            DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+  25            CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+  26            SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+  27            NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+  28            LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+  29            CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+  30            STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+  31            ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+  32            ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+  33            
+  34            
+  35            Abstraction layer for the graphics controller.
+  36            Main goal is the placement of a 8x8 pixel block (tile) on the display.
+  37            
+  38          */
+  39          
+  40          
+  41          #include "u8x8.h"
+  42          
+  43          
+  44          /*==========================================*/
+  45          /* internal library function */
+  46          
+  47          /*
+  48            this is a helper function for the U8X8_MSG_DISPLAY_SETUP_MEMORY function.
+  49            It can be called within the display callback function to carry out the usual standard tasks.
+  50            
+  51          */
+  52          void u8x8_d_helper_display_setup_memory(u8x8_t *u8x8, const u8x8_display_info_t *display_info)
+  53          {
+C51 COMPILER V9.60.7.0   U8X8_DISPLAY                                                      10/16/2024 16:37:12 PAGE 2   
+
+  54   1            /* 1) set display info struct */
+  55   1            u8x8->display_info = display_info;
+  56   1            u8x8->x_offset = u8x8->display_info->default_x_offset;
+  57   1      }
+  58          
+  59          /*
+  60            this is a helper function for the U8X8_MSG_DISPLAY_INIT function.
+  61            It can be called within the display callback function to carry out the usual standard tasks.
+  62            
+  63          */
+  64          void u8x8_d_helper_display_init(u8x8_t *u8x8)
+  65          {
+  66   1            /* 2) apply port directions to the GPIO lines and apply default values for the IO lines*/
+  67   1            u8x8_gpio_Init(u8x8);
+*** ERROR C212 IN LINE 67 OF ..\u8g2\u8x8_display.c: indirect call: parameters do not fit within registers
+  68   1            u8x8_cad_Init(u8x8);              /* this will also call U8X8_MSG_BYTE_INIT, byte init will NOT call
+             - GPIO_INIT */
+*** ERROR C212 IN LINE 68 OF ..\u8g2\u8x8_display.c: indirect call: parameters do not fit within registers
+  69   1      
+  70   1            /* 3) do reset */
+  71   1            u8x8_gpio_SetReset(u8x8, 1);
+  72   1            u8x8_gpio_Delay(u8x8, U8X8_MSG_DELAY_MILLI, u8x8->display_info->reset_pulse_width_ms);
+  73   1            u8x8_gpio_SetReset(u8x8, 0);
+  74   1            u8x8_gpio_Delay(u8x8, U8X8_MSG_DELAY_MILLI, u8x8->display_info->reset_pulse_width_ms);
+  75   1            u8x8_gpio_SetReset(u8x8, 1);
+  76   1            u8x8_gpio_Delay(u8x8, U8X8_MSG_DELAY_MILLI, u8x8->display_info->post_reset_wait_ms);
+  77   1      }    
+  78          
+  79          /*==========================================*/
+  80          /* official functions */
+  81          
+  82          uint8_t u8x8_DrawTile(u8x8_t *u8x8, uint8_t x, uint8_t y, uint8_t cnt, uint8_t *tile_ptr)
+  83          {
+  84   1        u8x8_tile_t tile;
+  85   1        tile.x_pos = x;
+  86   1        tile.y_pos = y;
+  87   1        tile.cnt = cnt;
+  88   1        tile.tile_ptr = tile_ptr;
+  89   1        return u8x8->display_cb(u8x8, U8X8_MSG_DISPLAY_DRAW_TILE, 1, (void *)&tile);
+*** ERROR C212 IN LINE 89 OF ..\u8g2\u8x8_display.c: indirect call: parameters do not fit within registers
+  90   1      }
+  91          
+  92          /* should be implemented as macro */
+  93          void u8x8_SetupMemory(u8x8_t *u8x8)
+  94          {
+  95   1        u8x8->display_cb(u8x8, U8X8_MSG_DISPLAY_SETUP_MEMORY, 0, NULL);  
+*** ERROR C212 IN LINE 95 OF ..\u8g2\u8x8_display.c: indirect call: parameters do not fit within registers
+  96   1      }
+  97          
+  98          /*
+  99            This will just init the display interface, compared to InitDisplay, it will not issue a reset and also n
+             -ot upload the init code.
+ 100            Comparison:
+ 101            Call                                                  u8x8_InitInterface              u8x8_InitDisplay
+ 102            Init Interface                                                yes                                     ye
+             -s
+ 103            Reset Display                                                 no                                      ye
+             -s
+ 104            Upload Display Init Code                              no                                      yes
+ 105          
+ 106            u8x8_InitInterface() is an alternative function to u8x8_InitDisplay(). Do not call both.
+ 107            
+C51 COMPILER V9.60.7.0   U8X8_DISPLAY                                                      10/16/2024 16:37:12 PAGE 3   
+
+ 108          */
+ 109          void u8x8_InitInterface(u8x8_t *u8x8)
+ 110          {
+ 111   1        u8x8_gpio_Init(u8x8);
+*** ERROR C212 IN LINE 111 OF ..\u8g2\u8x8_display.c: indirect call: parameters do not fit within registers
+ 112   1        u8x8_cad_Init(u8x8);              /* this will also call U8X8_MSG_BYTE_INIT, byte init will NOT call GPI
+             -O_INIT */
+*** ERROR C212 IN LINE 112 OF ..\u8g2\u8x8_display.c: indirect call: parameters do not fit within registers
+ 113   1      }
+ 114          
+ 115          /*
+ 116            This will sent the display init message to the display.
+ 117            The display itself will then call u8x8_d_helper_display_init() from above. This includes:
+ 118              GPIO Init (set port directions)
+ 119              BYTE init (part of CAD init: which may set some levels)
+ 120              CAD init (which will set things like I2C default address)
+ 121              Issue a reset to the display: This will usually turn off the display
+ 122            Additonally each display will set the init code to the display, which will also turn of the display in m
+             -ost cases (Arduino code disable power save mode later)
+ 123          
+ 124            Actually this procedure should be better called InitInterfaceAndDisplay, because it actually does both.
+ 125            (actually u8x8_InitInterface() is not called directly but only u8x8_gpio_Init and u8x8_cad_Init which
+ 126            in turn is called by u8x8_InitInterface())
+ 127          
+ 128          
+ 129            InitDisplay is called by the Arduino begin() function 
+ 130          
+ 131            In some cases it is not required to init the display (for example if the display is already running, but
+             - the controller comes out of deep sleep mode).
+ 132            Then InitDisplay can be skipped, but u8x8_InitInterface()  (== u8x8_gpio_Init() and u8x8_cad_Init()) nee
+             -d to be executed.
+ 133          
+ 134          */
+ 135          void u8x8_InitDisplay(u8x8_t *u8x8)
+ 136          {
+ 137   1        u8x8->display_cb(u8x8, U8X8_MSG_DISPLAY_INIT, 0, NULL);       /* this will call u8x8_d_helper_display_in
+             -it() and send the init seqence to the display */
+*** ERROR C212 IN LINE 137 OF ..\u8g2\u8x8_display.c: indirect call: parameters do not fit within registers
+ 138   1        /* u8x8->display_cb(u8x8, U8X8_MSG_DISPLAY_SET_FLIP_MODE, 0, NULL);  */ /* It would make sense to call f
+             -lip mode 0 here after U8X8_MSG_DISPLAY_INIT */
+ 139   1      }
+ 140          
+ 141          void u8x8_SetPowerSave(u8x8_t *u8x8, uint8_t is_enable)
+ 142          {
+ 143   1        u8x8->display_cb(u8x8, U8X8_MSG_DISPLAY_SET_POWER_SAVE, is_enable, NULL);  
+*** ERROR C212 IN LINE 143 OF ..\u8g2\u8x8_display.c: indirect call: parameters do not fit within registers
+ 144   1      }
+ 145          
+ 146          void u8x8_SetFlipMode(u8x8_t *u8x8, uint8_t mode)
+ 147          {
+ 148   1        u8x8->display_cb(u8x8, U8X8_MSG_DISPLAY_SET_FLIP_MODE, mode, NULL);  
+*** ERROR C212 IN LINE 148 OF ..\u8g2\u8x8_display.c: indirect call: parameters do not fit within registers
+ 149   1      }
+ 150          
+ 151          void u8x8_SetContrast(u8x8_t *u8x8, uint8_t value)
+ 152          {
+ 153   1        u8x8->display_cb(u8x8, U8X8_MSG_DISPLAY_SET_CONTRAST, value, NULL);  
+*** ERROR C212 IN LINE 153 OF ..\u8g2\u8x8_display.c: indirect call: parameters do not fit within registers
+ 154   1      }
+ 155          
+ 156          void u8x8_RefreshDisplay(u8x8_t *u8x8)
+ 157          {
+C51 COMPILER V9.60.7.0   U8X8_DISPLAY                                                      10/16/2024 16:37:12 PAGE 4   
+
+ 158   1        u8x8->display_cb(u8x8, U8X8_MSG_DISPLAY_REFRESH, 0, NULL);  
+*** ERROR C212 IN LINE 158 OF ..\u8g2\u8x8_display.c: indirect call: parameters do not fit within registers
+ 159   1      }
+ 160          
+ 161          void u8x8_ClearDisplayWithTile(u8x8_t *u8x8, const uint8_t *buf)
+ 162          {
+ 163   1        u8x8_tile_t tile;
+ 164   1        uint8_t h;
+ 165   1      
+ 166   1        tile.x_pos = 0;
+ 167   1        tile.cnt = 1;
+ 168   1        tile.tile_ptr = (uint8_t *)buf;   /* tile_ptr should be const, but isn't */
+ 169   1        
+ 170   1        h = u8x8->display_info->tile_height;
+ 171   1        tile.y_pos = 0;
+ 172   1        do
+ 173   1        {
+ 174   2          u8x8->display_cb(u8x8, U8X8_MSG_DISPLAY_DRAW_TILE, u8x8->display_info->tile_width, (void *)&tile);
+*** ERROR C212 IN LINE 174 OF ..\u8g2\u8x8_display.c: indirect call: parameters do not fit within registers
+ 175   2          tile.y_pos++;
+ 176   2        } while( tile.y_pos < h );
+ 177   1      }
+ 178          
+ 179          void u8x8_ClearDisplay(u8x8_t *u8x8)
+ 180          {
+ 181   1        uint8_t buf[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+ 182   1        u8x8_ClearDisplayWithTile(u8x8, buf);
+ 183   1      }
+ 184          
+ 185          void u8x8_FillDisplay(u8x8_t *u8x8)
+ 186          {
+ 187   1        uint8_t buf[8] = { 255, 255, 255, 255, 255, 255, 255, 255 };
+ 188   1        u8x8_ClearDisplayWithTile(u8x8, buf);
+ 189   1      }
+ 190          
+ 191          void u8x8_ClearLine(u8x8_t *u8x8, uint8_t line)
+ 192          {
+ 193   1        uint8_t buf[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+ 194   1        u8x8_tile_t tile;
+ 195   1        if ( line < u8x8->display_info->tile_height )
+ 196   1        {
+ 197   2          tile.x_pos = 0;
+ 198   2          tile.y_pos = line;
+ 199   2          tile.cnt = 1;
+ 200   2          tile.tile_ptr = (uint8_t *)buf;   /* tile_ptr should be const, but isn't */
+ 201   2          u8x8->display_cb(u8x8, U8X8_MSG_DISPLAY_DRAW_TILE, u8x8->display_info->tile_width, (void *)&tile);
+*** ERROR C212 IN LINE 201 OF ..\u8g2\u8x8_display.c: indirect call: parameters do not fit within registers
+ 202   2        }  
+ 203   1      }
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  13 ERROR(S)

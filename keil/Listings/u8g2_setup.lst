@@ -1,0 +1,514 @@
+C51 COMPILER V9.60.7.0   U8G2_SETUP                                                        10/16/2024 15:44:17 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE U8G2_SETUP
+OBJECT MODULE PLACED IN .\Objects\u8g2_setup.obj
+COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE ..\u8g2\u8g2_setup.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\Device\
+                    -CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\u8g2_setup.lst) TABS(2) OBJECT(
+                    -.\Objects\u8g2_setup.obj)
+
+line level    source
+
+   1          /*
+   2          
+   3            u8g2_setup.c
+   4          
+   5            Universal 8bit Graphics Library (https://github.com/olikraus/u8g2/)
+   6          
+   7            Copyright (c) 2016, olikraus@gmail.com
+   8            All rights reserved.
+   9          
+  10            Redistribution and use in source and binary forms, with or without modification, 
+  11            are permitted provided that the following conditions are met:
+  12          
+  13            * Redistributions of source code must retain the above copyright notice, this list 
+  14              of conditions and the following disclaimer.
+  15              
+  16            * Redistributions in binary form must reproduce the above copyright notice, this 
+  17              list of conditions and the following disclaimer in the documentation and/or other 
+  18              materials provided with the distribution.
+  19          
+  20            THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+  21            CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+  22            INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+  23            MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+  24            DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+  25            CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+  26            SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+  27            NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+  28            LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+  29            CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+  30            STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+  31            ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+  32            ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+  33          
+  34          */
+  35          
+  36          #include "u8g2.h"
+  37          #include <string.h>
+  38          #include <assert.h>
+  39          
+  40          
+  41          /*============================================*/
+  42          
+  43          
+  44          #ifdef U8G2_WITH_CLIP_WINDOW_SUPPORT
+  45          
+  46          void u8g2_SetMaxClipWindow(u8g2_t *u8g2)
+  47          {
+  48   1        u8g2->clip_x0 = 0;
+  49   1        u8g2->clip_y0 = 0;
+  50   1        u8g2->clip_x1 = (u8g2_uint_t)~(u8g2_uint_t)0;
+  51   1        u8g2->clip_y1 = (u8g2_uint_t)~(u8g2_uint_t)0;
+  52   1        
+  53   1        u8g2->cb->update_page_win(u8g2);
+C51 COMPILER V9.60.7.0   U8G2_SETUP                                                        10/16/2024 15:44:17 PAGE 2   
+
+  54   1      }
+  55          
+  56          void u8g2_SetClipWindow(u8g2_t *u8g2, u8g2_uint_t clip_x0, u8g2_uint_t clip_y0, u8g2_uint_t clip_x1, u8g2_
+             -uint_t clip_y1 )
+  57          {
+  58   1        u8g2->clip_x0 = clip_x0;
+  59   1        u8g2->clip_y0 = clip_y0;
+  60   1        u8g2->clip_x1 = clip_x1;
+  61   1        u8g2->clip_y1 = clip_y1;
+  62   1        u8g2->cb->update_page_win(u8g2);
+  63   1      }
+  64          #endif
+  65          
+  66          /*============================================*/
+  67          /*
+  68            This procedure is called after setting up the display (u8x8 structure).
+  69            --> This is the central init procedure for u8g2 object
+  70          */
+  71          void u8g2_SetupBuffer(u8g2_t *u8g2, uint8_t *buf, uint8_t tile_buf_height, u8g2_draw_ll_hvline_cb ll_hvlin
+             -e_cb, const u8g2_cb_t *u8g2_cb)
+  72          {
+  73   1        u8g2->font = NULL;
+  74   1        //u8g2->kerning = NULL;
+  75   1        //u8g2->get_kerning_cb = u8g2_GetNullKerning;
+  76   1        
+  77   1        //u8g2->ll_hvline = u8g2_ll_hvline_vertical_top_lsb;
+  78   1        u8g2->ll_hvline = ll_hvline_cb;
+  79   1        
+  80   1        u8g2->tile_buf_ptr = buf;
+  81   1        u8g2->tile_buf_height = tile_buf_height;
+  82   1        
+  83   1        u8g2->tile_curr_row = 0;
+  84   1        
+  85   1        u8g2->font_decode.is_transparent = 0; /* issue 443 */
+  86   1        u8g2->bitmap_transparency = 0;
+  87   1        
+  88   1        u8g2->draw_color = 1;
+  89   1        u8g2->is_auto_page_clear = 1;
+  90   1        
+  91   1        u8g2->cb = u8g2_cb;
+  92   1        u8g2->cb->update_dimension(u8g2);
+  93   1      #ifdef U8G2_WITH_CLIP_WINDOW_SUPPORT
+  94   1        u8g2_SetMaxClipWindow(u8g2);    /* assign a clip window and call the update() procedure */
+  95   1      #else
+                u8g2->cb->update_page_win(u8g2);
+              #endif
+  98   1      
+  99   1        u8g2_SetFontPosBaseline(u8g2);  /* issue 195 */
+ 100   1        
+ 101   1      #ifdef U8G2_WITH_FONT_ROTATION  
+ 102   1        u8g2->font_decode.dir = 0;
+ 103   1      #endif
+ 104   1      }
+ 105          
+ 106          /*
+ 107            Usually the display rotation is set initially, but it could be done later also
+ 108            u8g2_cb can be U8G2_R0..U8G2_R3
+ 109          */
+ 110          void u8g2_SetDisplayRotation(u8g2_t *u8g2, const u8g2_cb_t *u8g2_cb)
+ 111          {
+ 112   1        u8g2->cb = u8g2_cb;
+ 113   1        u8g2->cb->update_dimension(u8g2);
+C51 COMPILER V9.60.7.0   U8G2_SETUP                                                        10/16/2024 15:44:17 PAGE 3   
+
+ 114   1        u8g2->cb->update_page_win(u8g2);
+ 115   1      }
+ 116          
+ 117          /*============================================*/
+ 118          
+ 119          void u8g2_SendF(u8g2_t * u8g2, const char *fmt, ...)
+ 120          {
+ 121   1        va_list va;
+ 122   1        va_start(va, fmt);
+ 123   1        u8x8_cad_vsendf(u8g2_GetU8x8(u8g2), fmt, va);
+ 124   1        va_end(va);
+ 125   1      }
+ 126          
+ 127          
+ 128          /*============================================*/
+ 129          /* 
+ 130            update dimension: 
+ 131            calculate the following variables:
+ 132              u8g2_uint_t buf_x0; left corner of the buffer
+ 133              u8g2_uint_t buf_x1; right corner of the buffer (excluded)
+ 134              u8g2_uint_t buf_y0;
+ 135              u8g2_uint_t buf_y1;   
+ 136          */
+ 137          
+ 138          static void u8g2_update_dimension_common(u8g2_t *u8g2)
+ 139          {
+ 140   1        const u8x8_display_info_t *display_info = u8g2_GetU8x8(u8g2)->display_info;
+ 141   1        u8g2_uint_t t;
+ 142   1        
+ 143   1        t = u8g2->tile_buf_height;
+ 144   1        t *= 8;
+ 145   1        u8g2->pixel_buf_height = t;
+ 146   1        
+ 147   1        t = display_info->tile_width;
+ 148   1      #ifndef U8G2_16BIT
+ 149   1        if ( t >= 32 )
+ 150   1          t = 31;
+ 151   1      #endif
+ 152   1        t *= 8;
+ 153   1        u8g2->pixel_buf_width = t;
+ 154   1        
+ 155   1        t = u8g2->tile_curr_row;
+ 156   1        t *= 8;
+ 157   1        u8g2->pixel_curr_row = t;
+ 158   1        
+ 159   1        t = u8g2->tile_buf_height;
+ 160   1        /* handle the case, where the buffer is larger than the (remaining) part of the display */
+ 161   1        if ( t + u8g2->tile_curr_row > display_info->tile_height )
+ 162   1          t = display_info->tile_height - u8g2->tile_curr_row;
+ 163   1        t *= 8;
+ 164   1        
+ 165   1        u8g2->buf_y0 = u8g2->pixel_curr_row;   
+ 166   1        u8g2->buf_y1 = u8g2->buf_y0;
+ 167   1        u8g2->buf_y1 += t;
+ 168   1      
+ 169   1        
+ 170   1      #ifdef U8G2_16BIT
+                u8g2->width = display_info->pixel_width;
+                u8g2->height = display_info->pixel_height;
+              #else
+ 174   1        u8g2->width = 240;
+ 175   1        if ( display_info->pixel_width <= 240 )
+C51 COMPILER V9.60.7.0   U8G2_SETUP                                                        10/16/2024 15:44:17 PAGE 4   
+
+ 176   1          u8g2->width = display_info->pixel_width;
+ 177   1        u8g2->height = display_info->pixel_height;
+ 178   1      #endif
+ 179   1      
+ 180   1      }
+ 181          
+ 182          /*==========================================================*/
+ 183          /* apply clip window */
+ 184          
+ 185          #ifdef U8G2_WITH_CLIP_WINDOW_SUPPORT
+ 186          static void u8g2_apply_clip_window(u8g2_t *u8g2)
+ 187          {
+ 188   1        /* check aganst the current user_??? window */
+ 189   1        if ( u8g2_IsIntersection(u8g2, u8g2->clip_x0, u8g2->clip_y0, u8g2->clip_x1, u8g2->clip_y1) == 0 ) 
+ 190   1        {
+ 191   2          u8g2->is_page_clip_window_intersection = 0;
+ 192   2        }
+ 193   1        else
+ 194   1        {
+ 195   2          u8g2->is_page_clip_window_intersection = 1;
+ 196   2      
+ 197   2          if ( u8g2->user_x0 < u8g2->clip_x0 )
+ 198   2            u8g2->user_x0 = u8g2->clip_x0;
+ 199   2          if ( u8g2->user_x1 > u8g2->clip_x1 )
+ 200   2            u8g2->user_x1 = u8g2->clip_x1;
+ 201   2          if ( u8g2->user_y0 < u8g2->clip_y0 )
+ 202   2            u8g2->user_y0 = u8g2->clip_y0;
+ 203   2          if ( u8g2->user_y1 > u8g2->clip_y1 )
+ 204   2            u8g2->user_y1 = u8g2->clip_y1;
+ 205   2        }
+ 206   1      }
+ 207          #endif /* U8G2_WITH_CLIP_WINDOW_SUPPORT */
+ 208          
+ 209          /*==========================================================*/
+ 210          
+ 211          
+ 212          void u8g2_update_dimension_r0(u8g2_t *u8g2)
+ 213          {
+ 214   1        u8g2_update_dimension_common(u8g2);  
+ 215   1      }
+ 216          
+ 217          void u8g2_update_page_win_r0(u8g2_t *u8g2)
+ 218          {
+ 219   1        u8g2->user_x0 = 0;
+ 220   1        u8g2->user_x1 = u8g2->width;      /* pixel_buf_width replaced with width */
+ 221   1        
+ 222   1        u8g2->user_y0 = u8g2->buf_y0;
+ 223   1        u8g2->user_y1 = u8g2->buf_y1;
+ 224   1        
+ 225   1      #ifdef U8G2_WITH_CLIP_WINDOW_SUPPORT
+ 226   1        u8g2_apply_clip_window(u8g2);
+ 227   1      #endif /* U8G2_WITH_CLIP_WINDOW_SUPPORT */
+ 228   1      }
+ 229          
+ 230          
+ 231          void u8g2_update_dimension_r1(u8g2_t *u8g2)
+ 232          {
+ 233   1        u8g2_update_dimension_common(u8g2);
+ 234   1        
+ 235   1        u8g2->height = u8g2_GetU8x8(u8g2)->display_info->pixel_width;
+ 236   1        u8g2->width = u8g2_GetU8x8(u8g2)->display_info->pixel_height;
+ 237   1        
+C51 COMPILER V9.60.7.0   U8G2_SETUP                                                        10/16/2024 15:44:17 PAGE 5   
+
+ 238   1      }
+ 239          
+ 240          void u8g2_update_page_win_r1(u8g2_t *u8g2)
+ 241          {
+ 242   1        u8g2->user_x0 = u8g2->buf_y0;
+ 243   1        u8g2->user_x1 = u8g2->buf_y1;
+ 244   1        
+ 245   1        u8g2->user_y0 = 0;
+ 246   1        u8g2->user_y1 = u8g2->height; /* pixel_buf_width replaced with height (which is the real pixel width) */
+ 247   1        
+ 248   1      #ifdef U8G2_WITH_CLIP_WINDOW_SUPPORT
+ 249   1        u8g2_apply_clip_window(u8g2);
+ 250   1      #endif /* U8G2_WITH_CLIP_WINDOW_SUPPORT */
+ 251   1      }
+ 252          
+ 253          void u8g2_update_dimension_r2(u8g2_t *u8g2)
+ 254          {
+ 255   1        u8g2_update_dimension_common(u8g2);
+ 256   1      }
+ 257          
+ 258          void u8g2_update_page_win_r2(u8g2_t *u8g2)
+ 259          {
+ 260   1        u8g2->user_x0 = 0;
+ 261   1        u8g2->user_x1 = u8g2->width;  /* pixel_buf_width replaced with width */
+ 262   1        
+ 263   1        /* there are ases where the height is not a multiple of 8. */
+ 264   1        /* in such a case u8g2->buf_y1 might be heigher than u8g2->height */
+ 265   1        u8g2->user_y0 = 0;
+ 266   1        if ( u8g2->height >= u8g2->buf_y1 )
+ 267   1          u8g2->user_y0 = u8g2->height - u8g2->buf_y1;
+ 268   1        u8g2->user_y1 = u8g2->height - u8g2->buf_y0;
+ 269   1      
+ 270   1      #ifdef U8G2_WITH_CLIP_WINDOW_SUPPORT
+ 271   1        u8g2_apply_clip_window(u8g2);
+ 272   1      #endif /* U8G2_WITH_CLIP_WINDOW_SUPPORT */
+ 273   1      }
+ 274          
+ 275          
+ 276          void u8g2_update_dimension_r3(u8g2_t *u8g2)
+ 277          {
+ 278   1        u8g2_update_dimension_common(u8g2);
+ 279   1        
+ 280   1        u8g2->height = u8g2_GetU8x8(u8g2)->display_info->pixel_width;
+ 281   1        u8g2->width = u8g2_GetU8x8(u8g2)->display_info->pixel_height;
+ 282   1      
+ 283   1      }
+ 284          
+ 285          void u8g2_update_page_win_r3(u8g2_t *u8g2)
+ 286          {
+ 287   1        /* there are ases where the height is not a multiple of 8. */
+ 288   1        /* in such a case u8g2->buf_y1 might be heigher than u8g2->width */
+ 289   1        u8g2->user_x0 = 0;
+ 290   1        if ( u8g2->width >= u8g2->buf_y1 )
+ 291   1          u8g2->user_x0 = u8g2->width - u8g2->buf_y1;
+ 292   1        u8g2->user_x1 = u8g2->width - u8g2->buf_y0;
+ 293   1        
+ 294   1        u8g2->user_y0 = 0;
+ 295   1        u8g2->user_y1 = u8g2->height; /* pixel_buf_width replaced with height (pixel_width) */
+ 296   1      
+ 297   1      #ifdef U8G2_WITH_CLIP_WINDOW_SUPPORT
+ 298   1        u8g2_apply_clip_window(u8g2);
+ 299   1      #endif /* U8G2_WITH_CLIP_WINDOW_SUPPORT */
+C51 COMPILER V9.60.7.0   U8G2_SETUP                                                        10/16/2024 15:44:17 PAGE 6   
+
+ 300   1      }
+ 301          
+ 302          
+ 303          /*============================================*/
+ 304          extern void u8g2_draw_hv_line_2dir(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t len, uint8_t di
+             -r);
+ 305          
+ 306          
+ 307          void u8g2_draw_l90_r0(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t len, uint8_t dir)
+ 308          {
+ 309   1      #ifdef __unix
+                assert( dir <= 1 );
+              #endif
+ 312   1        u8g2_draw_hv_line_2dir(u8g2, x, y, len, dir);
+ 313   1      }
+ 314          
+ 315          void u8g2_draw_l90_mirrorr_r0(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t len, uint8_t dir)
+ 316          {
+ 317   1        u8g2_uint_t xx;
+ 318   1        xx = u8g2->width;
+ 319   1        xx -= x;
+ 320   1        if ( (dir & 1) == 0 )
+ 321   1        {
+ 322   2          xx -= len;
+ 323   2        }
+ 324   1        else
+ 325   1        {
+ 326   2          xx--;
+ 327   2        }
+ 328   1        u8g2_draw_hv_line_2dir(u8g2, xx, y, len, dir);
+ 329   1      }
+ 330          
+ 331          void u8g2_draw_mirror_vertical_r0(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t len, uint8_t dir
+             -)
+ 332          {
+ 333   1        u8g2_uint_t yy;
+ 334   1        yy = u8g2->height;
+ 335   1        yy -= y;
+ 336   1        if ( (dir & 1) == 1 )
+ 337   1        {
+ 338   2          yy -= len;
+ 339   2        }
+ 340   1        else
+ 341   1        {
+ 342   2          yy--;
+ 343   2        }
+ 344   1        u8g2_draw_hv_line_2dir(u8g2, x, yy, len, dir);
+ 345   1      }
+ 346          
+ 347          /* dir = 0 or 1 */
+ 348          void u8g2_draw_l90_r1(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t len, uint8_t dir)
+ 349          {
+ 350   1        u8g2_uint_t xx, yy;
+ 351   1      
+ 352   1      #ifdef __unix
+                assert( dir <= 1 );
+              #endif
+ 355   1        
+ 356   1        yy = x;
+ 357   1        
+ 358   1        xx = u8g2->height;
+ 359   1        xx -= y;
+C51 COMPILER V9.60.7.0   U8G2_SETUP                                                        10/16/2024 15:44:17 PAGE 7   
+
+ 360   1        xx--;
+ 361   1        
+ 362   1        dir ++;
+ 363   1        if ( dir == 2 )
+ 364   1        {
+ 365   2          xx -= len;
+ 366   2          xx++;
+ 367   2          dir = 0;
+ 368   2        }
+ 369   1        
+ 370   1        u8g2_draw_hv_line_2dir(u8g2, xx, yy, len, dir);
+ 371   1      }
+ 372          
+ 373          void u8g2_draw_l90_r2(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t len, uint8_t dir)
+ 374          {
+ 375   1        u8g2_uint_t xx, yy;
+ 376   1      
+ 377   1        /*
+ 378   1        yy = u8g2->height;
+ 379   1        yy -= y;
+ 380   1        yy--;
+ 381   1        
+ 382   1        xx = u8g2->width;
+ 383   1        xx -= x;
+ 384   1        xx--;
+ 385   1        
+ 386   1        if ( dir == 0 )
+ 387   1        {
+ 388   1          xx -= len;
+ 389   1          xx++;
+ 390   1        }
+ 391   1        else if ( dir == 1 )
+ 392   1        {
+ 393   1          yy -= len;
+ 394   1          yy++;
+ 395   1        }
+ 396   1        */
+ 397   1      
+ 398   1        yy = u8g2->height;
+ 399   1        yy -= y;
+ 400   1        
+ 401   1        xx = u8g2->width;
+ 402   1        xx -= x;
+ 403   1        
+ 404   1        if ( dir == 0 )
+ 405   1        {
+ 406   2          yy--;
+ 407   2          xx -= len;
+ 408   2        }
+ 409   1        else if ( dir == 1 )
+ 410   1        {
+ 411   2          xx--;
+ 412   2          yy -= len;
+ 413   2        }
+ 414   1      
+ 415   1        u8g2_draw_hv_line_2dir(u8g2, xx, yy, len, dir);
+ 416   1      }
+ 417          
+ 418          void u8g2_draw_l90_r3(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t len, uint8_t dir)
+ 419          {
+ 420   1        u8g2_uint_t xx, yy;
+ 421   1      
+C51 COMPILER V9.60.7.0   U8G2_SETUP                                                        10/16/2024 15:44:17 PAGE 8   
+
+ 422   1        xx = y;
+ 423   1        
+ 424   1        yy = u8g2->width;
+ 425   1        yy -= x;
+ 426   1        
+ 427   1        if ( dir == 0 )
+ 428   1        {
+ 429   2          yy--;
+ 430   2          yy -= len;
+ 431   2          yy++;
+ 432   2          dir = 1;
+ 433   2        }
+ 434   1        else
+ 435   1        {
+ 436   2          yy--;
+ 437   2          dir = 0;
+ 438   2        }
+ 439   1        
+ 440   1        
+ 441   1        u8g2_draw_hv_line_2dir(u8g2, xx, yy, len, dir);
+ 442   1      }
+ 443          
+ 444          
+ 445          
+ 446          /*============================================*/
+ 447          const u8g2_cb_t u8g2_cb_r0 = { u8g2_update_dimension_r0, u8g2_update_page_win_r0, u8g2_draw_l90_r0 };
+ 448          const u8g2_cb_t u8g2_cb_r1 = { u8g2_update_dimension_r1, u8g2_update_page_win_r1, u8g2_draw_l90_r1 };
+ 449          const u8g2_cb_t u8g2_cb_r2 = { u8g2_update_dimension_r2, u8g2_update_page_win_r2, u8g2_draw_l90_r2 };
+ 450          const u8g2_cb_t u8g2_cb_r3 = { u8g2_update_dimension_r3, u8g2_update_page_win_r3, u8g2_draw_l90_r3 };
+ 451            
+ 452          const u8g2_cb_t u8g2_cb_mirror = { u8g2_update_dimension_r0, u8g2_update_page_win_r0, u8g2_draw_l90_mirror
+             -r_r0 };
+ 453          const u8g2_cb_t u8g2_cb_mirror_vertical = { u8g2_update_dimension_r0, u8g2_update_page_win_r0, u8g2_draw_m
+             -irror_vertical_r0 };
+ 454            
+ 455          /*============================================*/
+ 456          /* setup for the null device */
+ 457          
+ 458          /* setup for the null (empty) device */
+ 459          void u8g2_Setup_null(u8g2_t *u8g2, const u8g2_cb_t *rotation, u8x8_msg_cb byte_cb, u8x8_msg_cb gpio_and_de
+             -lay_cb)
+ 460          {
+ 461   1        static uint8_t buf[8];
+ 462   1        u8g2_SetupDisplay(u8g2, u8x8_d_null_cb, u8x8_cad_empty, byte_cb, gpio_and_delay_cb);
+ 463   1        u8g2_SetupBuffer(u8g2, buf, 1, u8g2_ll_hvline_vertical_top_lsb, rotation);
+ 464   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1659    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     62     123
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,25 @@
+".\Objects\startup_cms8s6990.obj",
+".\Objects\clib.obj",
+".\Objects\globe.obj",
+".\Objects\sysRun.obj",
+".\Objects\acmp.obj",
+".\Objects\adc.obj",
+".\Objects\buzzer.obj",
+".\Objects\epwm.obj",
+".\Objects\extint.obj",
+".\Objects\flash.obj",
+".\Objects\gpio.obj",
+".\Objects\i2c.obj",
+".\Objects\lse.obj",
+".\Objects\opa.obj",
+".\Objects\pga.obj",
+".\Objects\spi.obj",
+".\Objects\system.obj",
+".\Objects\timer.obj",
+".\Objects\uart.obj",
+".\Objects\wdt.obj",
+".\Objects\isr.obj",
+".\Objects\main.obj" 
+TO ".\Objects\Project" 
+
+PRINT(".\Listings\Project.map") REMOVEUNUSED 

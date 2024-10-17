@@ -512,6 +512,13 @@
         </Group>
         <Group>
           <GroupName>Oled</GroupName>
+          <Files>
+            <File>
+              <FileName>gui.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\GUI\gui.c</FilePath>
+            </File>
+          </Files>
         </Group>
       </Groups>
     </Target>

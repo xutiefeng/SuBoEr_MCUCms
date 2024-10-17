@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   FUNCTAB                                                           10/17/2024 16:04:18 PAGE 1   
+C51 COMPILER V9.60.0.0   FUNCTAB                                                           10/17/2024 16:51:09 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE FUNCTAB
@@ -62,7 +62,7 @@ line level    source
   49   1            OnTime  = OnOffTimeTab[level][0];
   50   1            OffTime =  OnOffTimeTab[level][1];
   51   1            (*Value)++;
-C51 COMPILER V9.60.0.0   FUNCTAB                                                           10/17/2024 16:04:18 PAGE 2   
+C51 COMPILER V9.60.0.0   FUNCTAB                                                           10/17/2024 16:51:09 PAGE 2   
 
   52   1            if(*Value< OnTime) 
   53   1            {
@@ -126,7 +126,7 @@ line level    source
  111          //    mid = p[last+1]-num;
  112          //    if(len > mid)
  113          //      return (last+1);
-C51 COMPILER V9.60.0.0   FUNCTAB                                                           10/17/2024 16:04:18 PAGE 3   
+C51 COMPILER V9.60.0.0   FUNCTAB                                                           10/17/2024 16:51:09 PAGE 3   
 
  114          //  }   
  115          //  return last;

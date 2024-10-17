@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   BSP_PHYKEY                                                        10/17/2024 16:04:17 PAGE 1   
+C51 COMPILER V9.60.0.0   BSP_PHYKEY                                                        10/17/2024 16:51:07 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE BSP_PHYKEY
@@ -62,7 +62,7 @@ line level    source
   49   3                    sKey_yyy.Bit.gNoKeyTime = _500MS_Per50MS;
   50   3                    KeyLongPress(KeyValue);           
   51   3                    sKey_yyy.Bit.sProsessTime = 0;
-C51 COMPILER V9.60.0.0   BSP_PHYKEY                                                        10/17/2024 16:04:17 PAGE 2   
+C51 COMPILER V9.60.0.0   BSP_PHYKEY                                                        10/17/2024 16:51:07 PAGE 2   
 
   52   3              }
   53   2              else

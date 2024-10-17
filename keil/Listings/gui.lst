@@ -1,11 +1,11 @@
-C51 COMPILER V9.60.7.0   GUI                                                               10/17/2024 00:13:24 PAGE 1   
+C51 COMPILER V9.60.0.0   GUI                                                               10/17/2024 16:55:15 PAGE 1   
 
 
-C51 COMPILER V9.60.7.0, COMPILATION OF MODULE GUI
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE GUI
 OBJECT MODULE PLACED IN .\Objects\gui.obj
-COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE ..\GUI\gui.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\Device\CMS8S699
-                    -0\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\gui.lst) TABS(2) OBJECT(.\Objects\gui.o
-                    -bj)
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE ..\GUI\gui.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\Device\CMS8S
+                    -6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\gui.lst) TABS(2) OBJECT(.\Objects\gu
+                    -i.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   48          void GUI_HLine(uint16_t x0, uint16_t x1, uint16_t y, u8 color)
   49          {
   50            if(x0 > x1) {
-C51 COMPILER V9.60.7.0   GUI                                                               10/17/2024 00:13:24 PAGE 2   
+C51 COMPILER V9.60.0.0   GUI                                                               10/17/2024 16:55:15 PAGE 2   
 
   51              SWAP(x0, x1);
   52            }

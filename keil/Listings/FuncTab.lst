@@ -1,0 +1,162 @@
+C51 COMPILER V9.60.0.0   FUNCTAB                                                           10/17/2024 16:04:18 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE FUNCTAB
+OBJECT MODULE PLACED IN .\Objects\FuncTab.obj
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE ..\BSP\FuncTab.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\Device\C
+                    -MS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\FuncTab.lst) TABS(2) OBJECT(.\Ob
+                    -jects\FuncTab.obj)
+
+line level    source
+
+   1          #include "FuncTab.h"
+   2          
+   3          code u8   DefaultTempTab[] = {36,50};
+   4          
+   5          code u8   DefaultTimerTab[] = {2,8,12};
+   6          
+   7          
+   8          code u8   LED_BinkTimeTab[][2] =
+   9          { 
+  10            {5,      10, },
+  11          };
+  12          
+  13          code u8   LEDOnOffTimeTab[][2] = 
+  14          {
+  15            {100,    200, },  
+  16            {100,    200, },  
+  17            {100,    200, },
+  18          };
+  19          
+  20          code u8   HeatOnOffTimeTab[][2] = 
+  21          {
+  22            /*kai, zhou_qi  Unit 100ms*/
+  23              {00,    30},//yi zhi guan
+  24              {12,    30},//1dang： 1.2s kai  1.8S关
+  25              {20,    30},//2dang： 2s kai  1关 
+  26              {30,    30},//3dang：yi zhi kai
+  27          };
+  28          
+  29          
+  30          
+  31          /*********************************************************************************************************
+             -***************************************
+  32           * ??:?????????          
+  33           * ??:
+  34           *       Func            ??
+  35           *       pOnOffTime      ????
+  36           *       OnOffTimeTab    ??????                             
+  37           * ??:ON     ???
+  38           *       OFF    ???
+  39           *       ??? ?????
+  40           * ??:?   
+  41          **********************************************************************************************************
+             -***************************************/
+  42          u8  AccompanyFunc_OnOffHandle1( u8 *pOnOffTime, u8  level,const u8 OnOffTimeTab[][2])
+  43          {
+  44   1           u8 OnTime;
+  45   1           u8 OffTime;
+  46   1           u8  OnOff = OFF;
+  47   1           u8  *Value =pOnOffTime;
+  48   1      
+  49   1            OnTime  = OnOffTimeTab[level][0];
+  50   1            OffTime =  OnOffTimeTab[level][1];
+  51   1            (*Value)++;
+C51 COMPILER V9.60.0.0   FUNCTAB                                                           10/17/2024 16:04:18 PAGE 2   
+
+  52   1            if(*Value< OnTime) 
+  53   1            {
+  54   2              OnOff = ON;
+  55   2            }
+  56   1            else if(*Value< OffTime)
+  57   1            {
+  58   2              OnOff = OFF;
+  59   2            }
+  60   1            else
+  61   1            {
+  62   2              *Value = 0;
+  63   2            }
+  64   1            
+  65   1            return OnOff;
+  66   1      }
+  67          
+  68          u8 searchInArray_Temp(u16 * array, u8 arrayLen, u16 num)
+  69          {
+  70   1          u8 i;
+  71   1        
+  72   1          u8 *p = array;
+  73   1          u8 len = arrayLen;
+  74   1          i= 0;
+  75   1          for(i= 0; i<arrayLen ; i++)
+  76   1          {
+  77   2              if(num < array[i])
+  78   2                break;
+  79   2          }
+  80   1          return (i);
+  81   1      }
+  82          
+  83          //u8  searchInArray(u16 * array, u8 arrayLen, u16 num)  // 二分法查找 小头在前
+  84          //{   
+  85          //  u8 xdata first, last, mid;
+  86          //  
+  87          //  u16* p=array;
+  88          //  u8   len = arrayLen;
+  89          //  if(num < p[0])  return 0;
+  90          //  else if(num > p[len - 1]) return len - 1; 
+  91          //  
+  92          //  first = 0;
+  93          //  last = arrayLen;
+  94          //  
+  95          //  while(last != first + 1)
+  96          //  {
+  97          //    mid = (first + last) >> 1;
+  98          //    if(num >= p[mid])
+  99          //    {
+ 100          //      first = mid;
+ 101          //      last = mid;
+ 102          //      break;
+ 103          //    }
+ 104          //    else if(num < p[mid]) last = mid; // 如果数值小于中间值 二分的后一个数等于中间值
+ 105          //    else if(num > p[mid]) first = mid;
+ 106          //  }
+ 107          //  
+ 108          //  if(num != p[last])
+ 109          //  {
+ 110          //    len = num-p[last];
+ 111          //    mid = p[last+1]-num;
+ 112          //    if(len > mid)
+ 113          //      return (last+1);
+C51 COMPILER V9.60.0.0   FUNCTAB                                                           10/17/2024 16:04:18 PAGE 3   
+
+ 114          //  }   
+ 115          //  return last;
+ 116          //}
+ 117          
+ 118          
+ 119          
+ 120          
+ 121          
+ 122          
+ 123          
+ 124          
+ 125          
+ 126          
+*** WARNING C316 IN LINE 126 OF ..\BSP\FuncTab.c: unterminated conditionals
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    145    ----
+   CONSTANT SIZE    =     21    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      22
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)

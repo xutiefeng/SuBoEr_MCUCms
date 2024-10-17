@@ -19,7 +19,7 @@ code u8   LEDOnOffTimeTab[][2] =
 
 code u8   HeatOnOffTimeTab[][2] = 
 {
-		/*kai, zhou_qi 100ms*/
+	/*kai, zhou_qi 	Unit 100ms*/
     {00,    30},//yi zhi guan
     {12,    30},//1dang£º 1.2s kai  1.8S¹Ø
     {20,    30},//2dang£º 2s kai  1¹Ø 

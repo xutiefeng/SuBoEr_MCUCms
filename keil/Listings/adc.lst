@@ -1,11 +1,11 @@
-C51 COMPILER V9.60.7.0   ADC                                                               10/16/2024 15:44:08 PAGE 1   
+C51 COMPILER V9.60.0.0   ADC                                                               10/17/2024 15:47:34 PAGE 1   
 
 
-C51 COMPILER V9.60.7.0, COMPILATION OF MODULE ADC
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE ADC
 OBJECT MODULE PLACED IN .\Objects\adc.obj
-COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE ..\Libary\StdDriver\src\adc.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libar
-                    -y\Device\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\adc.lst) TABS(2) OBJEC
-                    -T(.\Objects\adc.obj)
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE ..\Libary\StdDriver\src\adc.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Li
+                    -bary\Device\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\adc.lst) TABS(2) OB
+                    -JECT(.\Objects\adc.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   51          *****************************************************************************/
   52          
   53          /****************************************************************************/
-C51 COMPILER V9.60.7.0   ADC                                                               10/16/2024 15:44:08 PAGE 2   
+C51 COMPILER V9.60.0.0   ADC                                                               10/17/2024 15:47:34 PAGE 2   
 
   54          /*  Local function prototypes('static')
   55          *****************************************************************************/
@@ -126,7 +126,7 @@ line level    source
  113   1      }
  114          /*****************************************************************************
  115           ** \brief   ADC_DisableHardwareTrig
-C51 COMPILER V9.60.7.0   ADC                                                               10/16/2024 15:44:08 PAGE 3   
+C51 COMPILER V9.60.0.0   ADC                                                               10/17/2024 15:47:34 PAGE 3   
 
  116           **      关闭硬件触发ADC
  117           ** \param [in] none
@@ -190,7 +190,7 @@ line level    source
  175           ** \note   
  176          *****************************************************************************/
  177          void  ADC_ConfigAN31(uint8_t An31Channel)
-C51 COMPILER V9.60.7.0   ADC                                                               10/16/2024 15:44:08 PAGE 4   
+C51 COMPILER V9.60.0.0   ADC                                                               10/17/2024 15:47:34 PAGE 4   
 
  178          {
  179   1        uint8_t Temp=0;
@@ -254,7 +254,7 @@ line level    source
  237   1      }
  238          
  239          /*****************************************************************************
-C51 COMPILER V9.60.7.0   ADC                                                               10/16/2024 15:44:08 PAGE 5   
+C51 COMPILER V9.60.0.0   ADC                                                               10/17/2024 15:47:34 PAGE 5   
 
  240           ** \brief   ADC_GetCmpResult
  241           **      获取ADC比较结果
@@ -318,7 +318,7 @@ line level    source
  299   1      }
  300          /*****************************************************************************
  301           ** \brief   ADC_ClearIntFlag
-C51 COMPILER V9.60.7.0   ADC                                                               10/16/2024 15:44:08 PAGE 6   
+C51 COMPILER V9.60.0.0   ADC                                                               10/17/2024 15:47:34 PAGE 6   
 
  302           **      清ADC转换完成中断标志位
  303           ** \param [in] none
@@ -382,7 +382,7 @@ MODULE INFORMATION:   STATIC OVERLAYABLE
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----
-C51 COMPILER V9.60.7.0   ADC                                                               10/16/2024 15:44:08 PAGE 7   
+C51 COMPILER V9.60.0.0   ADC                                                               10/17/2024 15:47:34 PAGE 7   
 
    BIT SIZE         =   ----    ----
    EDATA SIZE       =   ----    ----

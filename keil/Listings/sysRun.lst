@@ -1,11 +1,11 @@
-C51 COMPILER V9.60.7.0   SYSRUN                                                            10/17/2024 01:09:02 PAGE 1   
+C51 COMPILER V9.60.0.0   SYSRUN                                                            10/17/2024 16:04:16 PAGE 1   
 
 
-C51 COMPILER V9.60.7.0, COMPILATION OF MODULE SYSRUN
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE SYSRUN
 OBJECT MODULE PLACED IN .\Objects\sysRun.obj
-COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE ..\BSP\sysRun.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\Device\CMS8S
-                    -6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\sysRun.lst) TABS(2) OBJECT(.\Objects
-                    -\sysRun.obj)
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE ..\BSP\sysRun.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\Device\CM
+                    -S8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\sysRun.lst) TABS(2) OBJECT(.\Obje
+                    -cts\sysRun.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   51          //   CloseFuZai();
   52          //   display_Close();
   53          //   display_standby();
-C51 COMPILER V9.60.7.0   SYSRUN                                                            10/17/2024 01:09:02 PAGE 2   
+C51 COMPILER V9.60.0.0   SYSRUN                                                            10/17/2024 16:04:16 PAGE 2   
 
   54          //}
   55          
@@ -126,7 +126,7 @@ line level    source
  113          //            SetIcon_ShuShui_1628(OFF);
  114          //            SetIcon_DingShi_1628(OFF);
  115          //        }
-C51 COMPILER V9.60.7.0   SYSRUN                                                            10/17/2024 01:09:02 PAGE 3   
+C51 COMPILER V9.60.0.0   SYSRUN                                                            10/17/2024 16:04:16 PAGE 3   
 
  116          //        else if(Auto1Flag && !JieDianDisplayFlag)
  117          //        {
@@ -190,7 +190,7 @@ line level    source
  175          //            {
  176          //                SetIcon_DingShi_1628(ON);
  177          //            }
-C51 COMPILER V9.60.7.0   SYSRUN                                                            10/17/2024 01:09:02 PAGE 4   
+C51 COMPILER V9.60.0.0   SYSRUN                                                            10/17/2024 16:04:16 PAGE 4   
 
  178          //        }     
  179          //        if(GetKeySongKai_time())
@@ -254,7 +254,7 @@ line level    source
  235          //    {
  236          //        gSysRunTime--;
  237          //        
-C51 COMPILER V9.60.7.0   SYSRUN                                                            10/17/2024 01:09:02 PAGE 5   
+C51 COMPILER V9.60.0.0   SYSRUN                                                            10/17/2024 16:04:16 PAGE 5   
 
  238          //        if(gSysRunTime == 0)
  239          //        {
@@ -265,97 +265,81 @@ line level    source
  244          //    
  245          //}
  246          
- 247          
- 248          ///*******************************************************************************************************
+ 247          ///*******************************************************************************************************
              -*********************************** 
- 249          //* 函数名称  SetSysRunTime
- 250          //* 功能说明  ：设置功能运行时间
- 251          //* 输入：   时间，单位h  
- 252          //* 输出：   无
- 253          //*注意 无
- 254          //********************************************************************************************************
+ 248          //* 函数名称  GetSysRunTime
+ 249          //* 功能说明  ：获取系统时间时长
+ 250          //* 输入：   无 
+ 251          //* 输出：   已经设置的系统时间时长
+ 252          //* 注意 无
+ 253          //********************************************************************************************************
              -**********************************/
- 255          //void SetSysRunTime(u8 v)
- 256          //{
- 257          //  gSetSysRunTime = v;
- 258          //  gSysRunTime = gSetSysRunTime*3600;
- 259          //}
- 260          
- 261          ///*******************************************************************************************************
+ 254          //u8 GetSysRunTime(void)
+ 255          //{
+ 256          //  return gSetSysRunTime;
+ 257          //}
+ 258          
+ 259          ///*******************************************************************************************************
              -*********************************** 
- 262          //* 函数名称  GetSysRunTime
- 263          //* 功能说明  ：获取系统时间时长
- 264          //* 输入：   无 
- 265          //* 输出：   已经设置的系统时间时长
- 266          //* 注意 无
- 267          //********************************************************************************************************
+ 260          //* 函数名称: sysRuning
+ 261          //* 功能说明: 逻辑框架运行
+ 262          //* 输    入: 无
+ 263          //* 输    出: 无
+ 264          //********************************************************************************************************
              -**********************************/
- 268          //u8 GetSysRunTime(void)
- 269          //{
- 270          //  return gSetSysRunTime;
- 271          //}
- 272          
- 273          ///*******************************************************************************************************
-             -*********************************** 
- 274          //* 函数名称: sysRuning
- 275          //* 功能说明: 逻辑框架运行
- 276          //* 输    入: 无
- 277          //* 输    出: 无
- 278          //********************************************************************************************************
-             -**********************************/
- 279          
- 280          void sysRuning(void)
- 281          { 
- 282   1          
- 283   1        EventCollect();
- 284   1          switch(PopEvent())
- 285   1          {  
- 286   2          case evSysRest:
+ 265          
+ 266          void sysRuning(void)
+ 267          { 
+ 268   1          
+ 269   1          EventCollect();
+ 270   1          switch(PopEvent())
+ 271   1          {  
+ 272   2            case evSysRest:
+ 273   2      
+ 274   2            break;
+ 275   2      
+ 276   2            case ev5MS:       
+ 277   2            {
+ 278   3          
+ 279   3            } 
+ 280   2            break;  
+ 281   2          
+ 282   2            case ev20MS:
+ 283   2            {
+ 284   3                                
+ 285   3            }
+ 286   2            break;
  287   2      
- 288   2          break;
- 289   2      
- 290   2          case ev5MS:       
- 291   2          {
- 292   3        
- 293   3          } 
-C51 COMPILER V9.60.7.0   SYSRUN                                                            10/17/2024 01:09:02 PAGE 6   
+ 288   2            case ev50MS:
+ 289   2            {
+ 290   3                Kye_Scan();         
+ 291   3            }
+ 292   2            break;
+ 293   2              
+ 294   2            case ev100MS:
+ 295   2            {       
+C51 COMPILER V9.60.0.0   SYSRUN                                                            10/17/2024 16:04:16 PAGE 6   
 
- 294   2          break;  
- 295   2          
- 296   2          case ev20MS:
- 297   2          {
- 298   3      //      Kye_Scan();                   
- 299   3          }
- 300   2          break;
- 301   2      
- 302   2          case ev50MS:
- 303   2          {
- 304   3      //      KeyProsess();                     
- 305   3          }
- 306   2          break;
- 307   2              
- 308   2          case ev100MS:
- 309   2          {       
- 310   3                  
- 311   3          }
- 312   2          break;
- 313   2              
- 314   2          case ev1S:
- 315   2          { 
- 316   3      
- 317   3          }
- 318   2              break;
- 319   2              
- 320   2              default:
- 321   2              break;
- 322   2          }
- 323   1          
- 324   1      }
-*** WARNING C316 IN LINE 324 OF ..\BSP\sysRun.c: unterminated conditionals
+ 296   3                    
+ 297   3            }
+ 298   2            break;
+ 299   2              
+ 300   2            case ev1S:
+ 301   2            { 
+ 302   3      
+ 303   3            }
+ 304   2            break;
+ 305   2              
+ 306   2            default:
+ 307   2                break;
+ 308   2         }
+ 309   1          
+ 310   1      }
+*** WARNING C316 IN LINE 310 OF ..\BSP\sysRun.c: unterminated conditionals
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =      7    ----
+   CODE SIZE        =     17    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----

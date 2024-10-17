@@ -6,8 +6,9 @@
 
 typedef	struct
 {
-	u32 In_Put;
-	u32 In_Tmp[2];
+	u8 In_Put;
+	u8 In_Tmp[2];
+	u8 KeyValue;
 	unsigned char State;
 	
 }TYP_IO;

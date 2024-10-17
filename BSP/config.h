@@ -4,7 +4,7 @@
 #include  "..\bsp\globe.h"
 
 #define  LED_CONFIG  1
-#define  HEAT_CONFIG 1
+#define  HEAT_CONFIG 0
 #define  Bsp_Phykey_CONFIG 1
 #define  NTC_CONFIG 0
 #define  AiP4952A_SPI  1

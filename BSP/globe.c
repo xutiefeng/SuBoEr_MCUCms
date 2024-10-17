@@ -1,8 +1,6 @@
 
 #include "includeall.h"
 
-#include "globe.h"
-
 //////////////////////////////////////
 
 
@@ -15,11 +13,15 @@ xdata u8  gSetSysRunTime =8;
 xdata ST_Step gStep ;
 xdata STFactory gstFactory;
  
-#define  HEAT_CONFIG
+#if  HEAT_CONFIG
 xdata u8 gHeatTime ;
 #endif
+
+
 #if  NTC_CONFIG
 xdata volatile u8 sTemp_v,sTemp_v_1;
 #endif
 
+#if  Bsp_Phykey_CONFIG
 xdata STKeyType sKey_yyy ;
+#endif

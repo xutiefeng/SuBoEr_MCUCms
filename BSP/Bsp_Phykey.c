@@ -4,38 +4,72 @@
  * @LastEditors: xu_tie_feng xu_tie_feng@163.com
  * @LastEditTime: 2024-06-02 19:56:31
  * @FilePath: \LanYaDianReTan_8501\BSP\Bsp_Phykey.c
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ * @Description: https://github.com/xu
  */
 #include "Bsp_Phykey.h"
 
-
-
+#define NO_KEY_PRESS_VALUE   0
+#define COLEECT_KEY_VALUE(X) str_IO.In_Put
 volatile TYP_IO	 str_IO;
 
-#if Bsp_Phykey_CONFIG
-
+extern void KeyShortPress(u8 v);
+extern void KeyLongPress(u8 v);
 
 /****************************************************************************************************************************************** 
-* 函数名称:	IO_Process
-* 功能说明:	周期扫描物理按键
-* 输    入: 无
-* 输    出: 无
+
 
 ******************************************************************************************************************************************/
-void Kye_Scan(void)
+void KeyProsess(u8 v)
 {
+	u8 KeyValue = v;
 	
-//	u8 key_v = GetAD_Key();//获取AD值
-	
-	if(str_IO.State < 2)//扫描两次
-	{ 
-			str_IO.In_Tmp[str_IO.State] = (TKL_GetKey());
+	if( (NO_KEY_PRESS_VALUE == KeyValue)  || SysDelayFlag )
+	{
+			sKey_yyy.Bit.sProsessTime = 0;
+			if(sKey_yyy.Bit.gNoKeyTime > 0)
+		  {
+						sKey_yyy.Bit.gNoKeyTime--;								
+		  }	
+			else
+			{
+						SysDelayFlag = 0;
+			}
 	}
 	else
 	{
-		if((str_IO.In_Tmp[0] == str_IO.In_Tmp[1]))//扫描两次，结果相同，为有效值
+			  if(sKey_yyy.Bit.sProsessTime <0x3f)
+					sKey_yyy.Bit.sProsessTime++;
+				else
+					return;
+			
+
+				if(sKey_yyy.Bit.sProsessTime >= _3S_Per50MS )//long press
+				{					
+							SysDelayFlag = 1;//qu dou	
+							sKey_yyy.Bit.gNoKeyTime = _500MS_Per50MS;
+							KeyLongPress(KeyValue);	  				
+							sKey_yyy.Bit.sProsessTime = 0;
+				}
+				else
+				{
+							sKey_yyy.Bit.sProsessTime = 0x3f;
+							KeyShortPress(KeyValue);
+				}	
+	}
+}
+
+void Kye_Scan(void)
+{
+	if(str_IO.State < 2)//
+	{ 
+			str_IO.In_Tmp[str_IO.State] = COLEECT_KEY_VALUE();
+	}
+	else
+	{
+		if((str_IO.In_Tmp[0] == str_IO.In_Tmp[1]))//
 		{
-			str_IO.In_Put = str_IO.In_Tmp[0];
+		  str_IO.KeyValue = str_IO.In_Tmp[0];
+			KeyProsess(str_IO.In_Tmp[0] );
 		}
 		str_IO.State = 0;
 		return;
@@ -44,24 +78,16 @@ void Kye_Scan(void)
 }
 
 /****************************************************************************************************************************************** 
-* 函数名称:	getKeyValue
-* 功能说明:	获取按键值
-* 输    入: 无
-* 输    出: 无
+
 
 ******************************************************************************************************************************************/
 
+
 u8 getKeyValue(void)
 {
-	if(str_IO.In_Put > 0)
-	{
-	  	return str_IO.In_Put ;
-	}
-	
-	else
-	{
-			return 0;
-	}
-
+		return	str_IO.KeyValue;
 }
-#endif
+
+
+
+

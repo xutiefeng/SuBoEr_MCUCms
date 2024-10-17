@@ -1,47 +1,48 @@
-C51 COMPILER V9.60.7.0   GLOBE                                                             10/17/2024 00:36:55 PAGE 1   
+C51 COMPILER V9.60.0.0   GLOBE                                                             10/17/2024 16:04:16 PAGE 1   
 
 
-C51 COMPILER V9.60.7.0, COMPILATION OF MODULE GLOBE
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE GLOBE
 OBJECT MODULE PLACED IN .\Objects\globe.obj
-COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE ..\BSP\globe.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\Device\CMS8S6
-                    -990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\globe.lst) TABS(2) OBJECT(.\Objects\g
-                    -lobe.obj)
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE ..\BSP\globe.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\Device\CMS
+                    -8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\globe.lst) TABS(2) OBJECT(.\Object
+                    -s\globe.obj)
 
 line level    source
 
    1          
    2          #include "includeall.h"
    3          
-   4          #include "globe.h"
+   4          //////////////////////////////////////
    5          
-   6          //////////////////////////////////////
-   7          
-   8          
-   9          xdata ST_PushPop gstPushPop;
-  10          xdata volatile byte gbFlagData[3];
-  11          xdata volatile sysTick_t gstRDsysTick;
-  12          xdata Uchar gEventBuffer[EVENT_BUFFER_LENGTH];
-  13          xdata u16 gSysRunTime;
-  14          xdata u8  gSetSysRunTime =8;
-  15          xdata ST_Step gStep ;
-  16          xdata STFactory gstFactory;
-  17           
-  18          #define  HEAT_CONFIG
-*** WARNING C317 IN LINE 18 OF ..\BSP\globe.c: attempt to redefine macro 'HEAT_CONFIG'
-  19          xdata u8 gHeatTime ;
-  20          #endif
+   6          
+   7          xdata ST_PushPop gstPushPop;
+   8          xdata volatile byte gbFlagData[3];
+   9          xdata volatile sysTick_t gstRDsysTick;
+  10          xdata Uchar gEventBuffer[EVENT_BUFFER_LENGTH];
+  11          xdata u16 gSysRunTime;
+  12          xdata u8  gSetSysRunTime =8;
+  13          xdata ST_Step gStep ;
+  14          xdata STFactory gstFactory;
+  15           
+  16          #if  HEAT_CONFIG
+              xdata u8 gHeatTime ;
+              #endif
+  19          
+  20          
   21          #if  NTC_CONFIG
               xdata volatile u8 sTemp_v,sTemp_v_1;
               #endif
   24          
-  25          xdata STKeyType sKey_yyy ;
-*** WARNING C316 IN LINE 25 OF ..\BSP\globe.c: unterminated conditionals
+  25          #if  Bsp_Phykey_CONFIG
+  26          xdata STKeyType sKey_yyy ;
+  27          #endif
+*** WARNING C316 IN LINE 27 OF ..\BSP\globe.c: unterminated conditionals
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
    CODE SIZE        =   ----    ----
    CONSTANT SIZE    =   ----    ----
-   XDATA SIZE       =     27    ----
+   XDATA SIZE       =     26    ----
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----
@@ -53,4 +54,4 @@ MODULE INFORMATION:   STATIC OVERLAYABLE
 END OF MODULE INFORMATION.
 
 
-C51 COMPILATION COMPLETE.  2 WARNING(S),  0 ERROR(S)
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)

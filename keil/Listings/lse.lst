@@ -1,11 +1,11 @@
-C51 COMPILER V9.60.7.0   LSE                                                               10/16/2024 15:44:09 PAGE 1   
+C51 COMPILER V9.60.0.0   LSE                                                               10/17/2024 15:47:37 PAGE 1   
 
 
-C51 COMPILER V9.60.7.0, COMPILATION OF MODULE LSE
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE LSE
 OBJECT MODULE PLACED IN .\Objects\lse.obj
-COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE ..\Libary\StdDriver\src\lse.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libar
-                    -y\Device\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\lse.lst) TABS(2) OBJEC
-                    -T(.\Objects\lse.obj)
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE ..\Libary\StdDriver\src\lse.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Li
+                    -bary\Device\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\lse.lst) TABS(2) OB
+                    -JECT(.\Objects\lse.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   51          /*  Local variable  definitions('static')
   52          ****************************************************************************/
   53          
-C51 COMPILER V9.60.7.0   LSE                                                               10/16/2024 15:44:09 PAGE 2   
+C51 COMPILER V9.60.0.0   LSE                                                               10/17/2024 15:47:37 PAGE 2   
 
   54          /****************************************************************************/
   55          /*  Local function prototypes('static')
@@ -126,7 +126,7 @@ line level    source
  113           ** \note   
  114           *****************************************************************************/
  115          void LSE_ConfigLSE(uint16_t  Time)
-C51 COMPILER V9.60.7.0   LSE                                                               10/16/2024 15:44:09 PAGE 3   
+C51 COMPILER V9.60.0.0   LSE                                                               10/17/2024 15:47:37 PAGE 3   
 
  116          {
  117   1        LSECRH = (Time>>8);
@@ -190,7 +190,7 @@ line level    source
  175          {
  176   1        return((LSECON & LSE_LSECON_LSEIF_Msk)? 1:0);
  177   1      }
-C51 COMPILER V9.60.7.0   LSE                                                               10/16/2024 15:44:09 PAGE 4   
+C51 COMPILER V9.60.0.0   LSE                                                               10/17/2024 15:47:37 PAGE 4   
 
  178          /*****************************************************************************
  179           ** \brief   LSE_ClearLSEIntFlag

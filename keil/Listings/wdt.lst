@@ -1,11 +1,11 @@
-C51 COMPILER V9.60.7.0   WDT                                                               10/16/2024 15:44:11 PAGE 1   
+C51 COMPILER V9.60.0.0   WDT                                                               10/17/2024 15:47:41 PAGE 1   
 
 
-C51 COMPILER V9.60.7.0, COMPILATION OF MODULE WDT
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE WDT
 OBJECT MODULE PLACED IN .\Objects\wdt.obj
-COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE ..\Libary\StdDriver\src\wdt.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libar
-                    -y\Device\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\wdt.lst) TABS(2) OBJEC
-                    -T(.\Objects\wdt.obj)
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE ..\Libary\StdDriver\src\wdt.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Li
+                    -bary\Device\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\wdt.lst) TABS(2) OB
+                    -JECT(.\Objects\wdt.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   51          ****************************************************************************/
   52          
   53          /****************************************************************************/
-C51 COMPILER V9.60.7.0   WDT                                                               10/16/2024 15:44:11 PAGE 2   
+C51 COMPILER V9.60.0.0   WDT                                                               10/17/2024 15:47:41 PAGE 2   
 
   54          /*  Local function prototypes('static')
   55          ****************************************************************************/
@@ -126,7 +126,7 @@ line level    source
  113   2        } 
  114   1      }
  115          /*****************************************************************************
-C51 COMPILER V9.60.7.0   WDT                                                               10/16/2024 15:44:11 PAGE 3   
+C51 COMPILER V9.60.0.0   WDT                                                               10/17/2024 15:47:41 PAGE 3   
 
  116           ** \brief   WDT_EnableOverflowInt
  117           **      使能WDT计数溢出中断
@@ -190,7 +190,7 @@ line level    source
  175   1      }
  176          
  177          
-C51 COMPILER V9.60.7.0   WDT                                                               10/16/2024 15:44:11 PAGE 4   
+C51 COMPILER V9.60.0.0   WDT                                                               10/17/2024 15:47:41 PAGE 4   
 
  178          
  179          

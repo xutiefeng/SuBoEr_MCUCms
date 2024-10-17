@@ -244,20 +244,6 @@
 //		
 //}
 
-
-///****************************************************************************************************************************************** 
-//* 函数名称	SetSysRunTime
-//* 功能说明	：设置功能运行时间
-//* 输入：		时间，单位h	
-//* 输出：		无
-//*注意 无
-//******************************************************************************************************************************************/
-//void SetSysRunTime(u8 v)
-//{
-//	gSetSysRunTime = v;
-//	gSysRunTime = gSetSysRunTime*3600;
-//}
-
 ///****************************************************************************************************************************************** 
 //* 函数名称	GetSysRunTime
 //* 功能说明	：获取系统时间时长
@@ -280,45 +266,45 @@
 void sysRuning(void)
 {	
 		
-	EventCollect();
+		EventCollect();
     switch(PopEvent())
     {  
-		case evSysRest:
+			case evSysRest:
 
-		break;
+			break;
 
-		case ev5MS:       
-		{
-	
-		}	
-		break;  
+			case ev5MS:       
+			{
 		
-		case ev20MS:
-		{
-//			Kye_Scan();	         					
-		}
-		break;
+			}	
+			break;  
+		
+			case ev20MS:
+			{
+				         					
+			}
+			break;
 
-		case ev50MS:
-		{
-//			KeyProsess();            					
-    }
-    break;
+			case ev50MS:
+			{
+			  	Kye_Scan();					
+			}
+			break;
 				
-		case ev100MS:
-		{				
-						
-		}
-		break;
+			case ev100MS:
+			{				
+							
+			}
+			break;
 				
-		case ev1S:
-    {	
+			case ev1S:
+			{	
 
-		}
-        break;
+			}
+			break;
 				
-        default:
-        break;
-    }
+			default:
+					break;
+   }
 		
 }

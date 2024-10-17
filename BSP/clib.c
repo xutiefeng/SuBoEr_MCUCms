@@ -13,7 +13,7 @@ void PushEvent(Uchar event)
 	}
 	for(temp = 0; temp <= gstPushPop.WriteEventCount; temp++)
 	{
-		if(event == gEventBuffer[temp] && event != ev20MS && event != ev50MS && event != ev100MS && event != ev1S && event != ev5MS)
+		if(event == gEventBuffer[temp] /*&& event != ev20MS && event != ev50MS && event != ev100MS && event != ev1S && event != ev5MS*/)
 		{
 			return;
 		}
@@ -95,11 +95,9 @@ void EventCollect(void)
 		Ev1SFlag = 0;
 		PushEvent(ev1S);
 	}
+	else
+	{
 	
-//	else if(ADCollectFlag)//
-//	{
-//		ADCollectFlag = 0;
-//		PushEvent(evAD);
-//	}
-	
+	}
+
 }

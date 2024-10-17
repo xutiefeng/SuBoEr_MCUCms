@@ -10,9 +10,8 @@
 #include "..\bsp\sysRun.h"
 ////////////////////////////////////////////////////////////////////////////////
 #include "..\bsp\bsp_Led.h"
-#include "..\bsp\bsp_Heat.h"
 #include "..\bsp\Bsp_Phykey.h"
-
+#include "..\bsp\FuncTab.h"
 
 //#include "..\bsp\bsp_ADCollect.h"
 //#include "..\bsp\Dispaly.h"

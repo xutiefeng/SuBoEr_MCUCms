@@ -518,6 +518,36 @@
               <FileType>1</FileType>
               <FilePath>..\GUI\gui.c</FilePath>
             </File>
+            <File>
+              <FileName>..\..\tfxu\Code\ToolCode_OLED_Suppor\ToolCode_OLED_Suppor\u8g2\u8g2.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>$TC_ROOT$\..\..\tfxu\Code\ToolCode_OLED_Suppor\ToolCode_OLED_Suppor\u8g2\u8g2.h</FilePath>
+            </File>
+            <File>
+              <FileName>u8x8.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\u8g2\u8x8.h</FilePath>
+            </File>
+            <File>
+              <FileName>u8x8_d_ssd1306_128x64_noname.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\u8g2\u8x8_d_ssd1306_128x64_noname.c</FilePath>
+            </File>
+            <File>
+              <FileName>u8g2_d_memory.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\u8g2\u8g2_d_memory.c</FilePath>
+            </File>
+            <File>
+              <FileName>u8g2_d_setup.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\u8g2\u8g2_d_setup.c</FilePath>
+            </File>
+            <File>
+              <FileName>u8g2_fonts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\u8g2\u8g2_fonts.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

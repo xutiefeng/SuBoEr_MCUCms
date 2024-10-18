@@ -1,0 +1,1 @@
+"..\Libary\StdDriver\src\epwm.c" OMF2 OPTIMIZE (8,SPEED) BROWSE INCDIR(..\Libary\Device\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\epwm.lst) TABS (2) OBJECT(.\Objects\epwm.obj)

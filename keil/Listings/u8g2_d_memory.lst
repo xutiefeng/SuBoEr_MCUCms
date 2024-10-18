@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 1   
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE U8G2_D_MEMORY
@@ -62,7 +62,7 @@ line level    source
   51          //  *page_cnt = 2;
   52          //  return 0;
   53          //  #else
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 2   
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 2   
 
   54          //  static uint8_t buf[256];
   55          //  *page_cnt = 2;
@@ -126,7 +126,7 @@ line level    source
  113          //}
  114          //uint8_t *u8g2_m_9_5_2(uint8_t *page_cnt)
  115          //{
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 3   
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 3   
 
  116          //  #ifdef U8G2_USE_DYNAMIC_ALLOC
  117          //  *page_cnt = 2;
@@ -190,7 +190,7 @@ line level    source
  175          //  static uint8_t buf[64];
  176          //  *page_cnt = 1;
  177          //  return buf;
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 4   
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 4   
 
  178          //  #endif
  179          //}
@@ -254,7 +254,7 @@ line level    source
  237          //  #ifdef U8G2_USE_DYNAMIC_ALLOC
  238          //  *page_cnt = 1;
  239          //  return 0;
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 5   
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 5   
 
  240          //  #else
  241          //  static uint8_t buf[96];
@@ -318,7 +318,7 @@ line level    source
  299          //  #endif
  300          //}
  301          //uint8_t *u8g2_m_16_16_1(uint8_t *page_cnt)
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 6   
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 6   
 
  302          //{
  303          //  #ifdef U8G2_USE_DYNAMIC_ALLOC
@@ -382,7 +382,7 @@ line level    source
  361          //  #else
  362          //  static uint8_t buf[2560];
  363          //  *page_cnt = 20;
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 7   
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 7   
 
  364          //  return buf;
  365          //  #endif
@@ -446,7 +446,7 @@ line level    source
  423          //{
  424          //  #ifdef U8G2_USE_DYNAMIC_ALLOC
  425          //  *page_cnt = 8;
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 8   
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 8   
 
  426          //  return 0;
  427          //  #else
@@ -510,7 +510,7 @@ line level    source
  485          //  return buf;
  486          //  #endif
  487          //}
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 9   
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 9   
 
  488          //uint8_t *u8g2_m_8_6_f(uint8_t *page_cnt)
  489          //{
@@ -574,7 +574,7 @@ line level    source
  547          //  return 0;
  548          //  #else
  549          //  static uint8_t buf[192];
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 10  
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 10  
 
  550          //  *page_cnt = 2;
  551          //  return buf;
@@ -638,7 +638,7 @@ line level    source
  609          //uint8_t *u8g2_m_16_12_2(uint8_t *page_cnt)
  610          //{
  611          //  #ifdef U8G2_USE_DYNAMIC_ALLOC
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 11  
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 11  
 
  612          //  *page_cnt = 2;
  613          //  return 0;
@@ -702,7 +702,7 @@ line level    source
  671          //  *page_cnt = 1;
  672          //  return buf;
  673          //  #endif
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 12  
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 12  
 
  674          //}
  675          //uint8_t *u8g2_m_12_8_2(uint8_t *page_cnt)
@@ -766,7 +766,7 @@ line level    source
  733          //  *page_cnt = 1;
  734          //  return 0;
  735          //  #else
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 13  
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 13  
 
  736          //  static uint8_t buf[144];
  737          //  *page_cnt = 1;
@@ -830,7 +830,7 @@ line level    source
  795          //}
  796          //uint8_t *u8g2_m_24_4_1(uint8_t *page_cnt)
  797          //{
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 14  
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 14  
 
  798          //  #ifdef U8G2_USE_DYNAMIC_ALLOC
  799          //  *page_cnt = 1;
@@ -894,7 +894,7 @@ line level    source
  857          //  static uint8_t buf[12000];
  858          //  *page_cnt = 30;
  859          //  return buf;
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 15  
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 15  
 
  860          //  #endif
  861          //}
@@ -958,7 +958,7 @@ line level    source
  919          //  #ifdef U8G2_USE_DYNAMIC_ALLOC
  920          //  *page_cnt = 6;
  921          //  return 0;
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 16  
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 16  
 
  922          //  #else
  923          //  static uint8_t buf[528];
@@ -1022,7 +1022,7 @@ line level    source
  981          //  #endif
  982          //}
  983          //uint8_t *u8g2_m_24_8_f(uint8_t *page_cnt)
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 17  
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 17  
 
  984          //{
  985          //  #ifdef U8G2_USE_DYNAMIC_ALLOC
@@ -1086,7 +1086,7 @@ line level    source
 1043          //  #else
 1044          //  static uint8_t buf[480];
 1045          //  *page_cnt = 2;
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 18  
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 18  
 
 1046          //  return buf;
 1047          //  #endif
@@ -1150,7 +1150,7 @@ line level    source
 1105          //{
 1106          //  #ifdef U8G2_USE_DYNAMIC_ALLOC
 1107          //  *page_cnt = 2;
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 19  
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 19  
 
 1108          //  return 0;
 1109          //  #else
@@ -1214,7 +1214,7 @@ line level    source
 1167          //  return buf;
 1168          //  #endif
 1169          //}
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 20  
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 20  
 
 1170          //uint8_t *u8g2_m_24_12_2(uint8_t *page_cnt)
 1171          //{
@@ -1278,7 +1278,7 @@ line level    source
 1229          //  return 0;
 1230          //  #else
 1231          //  static uint8_t buf[240];
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 21  
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 21  
 
 1232          //  *page_cnt = 1;
 1233          //  return buf;
@@ -1342,7 +1342,7 @@ line level    source
 1291          //uint8_t *u8g2_m_20_8_1(uint8_t *page_cnt)
 1292          //{
 1293          //  #ifdef U8G2_USE_DYNAMIC_ALLOC
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 22  
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 22  
 
 1294          //  *page_cnt = 1;
 1295          //  return 0;
@@ -1406,7 +1406,7 @@ line level    source
 1353          //  *page_cnt = 4;
 1354          //  return buf;
 1355          //  #endif
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 23  
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 23  
 
 1356          //}
 1357          //uint8_t *u8g2_m_17_8_1(uint8_t *page_cnt)
@@ -1470,7 +1470,7 @@ line level    source
 1415          //  *page_cnt = 9;
 1416          //  return 0;
 1417          //  #else
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 24  
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 24  
 
 1418          //  static uint8_t buf[1224];
 1419          //  *page_cnt = 9;
@@ -1534,7 +1534,7 @@ line level    source
 1477          //}
 1478          //uint8_t *u8g2_m_48_20_f(uint8_t *page_cnt)
 1479          //{
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 25  
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 25  
 
 1480          //  #ifdef U8G2_USE_DYNAMIC_ALLOC
 1481          //  *page_cnt = 20;
@@ -1598,7 +1598,7 @@ line level    source
 1539          //  static uint8_t buf[320];
 1540          //  *page_cnt = 2;
 1541          //  return buf;
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 26  
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 26  
 
 1542          //  #endif
 1543          //}
@@ -1662,7 +1662,7 @@ line level    source
 1601          //  #ifdef U8G2_USE_DYNAMIC_ALLOC
 1602          //  *page_cnt = 2;
 1603          //  return 0;
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 27  
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 27  
 
 1604          //  #else
 1605          //  static uint8_t buf[352];
@@ -1726,7 +1726,7 @@ line level    source
 1663          //  #endif
 1664          //}
 1665          //uint8_t *u8g2_m_19_4_2(uint8_t *page_cnt)
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 28  
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 28  
 
 1666          //{
 1667          //  #ifdef U8G2_USE_DYNAMIC_ALLOC
@@ -1790,7 +1790,7 @@ line level    source
 1725          //  #else
 1726          //  static uint8_t buf[208];
 1727          //  *page_cnt = 1;
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 29  
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 29  
 
 1728          //  return buf;
 1729          //  #endif
@@ -1854,7 +1854,7 @@ line level    source
 1787          //{
 1788          //  #ifdef U8G2_USE_DYNAMIC_ALLOC
 1789          //  *page_cnt = 1;
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 30  
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 30  
 
 1790          //  return 0;
 1791          //  #else
@@ -1918,7 +1918,7 @@ line level    source
 1849          //  return buf;
 1850          //  #endif
 1851          //}
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 31  
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 31  
 
 1852          //uint8_t *u8g2_m_40_25_1(uint8_t *page_cnt)
 1853          //{
@@ -1982,7 +1982,7 @@ line level    source
 1911          //  return 0;
 1912          //  #else
 1913          //  static uint8_t buf[64];
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 32  
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 32  
 
 1914          //  *page_cnt = 1;
 1915          //  return buf;
@@ -2046,7 +2046,7 @@ line level    source
 1973          //uint8_t *u8g2_m_1_1_f(uint8_t *page_cnt)
 1974          //{
 1975          //  #ifdef U8G2_USE_DYNAMIC_ALLOC
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 33  
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 33  
 
 1976          //  *page_cnt = 1;
 1977          //  return 0;
@@ -2110,7 +2110,7 @@ line level    source
 2035          //  *page_cnt = 2;
 2036          //  return buf;
 2037          //  #endif
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 34  
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 34  
 
 2038          //}
 2039          //uint8_t *u8g2_m_32_7_f(uint8_t *page_cnt)
@@ -2174,7 +2174,7 @@ line level    source
 2097          //  *page_cnt = 2;
 2098          //  return 0;
 2099          //  #else
-C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 17:50:29 PAGE 35  
+C51 COMPILER V9.60.0.0   U8G2_D_MEMORY                                                     10/18/2024 18:20:24 PAGE 35  
 
 2100          //  static uint8_t buf[768];
 2101          //  *page_cnt = 2;

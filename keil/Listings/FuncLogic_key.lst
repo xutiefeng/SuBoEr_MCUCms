@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   FUNCLOGIC_KEY                                                     10/18/2024 17:50:07 PAGE 1   
+C51 COMPILER V9.60.0.0   FUNCLOGIC_KEY                                                     10/18/2024 18:24:21 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE FUNCLOGIC_KEY
@@ -62,7 +62,7 @@ line level    source
   47   2          }   
   48   1      }
   49          /*********************************************************************************************************
-C51 COMPILER V9.60.0.0   FUNCLOGIC_KEY                                                     10/18/2024 17:50:07 PAGE 2   
+C51 COMPILER V9.60.0.0   FUNCLOGIC_KEY                                                     10/18/2024 18:24:21 PAGE 2   
 
              -********************************* 
   50          *函数名称 SetSysRunTime
@@ -126,7 +126,7 @@ line level    source
  104          * 注意事项: 无
  105          **********************************************************************************************************
              -********************************/
-C51 COMPILER V9.60.0.0   FUNCLOGIC_KEY                                                     10/18/2024 17:50:07 PAGE 3   
+C51 COMPILER V9.60.0.0   FUNCLOGIC_KEY                                                     10/18/2024 18:24:21 PAGE 3   
 
  106          void KeyLongPress(u8 v)
  107          {
@@ -190,7 +190,7 @@ MODULE INFORMATION:   STATIC OVERLAYABLE
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----
    DATA SIZE        =   ----    ----
-C51 COMPILER V9.60.0.0   FUNCLOGIC_KEY                                                     10/18/2024 17:50:07 PAGE 4   
+C51 COMPILER V9.60.0.0   FUNCLOGIC_KEY                                                     10/18/2024 18:24:21 PAGE 4   
 
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----    ----

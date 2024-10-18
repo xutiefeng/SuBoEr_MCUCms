@@ -1,11 +1,11 @@
-C51 COMPILER V9.60.7.0   U8X8_D_SSD1309                                                    10/16/2024 16:37:12 PAGE 1   
+C51 COMPILER V9.60.0.0   U8X8_D_SSD1309                                                    10/18/2024 17:39:20 PAGE 1   
 
 
-C51 COMPILER V9.60.7.0, COMPILATION OF MODULE U8X8_D_SSD1309
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE U8X8_D_SSD1309
 OBJECT MODULE PLACED IN .\Objects\u8x8_d_ssd1309.obj
-COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE ..\u8g2\u8x8_d_ssd1309.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\Dev
-                    -ice\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\u8x8_d_ssd1309.lst) TABS(2)
-                    - OBJECT(.\Objects\u8x8_d_ssd1309.obj)
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE ..\u8g2\u8x8_d_ssd1309.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\
+                    -Device\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\u8x8_d_ssd1309.lst) TABS
+                    -(2) OBJECT(.\Objects\u8x8_d_ssd1309.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   51            U8X8_C(0x0ae),                    /* display off */
   52            U8X8_END_TRANSFER(),              /* disable chip */
   53            U8X8_END()                  /* end of sequence */
-C51 COMPILER V9.60.7.0   U8X8_D_SSD1309                                                    10/16/2024 16:37:12 PAGE 2   
+C51 COMPILER V9.60.0.0   U8X8_D_SSD1309                                                    10/18/2024 17:39:20 PAGE 2   
 
   54          };
   55          
@@ -126,7 +126,7 @@ line level    source
  113   2        u8x8_cad_SendSequence(u8x8, u8x8_d_ssd1309_powersave1_seq);
  114   2            break;
  115   2      #ifdef U8X8_WITH_SET_CONTRAST
-C51 COMPILER V9.60.7.0   U8X8_D_SSD1309                                                    10/16/2024 16:37:12 PAGE 3   
+C51 COMPILER V9.60.0.0   U8X8_D_SSD1309                                                    10/18/2024 17:39:20 PAGE 3   
 
  116   2          case U8X8_MSG_DISPLAY_SET_CONTRAST:
  117   2            u8x8_cad_StartTransfer(u8x8);
@@ -190,7 +190,7 @@ line level    source
  173            // U8X8_C(0x0a0),       /* segment remap a0/a1*/
  174            // U8X8_C(0x0c0),       /* c0: scan dir normal, c8: reverse */
  175            
-C51 COMPILER V9.60.7.0   U8X8_D_SSD1309                                                    10/16/2024 16:37:12 PAGE 4   
+C51 COMPILER V9.60.0.0   U8X8_D_SSD1309                                                    10/18/2024 17:39:20 PAGE 4   
 
  176            U8X8_CA(0x0da, 0x012),    /* com pin HW config, sequential com pin config (bit 4), disable left/right rema
              -p (bit 5) */
@@ -254,7 +254,7 @@ line level    source
  234          {
  235            /* chip_enable_level = */ 0,
  236            /* chip_disable_level = */ 1,
-C51 COMPILER V9.60.7.0   U8X8_D_SSD1309                                                    10/16/2024 16:37:12 PAGE 5   
+C51 COMPILER V9.60.0.0   U8X8_D_SSD1309                                                    10/18/2024 17:39:20 PAGE 5   
 
  237            
  238            /* post_chip_enable_wait_ns = */ 20,
@@ -318,7 +318,7 @@ line level    source
  294            Contributed here: https://github.com/olikraus/u8g2/pull/1497/files
  295            Manually added here, device renamed from SSD1309 to SSD1306
  296          */
-C51 COMPILER V9.60.7.0   U8X8_D_SSD1309                                                    10/16/2024 16:37:12 PAGE 6   
+C51 COMPILER V9.60.0.0   U8X8_D_SSD1309                                                    10/18/2024 17:39:20 PAGE 6   
 
  297          
  298          static const uint8_t u8x8_d_ssd1309_102x64_ea_oleds102_init_seq[] = {
@@ -382,7 +382,7 @@ line level    source
  354   2            {
  355   3        u8x8_cad_SendSequence(u8x8, u8x8_d_ssd1309_128x64_flip0_seq);
  356   3        u8x8->x_offset = u8x8->display_info->default_x_offset;
-C51 COMPILER V9.60.7.0   U8X8_D_SSD1309                                                    10/16/2024 16:37:12 PAGE 7   
+C51 COMPILER V9.60.0.0   U8X8_D_SSD1309                                                    10/18/2024 17:39:20 PAGE 7   
 
  357   3            }
  358   2            else

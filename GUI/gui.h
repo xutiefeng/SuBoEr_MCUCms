@@ -1,7 +1,7 @@
 #ifndef __GUI_H
 #define __GUI_H
 
-#include "types.h"
+#include "../bsp/includeall.h"
 
 #define LCD_WIDTH	 	128
 #define LCD_HEIGHT 		64

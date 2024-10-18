@@ -1,11 +1,11 @@
-C51 COMPILER V9.60.7.0   U8G2_BUTTON                                                       10/16/2024 15:44:13 PAGE 1   
+C51 COMPILER V9.60.0.0   U8G2_BUTTON                                                       10/18/2024 17:38:59 PAGE 1   
 
 
-C51 COMPILER V9.60.7.0, COMPILATION OF MODULE U8G2_BUTTON
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE U8G2_BUTTON
 OBJECT MODULE PLACED IN .\Objects\u8g2_button.obj
-COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE ..\u8g2\u8g2_button.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\Device
-                    -\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\u8g2_button.lst) TABS(2) OBJEC
-                    -T(.\Objects\u8g2_button.obj)
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE ..\u8g2\u8g2_button.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\Dev
+                    -ice\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\u8g2_button.lst) TABS(2) OB
+                    -JECT(.\Objects\u8g2_button.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   50            Note 3: Some fonts may add an extra gap on the right side. This is a font problem and can not be avoided
              - (for example inb16 has this problem).
   51            
-C51 COMPILER V9.60.7.0   U8G2_BUTTON                                                       10/16/2024 15:44:13 PAGE 2   
+C51 COMPILER V9.60.0.0   U8G2_BUTTON                                                       10/18/2024 17:38:59 PAGE 2   
 
   52          
   53            The height of the button is defined by the current font and
@@ -126,7 +126,7 @@ line level    source
  110   1        
  111   1        uint8_t color_backup = u8g2->draw_color;
  112   1        
-C51 COMPILER V9.60.7.0   U8G2_BUTTON                                                       10/16/2024 15:44:13 PAGE 3   
+C51 COMPILER V9.60.0.0   U8G2_BUTTON                                                       10/18/2024 17:38:59 PAGE 3   
 
  113   1        
  114   1        if ( flags & U8G2_BTN_XFRAME )
@@ -190,7 +190,7 @@ line level    source
              - u8g2_uint_t padding_h, u8g2_uint_t padding_v, const char *text)
  172          {
  173   1        u8g2_uint_t w = u8g2_GetUTF8Width(u8g2, text);
-C51 COMPILER V9.60.7.0   U8G2_BUTTON                                                       10/16/2024 15:44:13 PAGE 4   
+C51 COMPILER V9.60.0.0   U8G2_BUTTON                                                       10/18/2024 17:38:59 PAGE 4   
 
  174   1        
  175   1        u8g2_uint_t text_x_offset = 0; 
@@ -254,7 +254,7 @@ line level    source
               
               void u8g2_DrawRButtonUTF8(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t flags, u8g2_uint_t paddi
              -ng_h_or_width, u8g2_uint_t padding_v, u8g2_uint_t r, const char *text)
-C51 COMPILER V9.60.7.0   U8G2_BUTTON                                                       10/16/2024 15:44:13 PAGE 5   
+C51 COMPILER V9.60.0.0   U8G2_BUTTON                                                       10/18/2024 17:38:59 PAGE 5   
 
               {
                 u8g2_uint_t w = u8g2_GetUTF8Width(u8g2, text);
@@ -318,7 +318,7 @@ line level    source
                   if ( border_width == 0 )
                     break;
                   u8g2_DrawRFrame(u8g2, xx, yy, ww, hh, r);
-C51 COMPILER V9.60.7.0   U8G2_BUTTON                                                       10/16/2024 15:44:13 PAGE 6   
+C51 COMPILER V9.60.0.0   U8G2_BUTTON                                                       10/18/2024 17:38:59 PAGE 6   
 
                   if ( (flags & U8G2_BTN_BW_MASK) > 1 )
                     u8g2_DrawRFrame(u8g2, xx, yy, ww, hh, r+1);

@@ -1,11 +1,11 @@
-C51 COMPILER V9.60.7.0   U8X8_MESSAGE                                                      10/16/2024 15:44:21 PAGE 1   
+C51 COMPILER V9.60.0.0   U8X8_MESSAGE                                                      10/18/2024 17:39:25 PAGE 1   
 
 
-C51 COMPILER V9.60.7.0, COMPILATION OF MODULE U8X8_MESSAGE
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE U8X8_MESSAGE
 OBJECT MODULE PLACED IN .\Objects\u8x8_message.obj
-COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE ..\u8g2\u8x8_message.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\Devic
-                    -e\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\u8x8_message.lst) TABS(2) OBJ
-                    -ECT(.\Objects\u8x8_message.obj)
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE ..\u8g2\u8x8_message.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\De
+                    -vice\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\u8x8_message.lst) TABS(2) 
+                    -OBJECT(.\Objects\u8x8_message.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   51   2          total += u8x8_GetUTF8Len(u8x8, u8x8_GetStringLineStart(i, s));
   52   2        }
   53   1        total += (cnt-1); /* had one space between the buttons */
-C51 COMPILER V9.60.7.0   U8X8_MESSAGE                                                      10/16/2024 15:44:21 PAGE 2   
+C51 COMPILER V9.60.0.0   U8X8_MESSAGE                                                      10/18/2024 17:39:25 PAGE 2   
 
   54   1        
   55   1        /* calculate the left offset */
@@ -126,7 +126,7 @@ line level    source
  111   2          y /= 2;
  112   2        }
  113   1      
-C51 COMPILER V9.60.7.0   U8X8_MESSAGE                                                      10/16/2024 15:44:21 PAGE 3   
+C51 COMPILER V9.60.0.0   U8X8_MESSAGE                                                      10/18/2024 17:39:25 PAGE 3   
 
  114   1        /* draw message box */
  115   1        
@@ -170,7 +170,7 @@ line level    source
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    580    ----
+   CODE SIZE        =    583    ----
    CONSTANT SIZE    =      2    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----

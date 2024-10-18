@@ -1,11 +1,11 @@
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 1   
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 1   
 
 
-C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MUI_U8G2
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MUI_U8G2
 OBJECT MODULE PLACED IN .\Objects\mui_u8g2.obj
-COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE ..\u8g2\mui_u8g2.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\Device\CM
-                    -S8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\mui_u8g2.lst) TABS(2) OBJECT(.\Ob
-                    -jects\mui_u8g2.obj)
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE ..\u8g2\mui_u8g2.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\Device
+                    -\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\mui_u8g2.lst) TABS(2) OBJECT(.
+                    -\Objects\mui_u8g2.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   50                u8_opt_line       edit value options in the same line
   51                u8_opt_parent       edit value options parent
   52                u8_opt_child       edit value options child
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 2   
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 2   
 
   53              
   54              
@@ -126,7 +126,7 @@ line level    source
  106              2                mui_NextField()      Goto next field, increment value (mud)
  107              3                mui_PrevField()      Goto prev field, decrement value (mud)
  108              
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 3   
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 3   
 
  109            4 Buttons
  110              Prefer "mse"
@@ -190,7 +190,7 @@ line level    source
  153          {
  154            //u8g2_t *u8g2 = mui_get_U8g2(ui);
  155            //ui->dflags                          MUIF_DFLAG_IS_CURSOR_FOCUS       MUIF_DFLAG_IS_TOUCH_FOCUS
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 4   
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 4   
 
  156            //muif_get_cflags(ui->uif)       MUIF_CFLAG_IS_CURSOR_SELECTABLE
  157            //muif_get_data(ui->uif)
@@ -254,7 +254,7 @@ line level    source
  213          {
  214   1        if ( u8g2_GetDisplayWidth(mui_get_U8g2(ui)) >= 255 )
  215   1            return ui->x / 2;
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 5   
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 5   
 
  216   1        return ui->x;
  217   1      }
@@ -318,7 +318,7 @@ line level    source
  272          void mui_u8g2_draw_button_fi(mui_t *ui, u8g2_uint_t width, u8g2_uint_t padding_h, const char *text)
  273          {
  274   1        mui_u8g2_draw_button_utf(ui, mui_u8g2_get_fi_flags(ui), width, padding_h , MUI_U8G2_V_PADDING, text);
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 6   
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 6   
 
  275   1      }
  276          
@@ -382,7 +382,7 @@ line level    source
  334   2              return 255;
  335   2            break;
  336   2          case MUIF_MSG_EVENT_NEXT:
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 7   
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 7   
 
  337   2            if ( arg+1 == ui->form_scroll_visible )
  338   2            {
@@ -446,7 +446,7 @@ line level    source
  394   1      /* field functions */
  395   1      
  396   1      /*
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 8   
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 8   
 
  397   1        xy: yes, arg: no, text: yes
  398   1      */
@@ -510,7 +510,7 @@ line level    source
  456   1      {
  457   2        switch(msg)
  458   2        {
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 9   
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 9   
 
  459   3          case MUIF_MSG_DRAW:
  460   3            mui_u8g2_draw_button_utf(ui, U8G2_BTN_HCENTER |mui_u8g2_get_fi_flags(ui), 0, 1, MUI_U8G2_V_PADDING, 
@@ -574,7 +574,7 @@ line level    source
  516   2        switch(msg)
  517   2        {
  518   3          case MUIF_MSG_DRAW:
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 10  
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 10  
 
  519   3            mui_u8g2_draw_button_utf(ui, U8G2_BTN_HCENTER | mui_u8g2_get_fi_flags(ui), u8g2_GetDisplayWidth(u8g2
              -)/2 - 10, 0, MUI_U8G2_V_PADDING, ui->text);
@@ -638,7 +638,7 @@ line level    source
  576   1          A button with size equal to button text plus one pixel padding
  577   1          The button has a one pixel frame around the text.
  578   1          If selected, then the menu system will be closed.
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 11  
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 11  
 
  579   1          The arg value will be stored at the specified data location (if not NULL).
  580   1          The arg value can be used as an exit value of the button.
@@ -702,7 +702,7 @@ line level    source
  637   3          case MUIF_MSG_DRAW:
  638   3            mui_u8g2_draw_button_pi(ui, u8g2_GetDisplayWidth(u8g2)-mui_get_x(ui)*2, mui_get_x(ui) , ui->text);
  639   3            //mui_u8g2_draw_button_utf(ui, mui_u8g2_get_pi_flags(ui), u8g2_GetDisplayWidth(u8g2)-mui_get_x(ui)*2
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 12  
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 12  
 
              -, mui_get_x(ui) , MUI_U8G2_V_PADDING, ui->text);
  640   3            break;
@@ -766,7 +766,7 @@ line level    source
  697   1      {
  698   1        u8g2_t *u8g2 = mui_get_U8g2(ui);
  699   1        mui_u8g2_u8_min_max_t *vmm= (mui_u8g2_u8_min_max_t *)muif_get_data(ui->uif);
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 13  
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 13  
 
  700   1        char buf[4] = "999";
  701   1        char *s = buf;
@@ -830,7 +830,7 @@ line level    source
  758   1        return 0;
  759   1      }
  760          
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 14  
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 14  
 
  761          uint8_t mui_u8g2_u8_min_max_wm_mud_pi(mui_t *ui, uint8_t msg)
  762          {
@@ -894,7 +894,7 @@ line level    source
  820   1        char buf[4] = "999";
  821   1        char *s = buf;
  822   1        uint8_t *value = mui_u8g2_u8mm_get_valptr(vmm);
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 15  
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 15  
 
  823   1        uint8_t min = mui_u8g2_u8mm_get_min(vmm);
  824   1        uint8_t max = mui_u8g2_u8mm_get_max(vmm);
@@ -958,7 +958,7 @@ line level    source
  881          uint8_t mui_u8g2_u8_min_max_wm_mud_pf(mui_t *ui, uint8_t msg)
  882          {
  883   1        mui_u8g2_u8_min_max_t *vmm= (mui_u8g2_u8_min_max_t *)muif_get_data(ui->uif);
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 16  
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 16  
 
  884   1        uint8_t *value = mui_u8g2_u8mm_get_valptr(vmm);
  885   1        uint8_t min = mui_u8g2_u8mm_get_min(vmm);
@@ -1022,7 +1022,7 @@ line level    source
  943   1        uint8_t *value = mui_u8g2_u8mms_get_valptr(vmms);
  944   1        uint8_t min = mui_u8g2_u8mms_get_min(vmms);
  945   1        uint8_t max = mui_u8g2_u8mms_get_max(vmms);
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 17  
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 17  
 
  946   1        uint8_t scale = 0;
  947   1        //uint8_t step = mui_u8g2_u8mms_get_step(vmms);
@@ -1086,7 +1086,7 @@ line level    source
 1003   1        {
 1004   2          case MUIF_MSG_DRAW:
 1005   2            mui_u8g2_u8_bar_draw_wm(ui, mui_u8g2_get_pi_flags(ui));
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 18  
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 18  
 
 1006   2            break;
 1007   2          case MUIF_MSG_FORM_START:
@@ -1150,7 +1150,7 @@ line level    source
 1065   3              (*value)+=step;
 1066   3              if ( *value > max )
 1067   3                *value = min;
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 19  
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 19  
 
 1068   3              return 1;
 1069   3            }
@@ -1214,7 +1214,7 @@ line level    source
 1127   1        uint8_t step = mui_u8g2_u8mms_get_step(vmms);
 1128   1        switch(msg)
 1129   1        {
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 20  
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 20  
 
 1130   2          case MUIF_MSG_DRAW:
 1131   2            mui_u8g2_u8_bar_draw_wm(ui, mui_u8g2_get_pf_flags(ui));
@@ -1278,7 +1278,7 @@ line level    source
 1189          
 1190          
 1191          
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 21  
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 21  
 
 1192          uint8_t mui_u8g2_u8_char_wm_mud_pi(mui_t *ui, uint8_t msg)
 1193          {
@@ -1342,7 +1342,7 @@ line level    source
 1249          
 1250          
 1251          
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 22  
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 22  
 
 1252          
 1253          
@@ -1406,7 +1406,7 @@ line level    source
 1310                  (*value)--;
 1311                else
 1312                  (*value) = mui_fds_get_token_cnt(ui)-1;
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 23  
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 23  
 
 1313                break;
 1314              case MUIF_MSG_CURSOR_LEAVE:
@@ -1470,7 +1470,7 @@ line level    source
 1372            {
 1373              case MUIF_MSG_DRAW:
 1374                if ( mui_fds_get_nth_token(ui, *value) == 0 )
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 24  
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 24  
 
 1375                {
 1376                  *value = 0;
@@ -1534,7 +1534,7 @@ line level    source
 1434                mui_u8g2_draw_button_pf(ui, ui->arg, 1, ui->text);
 1435                
 1436                break;
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 25  
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 25  
 
 1437              case MUIF_MSG_FORM_START:
 1438                break;
@@ -1598,7 +1598,7 @@ line level    source
 1496            Field definition string (fds):
 1497              xy: Left position of the text (required)
 1498              arg: not used
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 26  
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 26  
 
 1499              text: Optional: Text will be printed after the checkbox with a small gap
 1500              
@@ -1662,7 +1662,7 @@ line level    source
 1558          /*
 1559            radio button style, arg is assigned as value
 1560          */
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 27  
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 27  
 
 1561          uint8_t mui_u8g2_u8_radio_wm_pi(mui_t *ui, uint8_t msg)
 1562          {
@@ -1726,7 +1726,7 @@ line level    source
 1620              case MUIF_MSG_DRAW:
 1621                if ( mui_fds_get_nth_token(ui, *value) == 0 )
 1622                {
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 28  
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 28  
 
 1623                  *value = 0;
 1624                  mui_fds_get_nth_token(ui, *value);
@@ -1790,7 +1790,7 @@ line level    source
 1679                if ( value != NULL )
 1680                  *value = ui->form_scroll_top + arg;
 1681                mui_RestoreForm(ui);
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 29  
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 29  
 
 1682                break;
 1683              case MUIF_MSG_CURSOR_LEAVE:
@@ -1854,7 +1854,7 @@ line level    source
 1737                return mui_u8g2_u8_opt_child_mse_common(ui, msg);
 1738            }
 1739            return 0;
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 30  
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 30  
 
 1740          }
 1741          
@@ -1918,7 +1918,7 @@ line level    source
 1794            
 1795            switch(msg)
 1796            {
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 31  
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 31  
 
 1797              case MUIF_MSG_DRAW:
 1798                {
@@ -1982,7 +1982,7 @@ line level    source
 1851                break;
 1852              case MUIF_MSG_CURSOR_ENTER:
 1853                break;
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 32  
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 32  
 
 1854              case MUIF_MSG_CURSOR_SELECT:
 1855                break;
@@ -2046,7 +2046,7 @@ line level    source
 1909                break;
 1910              default:
 1911                return mui_u8g2_u8_opt_child_mse_common(ui, msg);
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 33  
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 33  
 
 1912            }
 1913            return 0;
@@ -2110,7 +2110,7 @@ line level    source
 1970            mui_u8g2_get_list_count_cb count_cb = mui_u8g2_list_get_count_cb(list);
 1971            
 1972            switch(msg)
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 34  
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 34  
 
 1973            {
 1974              case MUIF_MSG_DRAW:
@@ -2174,7 +2174,7 @@ line level    source
 2031            switch(msg)
 2032            {
 2033              case MUIF_MSG_DRAW:
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 35  
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 35  
 
 2034                mui_u8g2_draw_button_pi(ui, 0, 1, element_cb(data, *selection));
 2035                //mui_u8g2_draw_button_utf(ui, mui_u8g2_get_pi_flags(ui), ui->arg, 1, MUI_U8G2_V_PADDING, element_cb
@@ -2238,7 +2238,7 @@ line level    source
 2091                mui_RestoreForm(ui);
 2092                break;
 2093              case MUIF_MSG_CURSOR_LEAVE:
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 36  
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 36  
 
 2094                break;
 2095              case MUIF_MSG_TOUCH_DOWN:
@@ -2302,7 +2302,7 @@ line level    source
 2150            mui_u8g2_list_t *list = (mui_u8g2_list_t *)muif_get_data(ui->uif);
 2151            uint16_t *selection =  mui_u8g2_list_get_selection_ptr(list);
 2152            void *data = mui_u8g2_list_get_data_ptr(list);
-C51 COMPILER V9.60.7.0   MUI_U8G2                                                          10/16/2024 16:37:10 PAGE 37  
+C51 COMPILER V9.60.0.0   MUI_U8G2                                                          10/18/2024 17:38:55 PAGE 37  
 
 2153            mui_u8g2_get_list_element_cb element_cb =  mui_u8g2_list_get_element_cb(list);
 2154            //mui_u8g2_get_list_count_cb count_cb = mui_u8g2_list_get_count_cb(list);

@@ -1,11 +1,11 @@
-C51 COMPILER V9.60.7.0   U8X8_DEBOUNCE                                                     10/16/2024 15:44:20 PAGE 1   
+C51 COMPILER V9.60.0.0   U8X8_DEBOUNCE                                                     10/18/2024 17:39:21 PAGE 1   
 
 
-C51 COMPILER V9.60.7.0, COMPILATION OF MODULE U8X8_DEBOUNCE
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE U8X8_DEBOUNCE
 OBJECT MODULE PLACED IN .\Objects\u8x8_debounce.obj
-COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE ..\u8g2\u8x8_debounce.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\Devi
-                    -ce\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\u8x8_debounce.lst) TABS(2) O
-                    -BJECT(.\Objects\u8x8_debounce.obj)
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE ..\u8g2\u8x8_debounce.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\D
+                    -evice\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\u8x8_debounce.lst) TABS(2
+                    -) OBJECT(.\Objects\u8x8_debounce.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   51   2          u8x8->gpio_result = 1;
   52   2          u8x8_gpio_call(u8x8, U8X8_MSG_GPIO(i+U8X8_PIN_OUTPUT_CNT), 0);
   53   2          pin_state |= u8x8->gpio_result & 1;
-C51 COMPILER V9.60.7.0   U8X8_DEBOUNCE                                                     10/16/2024 15:44:20 PAGE 2   
+C51 COMPILER V9.60.0.0   U8X8_DEBOUNCE                                                     10/18/2024 17:39:21 PAGE 2   
 
   54   2        }
   55   1        
@@ -126,7 +126,7 @@ line level    source
                   switch(c)
                   {
                       case 'n':
-C51 COMPILER V9.60.7.0   U8X8_DEBOUNCE                                                     10/16/2024 15:44:20 PAGE 3   
+C51 COMPILER V9.60.0.0   U8X8_DEBOUNCE                                                     10/18/2024 17:39:21 PAGE 3   
 
                           return  U8X8_MSG_GPIO_MENU_NEXT;
                       case 'p':
@@ -190,7 +190,7 @@ line level    source
  175   2            if ( u8x8->debounce_last_pin_state != pin_state )
  176   2            {
  177   3        u8x8->debounce_state = 0x00;  /* back to state A */
-C51 COMPILER V9.60.7.0   U8X8_DEBOUNCE                                                     10/16/2024 15:44:20 PAGE 4   
+C51 COMPILER V9.60.0.0   U8X8_DEBOUNCE                                                     10/18/2024 17:39:21 PAGE 4   
 
  178   3            }
  179   2            else
@@ -224,7 +224,7 @@ line level    source
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    275    ----
+   CODE SIZE        =    285    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----

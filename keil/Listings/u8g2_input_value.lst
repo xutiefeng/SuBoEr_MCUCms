@@ -1,11 +1,11 @@
-C51 COMPILER V9.60.7.0   U8G2_INPUT_VALUE                                                  10/16/2024 15:44:15 PAGE 1   
+C51 COMPILER V9.60.0.0   U8G2_INPUT_VALUE                                                  10/18/2024 17:39:04 PAGE 1   
 
 
-C51 COMPILER V9.60.7.0, COMPILATION OF MODULE U8G2_INPUT_VALUE
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE U8G2_INPUT_VALUE
 OBJECT MODULE PLACED IN .\Objects\u8g2_input_value.obj
-COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE ..\u8g2\u8g2_input_value.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\D
-                    -evice\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\u8g2_input_value.lst) TAB
-                    -S(2) OBJECT(.\Objects\u8g2_input_value.obj)
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE ..\u8g2\u8g2_input_value.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libar
+                    -y\Device\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\u8g2_input_value.lst) 
+                    -TABS(2) OBJECT(.\Objects\u8g2_input_value.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   50   1        u8g2_uint_t  pixel_width;
   51   1        u8g2_uint_t  x, xx;
   52   1        
-C51 COMPILER V9.60.7.0   U8G2_INPUT_VALUE                                                  10/16/2024 15:44:15 PAGE 2   
+C51 COMPILER V9.60.0.0   U8G2_INPUT_VALUE                                                  10/18/2024 17:39:04 PAGE 2   
 
   53   1        uint8_t local_value = *value;
   54   1        //uint8_t r; /* not used ??? */
@@ -126,7 +126,7 @@ line level    source
  112   2          
  113   2      #ifdef U8G2_REF_MAN_PIC
                     return 0;
-C51 COMPILER V9.60.7.0   U8G2_INPUT_VALUE                                                  10/16/2024 15:44:15 PAGE 3   
+C51 COMPILER V9.60.0.0   U8G2_INPUT_VALUE                                                  10/18/2024 17:39:04 PAGE 3   
 
               #endif
  116   2          
@@ -167,7 +167,7 @@ line level    source
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    464    ----
+   CODE SIZE        =    471    ----
    CONSTANT SIZE    =      2    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----

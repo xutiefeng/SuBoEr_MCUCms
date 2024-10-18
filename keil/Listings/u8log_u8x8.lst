@@ -1,11 +1,11 @@
-C51 COMPILER V9.60.7.0   U8LOG_U8X8                                                        10/16/2024 15:44:18 PAGE 1   
+C51 COMPILER V9.60.0.0   U8LOG_U8X8                                                        10/18/2024 17:39:15 PAGE 1   
 
 
-C51 COMPILER V9.60.7.0, COMPILATION OF MODULE U8LOG_U8X8
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE U8LOG_U8X8
 OBJECT MODULE PLACED IN .\Objects\u8log_u8x8.obj
-COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE ..\u8g2\u8log_u8x8.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\Device\
-                    -CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\u8log_u8x8.lst) TABS(2) OBJECT(
-                    -.\Objects\u8log_u8x8.obj)
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE ..\u8g2\u8log_u8x8.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\Devi
+                    -ce\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\u8log_u8x8.lst) TABS(2) OBJE
+                    -CT(.\Objects\u8log_u8x8.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   50   1      }
   51          
   52          void u8x8_DrawLog(u8x8_t *u8x8, uint8_t x, uint8_t y, u8log_t *u8log)
-C51 COMPILER V9.60.7.0   U8LOG_U8X8                                                        10/16/2024 15:44:18 PAGE 2   
+C51 COMPILER V9.60.0.0   U8LOG_U8X8                                                        10/18/2024 17:39:15 PAGE 2   
 
   53          {
   54   1        uint8_t buf_y;

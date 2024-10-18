@@ -1,6 +1,6 @@
 #ifndef __wordbook_H_
 #define __wordbook_H_
-#include "types.h"
+#include "../bsp/includeall.h"
 
 extern const uint8_t ICO_9x6[][12];
 extern const uint8_t ICO_7x7[][7];

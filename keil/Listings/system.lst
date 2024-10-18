@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   SYSTEM                                                            10/17/2024 16:51:16 PAGE 1   
+C51 COMPILER V9.60.0.0   SYSTEM                                                            10/18/2024 17:50:21 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE SYSTEM
@@ -62,7 +62,7 @@ line level    source
   51          ****************************************************************************/
   52          
   53          /****************************************************************************/
-C51 COMPILER V9.60.0.0   SYSTEM                                                            10/17/2024 16:51:16 PAGE 2   
+C51 COMPILER V9.60.0.0   SYSTEM                                                            10/18/2024 17:50:21 PAGE 2   
 
   54          /*  Local function prototypes('static')
   55          ****************************************************************************/
@@ -126,7 +126,7 @@ line level    source
  113          *****************************************************************************/
  114          void SYS_EnableLVDInt(void)
  115          {
-C51 COMPILER V9.60.0.0   SYSTEM                                                            10/17/2024 16:51:16 PAGE 3   
+C51 COMPILER V9.60.0.0   SYSTEM                                                            10/18/2024 17:50:21 PAGE 3   
 
  116   1        LVDCON |= LVD_LVDCON_LVDINTE_Msk; 
  117   1      }
@@ -190,7 +190,7 @@ line level    source
  175   2          TA = 0xAA;
  176   2          TA = 0x55;
  177   2          WDCON |= WDT_WDCON_WDTRE_Msk;
-C51 COMPILER V9.60.0.0   SYSTEM                                                            10/17/2024 16:51:16 PAGE 4   
+C51 COMPILER V9.60.0.0   SYSTEM                                                            10/18/2024 17:50:21 PAGE 4   
 
  178   2        }
  179   1      }
@@ -254,7 +254,7 @@ line level    source
  237   2          TA = 0xAA;
  238   2          TA = 0x55;
  239   2          WDCON &= ~(WDT_WDCON_WDTRF_Msk);
-C51 COMPILER V9.60.0.0   SYSTEM                                                            10/17/2024 16:51:16 PAGE 5   
+C51 COMPILER V9.60.0.0   SYSTEM                                                            10/18/2024 17:50:21 PAGE 5   
 
  240   2      
  241   2        }
@@ -318,7 +318,7 @@ line level    source
  299           ** \return   0：复位不由上电复位引起    1：复位由上电复位引起
  300           ** \note
  301           *****************************************************************************/
-C51 COMPILER V9.60.0.0   SYSTEM                                                            10/17/2024 16:51:16 PAGE 6   
+C51 COMPILER V9.60.0.0   SYSTEM                                                            10/18/2024 17:50:21 PAGE 6   
 
  302          uint8_t SYS_GetPowerOnResetFlag(void)
  303          {
@@ -382,7 +382,7 @@ line level    source
  361   1        _nop_();
  362   1        _nop_();
  363   1        _nop_();  
-C51 COMPILER V9.60.0.0   SYSTEM                                                            10/17/2024 16:51:16 PAGE 7   
+C51 COMPILER V9.60.0.0   SYSTEM                                                            10/18/2024 17:50:21 PAGE 7   
 
  364   1      }
  365          /*****************************************************************************
@@ -446,7 +446,7 @@ line level    source
  423          {
  424   1        uint8_t Temp=0;
  425   1        
-C51 COMPILER V9.60.0.0   SYSTEM                                                            10/17/2024 16:51:16 PAGE 8   
+C51 COMPILER V9.60.0.0   SYSTEM                                                            10/18/2024 17:50:21 PAGE 8   
 
  426   1        Temp = WUTCRH;
  427   1        Temp &= ~(0x3<<4);

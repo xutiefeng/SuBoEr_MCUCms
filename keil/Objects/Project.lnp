@@ -22,7 +22,12 @@
 ".\Objects\uart.obj",
 ".\Objects\wdt.obj",
 ".\Objects\isr.obj",
-".\Objects\main.obj" 
+".\Objects\main.obj",
+".\Objects\gui.obj",
+".\Objects\u8x8_d_ssd1306_128x64_noname.obj",
+".\Objects\u8x8_setup.obj",
+".\Objects\u8g2_d_memory.obj",
+".\Objects\u8g2_font.obj" 
 TO ".\Objects\Project" 
 
 PRINT(".\Listings\Project.map") REMOVEUNUSED 

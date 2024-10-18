@@ -1,11 +1,11 @@
-C51 COMPILER V9.60.7.0   U8X8_BYTE                                                         10/16/2024 16:37:11 PAGE 1   
+C51 COMPILER V9.60.0.0   U8X8_BYTE                                                         10/18/2024 17:39:16 PAGE 1   
 
 
-C51 COMPILER V9.60.7.0, COMPILATION OF MODULE U8X8_BYTE
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE U8X8_BYTE
 OBJECT MODULE PLACED IN .\Objects\u8x8_byte.obj
-COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE ..\u8g2\u8x8_byte.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\Device\C
-                    -MS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\u8x8_byte.lst) TABS(2) OBJECT(.\
-                    -Objects\u8x8_byte.obj)
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE ..\u8g2\u8x8_byte.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\Devic
+                    -e\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\u8x8_byte.lst) TABS(2) OBJECT
+                    -(.\Objects\u8x8_byte.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   47   1      }
   48   1      
   49   1      uint8_t u8x8_byte_SendByte(u8x8_t *u8x8, uint8_t byte)
-C51 COMPILER V9.60.7.0   U8X8_BYTE                                                         10/16/2024 16:37:11 PAGE 2   
+C51 COMPILER V9.60.0.0   U8X8_BYTE                                                         10/18/2024 17:39:16 PAGE 2   
 
   50   1      {
   51   1        return u8x8_byte_SendBytes(u8x8, 1, &byte);
@@ -126,7 +126,7 @@ line level    source
  108          {
  109   1        uint8_t i, b;
  110   1        uint8_t *data;
-C51 COMPILER V9.60.7.0   U8X8_BYTE                                                         10/16/2024 16:37:11 PAGE 3   
+C51 COMPILER V9.60.0.0   U8X8_BYTE                                                         10/18/2024 17:39:16 PAGE 3   
 
  111   1        uint8_t takeover_edge = u8x8_GetSPIClockPhase(u8x8);
  112   1        uint8_t not_takeover_edge = 1 - takeover_edge;
@@ -190,7 +190,7 @@ line level    source
  168   1        uint8_t i, b;
  169   1        uint8_t *data;
  170   1       
-C51 COMPILER V9.60.7.0   U8X8_BYTE                                                         10/16/2024 16:37:11 PAGE 4   
+C51 COMPILER V9.60.0.0   U8X8_BYTE                                                         10/18/2024 17:39:16 PAGE 4   
 
  171   1        switch(msg)
  172   1        {
@@ -254,7 +254,7 @@ line level    source
  228   3        data++;
  229   3        arg_int--;
  230   3        for( i = U8X8_MSG_GPIO_D0; i <= U8X8_MSG_GPIO_D7; i++ )
-C51 COMPILER V9.60.7.0   U8X8_BYTE                                                         10/16/2024 16:37:11 PAGE 5   
+C51 COMPILER V9.60.0.0   U8X8_BYTE                                                         10/18/2024 17:39:16 PAGE 5   
 
  231   3        {
  232   4          u8x8_gpio_call(u8x8, i, b&1);
@@ -318,7 +318,7 @@ line level    source
  288   3        for( i = 0; i < 9; i++ )
  289   3        {
  290   4          if ( b & 256 )
-C51 COMPILER V9.60.7.0   U8X8_BYTE                                                         10/16/2024 16:37:11 PAGE 6   
+C51 COMPILER V9.60.0.0   U8X8_BYTE                                                         10/18/2024 17:39:16 PAGE 6   
 
  291   4            u8x8_gpio_SetSPIData(u8x8, 1);
  292   4          else
@@ -382,7 +382,7 @@ line level    source
  348   2          case U8X8_MSG_BYTE_SEND:
  349   2            data = (uint8_t *)arg_ptr;
  350   2            while( arg_int > 0 )
-C51 COMPILER V9.60.7.0   U8X8_BYTE                                                         10/16/2024 16:37:11 PAGE 7   
+C51 COMPILER V9.60.0.0   U8X8_BYTE                                                         10/18/2024 17:39:16 PAGE 7   
 
  351   2            {
  352   3        b = *data;
@@ -446,7 +446,7 @@ line level    source
  408   2            {
  409   3        b = *data;
  410   3        data++;
-C51 COMPILER V9.60.7.0   U8X8_BYTE                                                         10/16/2024 16:37:11 PAGE 8   
+C51 COMPILER V9.60.0.0   U8X8_BYTE                                                         10/18/2024 17:39:16 PAGE 8   
 
  411   3        arg_int--;
  412   3        for( i = U8X8_MSG_GPIO_D0; i <= U8X8_MSG_GPIO_D7; i++ )
@@ -510,7 +510,7 @@ line level    source
  469   1        u8x8_gpio_SetI2CClock(u8x8, 1);
  470   1        u8x8_gpio_SetI2CData(u8x8, 1);
  471   1        
-C51 COMPILER V9.60.7.0   U8X8_BYTE                                                         10/16/2024 16:37:11 PAGE 9   
+C51 COMPILER V9.60.0.0   U8X8_BYTE                                                         10/18/2024 17:39:16 PAGE 9   
 
  472   1        i2c_delay(u8x8);
  473   1      }
@@ -574,7 +574,7 @@ line level    source
  531   1        i2c_delay(u8x8);
  532   1        u8x8->i2c_started = 0;
  533   1      }
-C51 COMPILER V9.60.7.0   U8X8_BYTE                                                         10/16/2024 16:37:11 PAGE 10  
+C51 COMPILER V9.60.0.0   U8X8_BYTE                                                         10/18/2024 17:39:16 PAGE 10  
 
  534          
  535          static void i2c_write_bit(u8x8_t *u8x8, uint8_t val)
@@ -638,7 +638,7 @@ line level    source
  593   2            break;
  594   2            
  595   2          case U8X8_MSG_BYTE_INIT:
-C51 COMPILER V9.60.7.0   U8X8_BYTE                                                         10/16/2024 16:37:11 PAGE 11  
+C51 COMPILER V9.60.0.0   U8X8_BYTE                                                         10/18/2024 17:39:16 PAGE 11  
 
  596   2            i2c_init(u8x8);
  597   2            break;
@@ -702,7 +702,7 @@ line level    source
                     buf_idx = 0;
                     break;
                   case U8X8_MSG_BYTE_END_TRANSFER:
-C51 COMPILER V9.60.7.0   U8X8_BYTE                                                         10/16/2024 16:37:11 PAGE 12  
+C51 COMPILER V9.60.0.0   U8X8_BYTE                                                         10/18/2024 17:39:16 PAGE 12  
 
                     i2c_transfer(u8x8, u8x8_GetI2CAddress(u8x8), buf_idx, buffer);
                     break;

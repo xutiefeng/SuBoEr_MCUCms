@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   SPI                                                               10/17/2024 16:51:15 PAGE 1   
+C51 COMPILER V9.60.0.0   SPI                                                               10/18/2024 17:50:20 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE SPI
@@ -62,7 +62,7 @@ line level    source
   51          *****************************************************************************/
   52          
   53          /****************************************************************************/
-C51 COMPILER V9.60.0.0   SPI                                                               10/17/2024 16:51:15 PAGE 2   
+C51 COMPILER V9.60.0.0   SPI                                                               10/18/2024 17:50:20 PAGE 2   
 
   54          /*  Local function prototypes('static')
   55          *****************************************************************************/
@@ -126,7 +126,7 @@ line level    source
  113          void SPI_ConfigRunMode(uint8_t ClkPositive, uint8_t ClkPhash, uint8_t NSSMode)
  114          {
  115   1        uint8_t Temp=0;
-C51 COMPILER V9.60.0.0   SPI                                                               10/17/2024 16:51:15 PAGE 3   
+C51 COMPILER V9.60.0.0   SPI                                                               10/18/2024 17:50:20 PAGE 3   
 
  116   1        
  117   1        Temp = SPCR;
@@ -190,7 +190,7 @@ line level    source
  175          /*****************************************************************************
  176           ** \brief  SPI_GetTransferIntFlag
  177           **     获取传输完毕中断标志位
-C51 COMPILER V9.60.0.0   SPI                                                               10/17/2024 16:51:15 PAGE 4   
+C51 COMPILER V9.60.0.0   SPI                                                               10/18/2024 17:50:20 PAGE 4   
 
  178           ** \param [in] none
  179           ** \return  1:SPI传输完毕  0:SPI未传输完毕
@@ -254,7 +254,7 @@ line level    source
  237           **     关闭SPI中断
  238           ** \param [in] none
  239           ** \return  none
-C51 COMPILER V9.60.0.0   SPI                                                               10/17/2024 16:51:15 PAGE 5   
+C51 COMPILER V9.60.0.0   SPI                                                               10/18/2024 17:50:20 PAGE 5   
 
  240           ** \note  
  241          *****************************************************************************/

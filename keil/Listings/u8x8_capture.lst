@@ -1,11 +1,11 @@
-C51 COMPILER V9.60.7.0   U8X8_CAPTURE                                                      10/16/2024 16:37:11 PAGE 1   
+C51 COMPILER V9.60.0.0   U8X8_CAPTURE                                                      10/18/2024 17:39:18 PAGE 1   
 
 
-C51 COMPILER V9.60.7.0, COMPILATION OF MODULE U8X8_CAPTURE
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE U8X8_CAPTURE
 OBJECT MODULE PLACED IN .\Objects\u8x8_capture.obj
-COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE ..\u8g2\u8x8_capture.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\Devic
-                    -e\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\u8x8_capture.lst) TABS(2) OBJ
-                    -ECT(.\Objects\u8x8_capture.obj)
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE ..\u8g2\u8x8_capture.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\De
+                    -vice\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\u8x8_capture.lst) TABS(2) 
+                    -OBJECT(.\Objects\u8x8_capture.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   51   1        dest_ptr += (y/8)*tile_width*8;
   52   1        y &= 7;
   53   1        dest_ptr += x;
-C51 COMPILER V9.60.7.0   U8X8_CAPTURE                                                      10/16/2024 16:37:11 PAGE 2   
+C51 COMPILER V9.60.0.0   U8X8_CAPTURE                                                      10/18/2024 17:39:18 PAGE 2   
 
   54   1        if ( (*dest_ptr & (1<<y)) == 0 )
   55   1          return 0;
@@ -126,7 +126,7 @@ line level    source
  111          void u8x8_capture_write_xbm_pre(uint8_t tile_width, uint8_t tile_height, void (*out)(const char *s))
  112          {
  113   1        out("#define xbm_width ");
-C51 COMPILER V9.60.7.0   U8X8_CAPTURE                                                      10/16/2024 16:37:11 PAGE 3   
+C51 COMPILER V9.60.0.0   U8X8_CAPTURE                                                      10/18/2024 17:39:18 PAGE 3   
 
  114   1        out(u8x8_utoa((uint16_t)tile_width*8));
  115   1        out("\n");
@@ -190,7 +190,7 @@ line level    source
  171   2        }
  172   1        out("};\n");
  173   1        
-C51 COMPILER V9.60.7.0   U8X8_CAPTURE                                                      10/16/2024 16:37:11 PAGE 4   
+C51 COMPILER V9.60.0.0   U8X8_CAPTURE                                                      10/18/2024 17:39:18 PAGE 4   
 
  174   1      }
  175          
@@ -254,7 +254,7 @@ line level    source
                 return u8x8_capture.old_cb(u8x8, msg, arg_int, arg_ptr);
               }
               
-C51 COMPILER V9.60.7.0   U8X8_CAPTURE                                                      10/16/2024 16:37:11 PAGE 5   
+C51 COMPILER V9.60.0.0   U8X8_CAPTURE                                                      10/18/2024 17:39:18 PAGE 5   
 
               uint8_t u8x8_GetCaptureMemoryPixel(u8x8_t *u8x8, uint16_t x, uint16_t y)
               {

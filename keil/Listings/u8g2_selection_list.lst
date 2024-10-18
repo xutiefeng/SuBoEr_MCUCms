@@ -1,11 +1,11 @@
-C51 COMPILER V9.60.7.0   U8G2_SELECTION_LIST                                               10/16/2024 15:44:17 PAGE 1   
+C51 COMPILER V9.60.0.0   U8G2_SELECTION_LIST                                               10/18/2024 17:39:11 PAGE 1   
 
 
-C51 COMPILER V9.60.7.0, COMPILATION OF MODULE U8G2_SELECTION_LIST
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE U8G2_SELECTION_LIST
 OBJECT MODULE PLACED IN .\Objects\u8g2_selection_list.obj
-COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE ..\u8g2\u8g2_selection_list.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libar
-                    -y\Device\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\u8g2_selection_list.ls
-                    -t) TABS(2) OBJECT(.\Objects\u8g2_selection_list.obj)
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE ..\u8g2\u8g2_selection_list.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Li
+                    -bary\Device\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\u8g2_selection_list
+                    -.lst) TABS(2) OBJECT(.\Objects\u8g2_selection_list.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   51          */
   52          void u8g2_DrawUTF8Line(u8g2_t *u8g2, u8g2_uint_t x, u8g2_uint_t y, u8g2_uint_t w, const char *s, uint8_t b
              -order_size, uint8_t is_invert)
-C51 COMPILER V9.60.7.0   U8G2_SELECTION_LIST                                               10/16/2024 15:44:17 PAGE 2   
+C51 COMPILER V9.60.0.0   U8G2_SELECTION_LIST                                               10/18/2024 17:39:11 PAGE 2   
 
   53          {
   54   1        u8g2_uint_t d, str_width;
@@ -126,7 +126,7 @@ line level    source
  112   1        /* draw the text */
  113   1        u8g2_DrawUTF8(u8g2, x+d, y, s);
  114   1      
-C51 COMPILER V9.60.7.0   U8G2_SELECTION_LIST                                               10/16/2024 15:44:17 PAGE 3   
+C51 COMPILER V9.60.0.0   U8G2_SELECTION_LIST                                               10/18/2024 17:39:11 PAGE 3   
 
  115   1        /* revert draw color */
  116   1        u8g2_SetDrawColor(u8g2, 1);
@@ -190,7 +190,7 @@ line level    source
  171   1      
  172   1        /* get the line from the array */
  173   1        s = u8x8_GetStringLineStart(idx, s);
-C51 COMPILER V9.60.7.0   U8G2_SELECTION_LIST                                               10/16/2024 15:44:17 PAGE 4   
+C51 COMPILER V9.60.0.0   U8G2_SELECTION_LIST                                               10/18/2024 17:39:11 PAGE 4   
 
  174   1      
  175   1        /* draw the line */
@@ -254,7 +254,7 @@ line level    source
  231   1      
  232   1        u8sl.total = u8x8_GetStringLineCnt(sl);
  233   1        u8sl.first_pos = 0;
-C51 COMPILER V9.60.7.0   U8G2_SELECTION_LIST                                               10/16/2024 15:44:17 PAGE 5   
+C51 COMPILER V9.60.0.0   U8G2_SELECTION_LIST                                               10/18/2024 17:39:11 PAGE 5   
 
  234   1        u8sl.current_pos = start_pos;
  235   1      
@@ -310,7 +310,7 @@ line level    source
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    935    ----
+   CODE SIZE        =    956    ----
    CONSTANT SIZE    =      1    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----
@@ -318,7 +318,7 @@ MODULE INFORMATION:   STATIC OVERLAYABLE
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----    ----
    EDATA SIZE       =   ----    ----
-C51 COMPILER V9.60.7.0   U8G2_SELECTION_LIST                                               10/16/2024 15:44:17 PAGE 6   
+C51 COMPILER V9.60.0.0   U8G2_SELECTION_LIST                                               10/18/2024 17:39:11 PAGE 6   
 
    HDATA SIZE       =   ----    ----
    XDATA CONST SIZE =   ----    ----

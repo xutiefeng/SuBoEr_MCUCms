@@ -1,11 +1,11 @@
-C51 COMPILER V9.60.7.0   U8X8_8X8                                                          10/16/2024 15:44:18 PAGE 1   
+C51 COMPILER V9.60.0.0   U8X8_8X8                                                          10/18/2024 17:39:16 PAGE 1   
 
 
-C51 COMPILER V9.60.7.0, COMPILATION OF MODULE U8X8_8X8
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE U8X8_8X8
 OBJECT MODULE PLACED IN .\Objects\u8x8_8x8.obj
-COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE ..\u8g2\u8x8_8x8.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\Device\CM
-                    -S8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\u8x8_8x8.lst) TABS(2) OBJECT(.\Ob
-                    -jects\u8x8_8x8.obj)
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE ..\u8g2\u8x8_8x8.c OMF2 OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Libary\Device
+                    -\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\u8x8_8x8.lst) TABS(2) OBJECT(.
+                    -\Objects\u8x8_8x8.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   51          {
   52   1        u8x8->font = font_8x8;
   53   1      }
-C51 COMPILER V9.60.7.0   U8X8_8X8                                                          10/16/2024 15:44:18 PAGE 2   
+C51 COMPILER V9.60.0.0   U8X8_8X8                                                          10/18/2024 17:39:16 PAGE 2   
 
   54          
   55          /*
@@ -126,7 +126,7 @@ line level    source
  112   1        tv += y;
  113   1        tile = 0;
  114   1        do
-C51 COMPILER V9.60.7.0   U8X8_8X8                                                          10/16/2024 15:44:18 PAGE 3   
+C51 COMPILER V9.60.0.0   U8X8_8X8                                                          10/18/2024 17:39:16 PAGE 3   
 
  115   1        {
  116   2          xx = x;
@@ -190,7 +190,7 @@ line level    source
  174   2          *dest++ = *src++;
  175   2          i--;
  176   2        } while( i > 0 );
-C51 COMPILER V9.60.7.0   U8X8_8X8                                                          10/16/2024 15:44:18 PAGE 4   
+C51 COMPILER V9.60.0.0   U8X8_8X8                                                          10/18/2024 17:39:16 PAGE 4   
 
  177   1      }
  178          
@@ -254,7 +254,7 @@ line level    source
  236   1        uint8_t buf1[8];
  237   1        uint8_t buf2[8];
  238   1        u8x8_get_glyph_data(u8x8, encoding, buf, tile);
-C51 COMPILER V9.60.7.0   U8X8_8X8                                                          10/16/2024 15:44:18 PAGE 5   
+C51 COMPILER V9.60.0.0   U8X8_8X8                                                          10/18/2024 17:39:16 PAGE 5   
 
  239   1        for( i = 0; i < 8; i ++ )
  240   1        {
@@ -318,7 +318,7 @@ line level    source
  297          /*
  298            pass a byte from an utf8 encoded string to the utf8 decoder state machine
  299            returns 
-C51 COMPILER V9.60.7.0   U8X8_8X8                                                          10/16/2024 15:44:18 PAGE 6   
+C51 COMPILER V9.60.0.0   U8X8_8X8                                                          10/18/2024 17:39:16 PAGE 6   
 
  300              0x0fffe: no glyph, just continue
  301              0x0ffff: end of string
@@ -382,7 +382,7 @@ line level    source
  359          static uint8_t u8x8_draw_string(u8x8_t *u8x8, uint8_t x, uint8_t y, const char *s)
  360          {
  361   1        uint16_t e;
-C51 COMPILER V9.60.7.0   U8X8_8X8                                                          10/16/2024 15:44:18 PAGE 7   
+C51 COMPILER V9.60.0.0   U8X8_8X8                                                          10/18/2024 17:39:16 PAGE 7   
 
  362   1        uint8_t cnt = 0;
  363   1        uint8_t th = u8x8_pgm_read(u8x8->font+2);   /* new 2019 format */
@@ -446,7 +446,7 @@ line level    source
  421   1      }
  422          
  423          
-C51 COMPILER V9.60.7.0   U8X8_8X8                                                          10/16/2024 15:44:18 PAGE 8   
+C51 COMPILER V9.60.0.0   U8X8_8X8                                                          10/18/2024 17:39:16 PAGE 8   
 
  424          uint8_t u8x8_Draw2x2String(u8x8_t *u8x8, uint8_t x, uint8_t y, const char *s)
  425          {
@@ -510,7 +510,7 @@ line level    source
  483   2          e = u8x8_utf8_next(u8x8, *s);
  484   2          if ( e == 0x0ffff )
  485   2            break;
-C51 COMPILER V9.60.7.0   U8X8_8X8                                                          10/16/2024 15:44:18 PAGE 9   
+C51 COMPILER V9.60.0.0   U8X8_8X8                                                          10/18/2024 17:39:16 PAGE 9   
 
  486   2          s++;
  487   2          if ( e != 0x0fffe )
@@ -523,7 +523,7 @@ line level    source
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =   2203    ----
+   CODE SIZE        =   2280    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----

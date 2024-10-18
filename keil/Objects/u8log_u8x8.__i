@@ -1,0 +1,1 @@
+"..\u8g2\u8log_u8x8.c" OMF2 OPTIMIZE (8,SPEED) BROWSE INCDIR(..\Libary\Device\CMS8S6990\Include;..\Libary\StdDriver\inc;..\code;..\u8g2;..\GUI) DEBUG PRINT(.\Listings\u8log_u8x8.lst) TABS (2) OBJECT(.\Objects\u8log_u8x8.obj)

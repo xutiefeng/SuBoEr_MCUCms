@@ -155,7 +155,7 @@ static const u8x8_display_info_t u8x8_a2printer_384x240_display_info =
   /* data_setup_time_ns = */ 30,
   /* write_pulse_width_ns = */ 40,
   /* tile_width = */ 48,
-  /* tile_hight = */ 30,
+  /* tile_height = */ 30,
   /* default_x_offset = */ 0,
   /* flipmode_x_offset = */ 0,
   /* pixel_width = */ 384,
@@ -174,3 +174,9 @@ uint8_t u8x8_d_a2printer_384x240(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, voi
   }
   return 1;
 }
+
+
+
+  
+
+  

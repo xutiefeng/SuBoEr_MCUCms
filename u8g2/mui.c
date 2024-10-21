@@ -82,7 +82,7 @@
 
 //#include <stdio.h>
 //#define MUI_DEBUG(...) printf(__VA_ARGS__)
-
+#define MUI_DEBUG(...)
 
 uint8_t mui_get_fds_char(fds_t *s)
 {
@@ -128,10 +128,10 @@ static size_t mui_fds_get_cmd_size_without_text(fds_t *s)
 static size_t mui_fds_parse_text(mui_t *ui, fds_t *s)
 {
   uint8_t i = 0;
-	 uint8_t c;
-	 fds_t *t= s;;
   ui->delimiter = mui_get_fds_char(s);
-
+  uint8_t c;
+  fds_t *t = s;
+  
   //printf("mui_fds_parse_text del=%d\n", delimiter);
 #ifdef MUI_CHECK_EOFDS
   if ( ui->delimiter == 0 )
@@ -740,14 +740,14 @@ void mui_EnterForm(mui_t *ui, fds_t *fds, uint8_t initial_cursor_position)
   ui->current_form_fds = fds;
   
   /* inform all fields that we start a new form */
-//  MUI_DEBUG("mui_EnterForm: form_start, initial_cursor_position=%d\n", initial_cursor_position);
+  MUI_DEBUG("mui_EnterForm: form_start, initial_cursor_position=%d\n", initial_cursor_position);
   mui_loop_over_form(ui, mui_task_form_start);
   
   /* assign initional cursor focus */
-//  MUI_DEBUG("mui_EnterForm: find_first_cursor_uif\n");
+  MUI_DEBUG("mui_EnterForm: find_first_cursor_uif\n");
   mui_loop_over_form(ui, mui_task_find_first_cursor_uif);  
   ui->cursor_focus_fds = ui->target_fds;      // NULL is ok  
-//  MUI_DEBUG("mui_EnterForm: find_first_cursor_uif target_fds=%p\n", ui->target_fds);
+  MUI_DEBUG("mui_EnterForm: find_first_cursor_uif target_fds=%p\n", ui->target_fds);
   
   while( initial_cursor_position > 0 )
   {
@@ -774,7 +774,7 @@ void mui_LeaveForm(mui_t *ui)
   ui->cursor_focus_fds = NULL;
   
   /* inform all fields that we leave the form */
-//  MUI_DEBUG("mui_LeaveForm: form_end\n");
+  MUI_DEBUG("mui_LeaveForm: form_end\n");
   mui_loop_over_form(ui, mui_task_form_end);  
   ui->current_form_fds = NULL;
 }
@@ -818,7 +818,7 @@ void mui_RestoreForm(mui_t *ui)
 void mui_SaveCursorPosition(mui_t *ui, uint8_t cursor_position)
 {
   uint8_t form_id = mui_get_fds_char(ui->current_form_fds+1);
-//  MUI_DEBUG("mui_SaveCursorPosition form_id=%d cursor_position=%d\n", form_id, cursor_position);
+  MUI_DEBUG("mui_SaveCursorPosition form_id=%d cursor_position=%d\n", form_id, cursor_position);
   
   if ( form_id == ui->menu_form_id[0] )
     ui->menu_form_last_added = 0;
@@ -828,7 +828,7 @@ void mui_SaveCursorPosition(mui_t *ui, uint8_t cursor_position)
     ui->menu_form_last_added ^= 1;
   ui->menu_form_id[ui->menu_form_last_added] = form_id;
   ui->menu_form_cursor_focus_position[ui->menu_form_last_added] = cursor_position;
-//  MUI_DEBUG("mui_SaveCursorPosition ui->menu_form_last_added=%d \n", ui->menu_form_last_added);
+  MUI_DEBUG("mui_SaveCursorPosition ui->menu_form_last_added=%d \n", ui->menu_form_last_added);
 }
 
 /*
@@ -841,7 +841,7 @@ uint8_t mui_GotoFormAutoCursorPosition(mui_t *ui, uint8_t form_id)
     cursor_position = ui->menu_form_cursor_focus_position[0];
   if ( form_id == ui->menu_form_id[1] )
     cursor_position = ui->menu_form_cursor_focus_position[1];
-//  MUI_DEBUG("mui_GotoFormAutoCursorPosition form_id=%d cursor_position=%d\n", form_id, cursor_position);
+  MUI_DEBUG("mui_GotoFormAutoCursorPosition form_id=%d cursor_position=%d\n", form_id, cursor_position);
   return mui_GotoForm(ui, form_id, cursor_position);
 }
 
@@ -906,6 +906,10 @@ void mui_SendSelect(mui_t *ui)
 /*
   Same as mui_SendSelect(), but will try to find a field, which is marked as "execute on select" (MUIF_EXECUTE_ON_SELECT_BUTTON).
   If such a field exists, then this field is executed, otherwise the current field will receive the select message.
+
+  MUIF_EXECUTE_ON_SELECT_BUTTON is set by muif macro MUIF_EXECUTE_ON_SELECT_BUTTON
+  
+  used by MUIInputVersatileRotaryEncoder.ino example
 */
 void mui_SendSelectWithExecuteOnSelectFieldSearch(mui_t *ui)
 {

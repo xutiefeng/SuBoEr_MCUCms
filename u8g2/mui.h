@@ -35,7 +35,7 @@
   
   MUIF  (Monochrome User Interface Functions)
     n:  A number 0 to 9 without any quotes, e.g.: 5
-    id: Exactly two characters or numbers in doubl quotes, e.g. "G5".
+    id: Exactly two characters or numbers in double quotes, e.g. "G5".
     cb: A callback function with the following prototype: "uint8_t muif_cb(mui_t *ui, uint8_t msg)"
       There are MANY predefined callback functions, see separate list
     var: Address of a variable. 
@@ -75,7 +75,7 @@
 #define MUI_H
 
 #include <stddef.h>
-#include "cms8s6990.h"//#include <stdint.h>
+#include <stdint.h>
 #include <string.h>
 
 #if defined(__GNUC__) && defined(__AVR__)
@@ -138,23 +138,23 @@ extern "C" {
 typedef struct mui_struct mui_t;
 typedef const struct muif_struct muif_t;
 typedef uint8_t (*muif_cb)(mui_t *ui, uint8_t msg);
-//typedef const char fds_t MUI_PROGMEM;
+typedef const char fds_t MUI_PROGMEM;
 
 
 
-///*=== struct declarations === */
+/*=== struct declarations === */
 
-//struct muif_struct
-//{
-//  uint8_t id0;
-//  uint8_t id1;
-//  uint8_t cflags;             // config flags e.g. MUIF_CFLAG_IS_CURSOR_SELECTABLE, if so, then it will not receive any cursor/touch msgs
-//  uint8_t extra;
-//  void *data;                           // might be a pointer to a variable
-//  muif_cb cb;                        // callback
-//} MUI_PROGMEM;
+struct muif_struct
+{
+  uint8_t id0;
+  uint8_t id1;
+  uint8_t cflags;             // config flags e.g. MUIF_CFLAG_IS_CURSOR_SELECTABLE, if so, then it will not receive any cursor/touch msgs
+  uint8_t extra;
+  void *data;                           // might be a pointer to a variable
+  muif_cb cb;                        // callback
+} MUI_PROGMEM;
 
-/* assumes that pointers are 16 bit so encapusalte the wread i another ifdef __AVR__ */
+/* assumes that pointers are 16 bit so encapsulate the wread i another ifdef __AVR__ */
 #if defined(__GNUC__) && defined(__AVR__)
 #  define muif_get_id0(muif) mui_pgm_read(&((muif)->id0))
 #  define muif_get_id1(muif) mui_pgm_read(&((muif)->id1))
@@ -219,7 +219,9 @@ typedef uint8_t (*muif_cb)(mui_t *ui, uint8_t msg);
 
 
 /* must be smaller than or equal to 255 */
+#ifndef MUI_MAX_TEXT_LEN
 #define MUI_MAX_TEXT_LEN 41
+#endif
 
 #define MUI_MENU_CACHE_CNT 2
 

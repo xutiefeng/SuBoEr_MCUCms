@@ -85,6 +85,7 @@ void u8g2_SetupBuffer(u8g2_t *u8g2, uint8_t *buf, uint8_t tile_buf_height, u8g2_
   u8g2->font_decode.is_transparent = 0; /* issue 443 */
   u8g2->bitmap_transparency = 0;
   
+  u8g2->font_height_mode = 0; /* issue 2046 */
   u8g2->draw_color = 1;
   u8g2->is_auto_page_clear = 1;
   
@@ -462,3 +463,7 @@ void u8g2_Setup_null(u8g2_t *u8g2, const u8g2_cb_t *rotation, u8x8_msg_cb byte_c
   u8g2_SetupDisplay(u8g2, u8x8_d_null_cb, u8x8_cad_empty, byte_cb, gpio_and_delay_cb);
   u8g2_SetupBuffer(u8g2, buf, 1, u8g2_ll_hvline_vertical_top_lsb, rotation);
 }
+
+
+  
+  

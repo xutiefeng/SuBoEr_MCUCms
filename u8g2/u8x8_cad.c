@@ -2,7 +2,7 @@
   
   u8x8_cad.c
   
-  "command arg pData" interface to the graphics controller
+  "command arg p" interface to the graphics controller
 
   Universal 8bit Graphics Library (https://github.com/olikraus/u8g2/)
 
@@ -34,7 +34,7 @@
   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
 
 
-  The following sequence must be used for any pData, which is set to the display:
+  The following sequence must be used for any p, which is set to the display:
   
   
   uint8_t u8x8_cad_StartTransfer(u8x8_t *u8x8)
@@ -42,7 +42,7 @@
   any of the following calls
     uint8_t u8x8_cad_SendCmd(u8x8_t *u8x8, uint8_t cmd)
     uint8_t u8x8_cad_SendArg(u8x8_t *u8x8, uint8_t arg)
-    uint8_t u8x8_cad_SendData(u8x8_t *u8x8, uint8_t cnt, uint8_t *pData)
+    uint8_t u8x8_cad_SendData(u8x8_t *u8x8, uint8_t cnt, uint8_t *p)
   
   uint8_t u8x8_cad_EndTransfer(u8x8_t *u8x8)
 
@@ -105,9 +105,9 @@ uint8_t u8x8_cad_SendMultipleArg(u8x8_t *u8x8, uint8_t cnt, uint8_t arg)
   return 1;
 }
 
-uint8_t u8x8_cad_SendData(u8x8_t *u8x8, uint8_t cnt, uint8_t *pData)
+uint8_t u8x8_cad_SendData(u8x8_t *u8x8, uint8_t cnt, uint8_t *p)
 {
-  return u8x8->cad_cb(u8x8, U8X8_MSG_CAD_SEND_DATA, cnt, pData);
+  return u8x8->cad_cb(u8x8, U8X8_MSG_CAD_SEND_DATA, cnt, p);
 }
 
 uint8_t u8x8_cad_StartTransfer(u8x8_t *u8x8)
@@ -149,43 +149,43 @@ void u8x8_SendF(u8x8_t * u8x8, const char *fmt, ...)
 /*
   21 c		send command c
   22 a		send arg a
-  23 d		send pData d
+  23 d		send p d
   24			CS on
   25			CS off
   254 milli	delay by milliseconds
   255		end of sequence
 */
 
-void u8x8_cad_SendSequence(u8x8_t *u8x8, uint8_t const *pData)
+void u8x8_cad_SendSequence(u8x8_t *u8x8, uint8_t const *p)
 {
   uint8_t cmd;
   uint8_t v;
 
   for(;;)
   {
-    cmd = *pData;
-    pData++;
+    cmd = *p;
+    p++;
     switch( cmd )
     {
       case U8X8_MSG_CAD_SEND_CMD:
       case U8X8_MSG_CAD_SEND_ARG:
-	  v = *pData;
+	  v = *p;
 	  u8x8->cad_cb(u8x8, cmd, v, NULL);
-	  pData++;
+	  p++;
 	  break;
       case U8X8_MSG_CAD_SEND_DATA:
-	  v = *pData;
+	  v = *p;
 	  u8x8_cad_SendData(u8x8, 1, &v);
-	  pData++;
+	  p++;
 	  break;
       case U8X8_MSG_CAD_START_TRANSFER:
       case U8X8_MSG_CAD_END_TRANSFER:
 	  u8x8->cad_cb(u8x8, cmd, 0, NULL);
 	  break;
       case 0x0fe:
-	  v = *pData;
+	  v = *p;
 	  u8x8_gpio_Delay(u8x8, U8X8_MSG_DELAY_MILLI, v);	    
-	  pData++;
+	  p++;
 	  break;
       default:
 	return;
@@ -219,7 +219,7 @@ uint8_t u8x8_cad_empty(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr
 /*
   convert to bytes by using 
     dc = 1 for commands and args and
-    dc = 0 for pData
+    dc = 0 for p
 */
 uint8_t u8x8_cad_110(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
 {
@@ -251,11 +251,11 @@ uint8_t u8x8_cad_110(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
 /*
   convert to bytes by using 
     dc = 1 for commands and args and
-    dc = 0 for pData
+    dc = 0 for p
 */
 uint8_t u8x8_gu800_cad_110(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
 {
-  uint8_t *pData;
+  uint8_t *p;
   switch(msg)
   {
     case U8X8_MSG_CAD_SEND_CMD:
@@ -272,13 +272,13 @@ uint8_t u8x8_gu800_cad_110(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg
       break;
     case U8X8_MSG_CAD_SEND_DATA:
       u8x8_byte_SetDC(u8x8, 0);
-      pData = (uint8_t *)arg_ptr;
+      p = (uint8_t *)arg_ptr;
       while( arg_int > 0 )
       {
         u8x8_byte_StartTransfer(u8x8);
-        u8x8_byte_SendByte(u8x8, *pData);
+        u8x8_byte_SendByte(u8x8, *p);
         u8x8_byte_EndTransfer(u8x8);
-        pData++;
+        p++;
         arg_int--;
       }
       break;
@@ -297,7 +297,7 @@ uint8_t u8x8_gu800_cad_110(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg
 /*
   convert to bytes by using 
     dc = 1 for commands and args and
-    dc = 0 for pData
+    dc = 0 for p
     t6963
 */
 uint8_t u8x8_cad_100(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
@@ -330,7 +330,7 @@ uint8_t u8x8_cad_100(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
 /*
   convert to bytes by using 
     dc = 0 for commands and args and
-    dc = 1 for pData
+    dc = 1 for p
 */
 uint8_t u8x8_cad_001(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
 {
@@ -362,7 +362,7 @@ uint8_t u8x8_cad_001(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
 /*
   convert to bytes by using 
     dc = 0 for commands 
-    dc = 1 for args and pData
+    dc = 1 for args and p
 */
 uint8_t u8x8_cad_011(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
 {
@@ -395,7 +395,7 @@ uint8_t u8x8_cad_011(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
 /* u8x8_byte_SetDC is not used */
 uint8_t u8x8_cad_st7920_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
 {
-  uint8_t *pData;
+  uint8_t *p;
   uint8_t b;
   uint8_t i;
   static uint8_t buf[16];
@@ -423,7 +423,7 @@ uint8_t u8x8_cad_st7920_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *ar
 
       /* this loop should be optimized: multiple bytes should be sent */
       /* u8x8_byte_SendBytes(u8x8, arg_int, arg_ptr); */
-      pData = (uint8_t *)arg_ptr;
+      p = (uint8_t *)arg_ptr;
     
       /* the following loop increases speed by 20% */
       while( arg_int >= 8 )
@@ -432,7 +432,7 @@ uint8_t u8x8_cad_st7920_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *ar
 	ptr = buf;
 	do
 	{
-	  b = *pData++;
+	  b = *p++;
 	  *ptr++= b & 0x0f0;
 	  b <<= 4;
 	  *ptr++= b;
@@ -445,10 +445,10 @@ uint8_t u8x8_cad_st7920_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *ar
     
       while( arg_int > 0 )
       {
-	b = *pData;
+	b = *p;
 	u8x8_byte_SendByte(u8x8, b & 0x0f0);
 	u8x8_byte_SendByte(u8x8, b << 4);
-	pData++;
+	p++;
 	arg_int--;
       }
       u8x8_gpio_Delay(u8x8, U8X8_MSG_DELAY_NANO, 1);
@@ -468,7 +468,7 @@ uint8_t u8x8_cad_st7920_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *ar
 /* this procedure is also used by the ST7588 */
 /* u8x8_byte_SetDC is not used */
 /* U8X8_MSG_BYTE_START_TRANSFER starts i2c transfer, U8X8_MSG_BYTE_END_TRANSFER stops transfer */
-/* After transfer start, a full byte indicates command or pData mode */
+/* After transfer start, a full byte indicates command or p mode */
 
 static void u8x8_i2c_data_transfer(u8x8_t *u8x8, uint8_t arg_int, void *arg_ptr) U8X8_NOINLINE;
 static void u8x8_i2c_data_transfer(u8x8_t *u8x8, uint8_t arg_int, void *arg_ptr)
@@ -530,7 +530,7 @@ uint8_t u8x8_cad_ssd13xx_i2c(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *a
 }
 
 
-/* fast version with reduced pData start/stops, issue 735 */
+/* fast version with reduced p start/stops, issue 735 */
 uint8_t u8x8_cad_ssd13xx_fast_i2c(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr)
 {
   static uint8_t in_transfer = 0;
@@ -688,7 +688,7 @@ uint8_t u8x8_cad_ld7032_i2c(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *ar
 	p+=24;
 	u8x8_byte_EndTransfer(u8x8); 
 	u8x8_byte_StartTransfer(u8x8);
-	u8x8_byte_SendByte(u8x8, 0x08);	/* pData write for LD7032 */
+	u8x8_byte_SendByte(u8x8, 0x08);	/* p write for LD7032 */
       }
       u8x8->byte_cb(u8x8, U8X8_MSG_CAD_SEND_DATA, arg_int, p);
       break;
@@ -726,7 +726,7 @@ uint8_t u8x8_cad_uc16xx_i2c(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *ar
       {
 	if ( is_data != 0 )
 	{
-	  /* transfer mode is active, but pData transfer */
+	  /* transfer mode is active, but p transfer */
 	  u8x8_byte_EndTransfer(u8x8); 
 	  /* clear the lowest two bits of the adr */
 	  u8x8_SetI2CAddress( u8x8, u8x8_GetI2CAddress(u8x8)&0x0fc );
@@ -748,7 +748,7 @@ uint8_t u8x8_cad_uc16xx_i2c(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *ar
       {
 	if ( is_data == 0 )
 	{
-	  /* transfer mode is active, but pData transfer */
+	  /* transfer mode is active, but p transfer */
 	  u8x8_byte_EndTransfer(u8x8); 
 	  /* clear the lowest two bits of the adr */
 	  u8x8_SetI2CAddress( u8x8, (u8x8_GetI2CAddress(u8x8)&0x0fc)|2 );
@@ -783,7 +783,7 @@ uint8_t u8x8_cad_uc16xx_i2c(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *ar
       return u8x8->byte_cb(u8x8, msg, arg_int, arg_ptr);
     case U8X8_MSG_CAD_START_TRANSFER:
       in_transfer = 0;    
-      /* actual start is delayed, because we do not whether this is pData or cmd transfer */
+      /* actual start is delayed, because we do not whether this is p or cmd transfer */
       break;
     case U8X8_MSG_CAD_END_TRANSFER:
       if ( in_transfer != 0 )
@@ -811,7 +811,7 @@ uint8_t u8x8_cad_uc1638_i2c(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *ar
       {
 	if ( is_data != 0 )
 	{
-	  /* transfer mode is active, but pData transfer */
+	  /* transfer mode is active, but p transfer */
 	  u8x8_byte_EndTransfer(u8x8); 
 	  /* clear the lowest two bits of the adr */
 	  u8x8_SetI2CAddress( u8x8, u8x8_GetI2CAddress(u8x8)&0x0fc );
@@ -833,7 +833,7 @@ uint8_t u8x8_cad_uc1638_i2c(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *ar
       {
 	if ( is_data == 0 )
 	{
-	  /* transfer mode is active, but pData transfer */
+	  /* transfer mode is active, but p transfer */
 	  u8x8_byte_EndTransfer(u8x8); 
 	  /* clear the lowest two bits of the adr */
 	  u8x8_SetI2CAddress( u8x8, (u8x8_GetI2CAddress(u8x8)&0x0fc)|2 );
@@ -855,7 +855,7 @@ uint8_t u8x8_cad_uc1638_i2c(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *ar
       {
 	if ( is_data == 0 )
 	{
-	  /* transfer mode is active, but pData transfer */
+	  /* transfer mode is active, but p transfer */
 	  u8x8_byte_EndTransfer(u8x8); 
 	  /* clear the lowest two bits of the adr */
 	  u8x8_SetI2CAddress( u8x8, (u8x8_GetI2CAddress(u8x8)&0x0fc)|2 );
@@ -890,7 +890,7 @@ uint8_t u8x8_cad_uc1638_i2c(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *ar
       return u8x8->byte_cb(u8x8, msg, arg_int, arg_ptr);
     case U8X8_MSG_CAD_START_TRANSFER:
       in_transfer = 0;    
-      /* actual start is delayed, because we do not whether this is pData or cmd transfer */
+      /* actual start is delayed, because we do not whether this is p or cmd transfer */
       break;
     case U8X8_MSG_CAD_END_TRANSFER:
       if ( in_transfer != 0 )
